@@ -1,6 +1,6 @@
 module Wheels
   module Orm
-    module Adapters
+    module Repositories
       class Abstract
         
         module Types

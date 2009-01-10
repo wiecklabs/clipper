@@ -29,8 +29,8 @@ class MappingTest < Test::Unit::TestCase
       # isn't necessarily directly related to the type returned by a loaded object's
       # mapped accessor, this information is simply used to optimize how values are stored
       # and provide some flexibility in mapping them uniformally to objects.
-      people.field "age", Wheels::Orm::Adapters::Abstract::Types::Integer
-      people.field "marital_status", Wheels::Orm::Adapters::Abstract::Types::Integer
+      people.field "age", Wheels::Orm::Repositories::Abstract::Types::Integer
+      people.field "marital_status", Wheels::Orm::Repositories::Abstract::Types::Integer
       
       # Typically we would want our keys to appear first in our mappings, but we needed
       # to talk about fields first.
@@ -49,8 +49,8 @@ class MappingTest < Test::Unit::TestCase
       #   last_name = people.field("last_name", Wheels::Orm::Adapters::Abstract::Types::String)
       #   people.key(first_name, last_name)
       people.key(
-        people.field("first_name", Wheels::Orm::Adapters::Abstract::Types::String),
-        people.field("last_name", Wheels::Orm::Adapters::Abstract::Types::String)
+        people.field("first_name", Wheels::Orm::Repositories::Abstract::Types::String),
+        people.field("last_name", Wheels::Orm::Repositories::Abstract::Types::String)
       )
     end
   end
