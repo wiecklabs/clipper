@@ -6,12 +6,20 @@ module Wheels
         include Test::Unit::Assertions
         
         def initialize(name, type)
-          assert_kind_of(String, name, "Field#name must be a String")
-          assert(!Helpers::blank?(name), "Field#name must not be blank")
-          @name = name
+          begin
+            assert_kind_of(String, name, "Field#name must be a String")
+            assert(!name.blank?, "Field#name must not be blank")
+            @name = name
+          rescue Test::Unit::AssertionFailedError => e
+            raise ArgumentError.new(e.message)
+          end
           
-          assert_kind_of(Class, type, "Field#type must be a Class")
-          @type = type
+          begin
+            assert_descendant_of(Wheels::Orm::Type, type, "Field#type must be a Wheels::Orm::Type")
+            @type = type
+          rescue Test::Unit::AssertionFailedError => e
+            raise ArgumentError.new(e.message)
+          end
         end
         
         def name
@@ -20,6 +28,14 @@ module Wheels
         
         def type
           @type
+        end
+        
+        def eql?(other)
+          other.is_a?(Field) && type == other.type && name == other.name
+        end
+        
+        def hash
+          @hash ||= [name, type].hash
         end
       end
     end

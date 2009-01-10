@@ -9,11 +9,11 @@ module Wheels
         
         def initialize(name)
           assert_kind_of(String, name, "Mapping#name must be a String")
-          assert(!Helpers::blank?(name), "Mapping#name must not be blank")
+          assert(!name.blank?, "Mapping#name must not be blank")
           @name = name
           
-          @fields = []
-          @keys = []
+          @fields = Helpers::OrderedSet.new
+          @keys = Helpers::OrderedSet.new
         end
         
         # The name of this mapping. In database terms this would map to a
