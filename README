@@ -1,1 +1,21 @@
 Wheels O/RM
+
+
+TODO:
+
+* Schema Mappings
+* Repository Session helper method
+* Object Repository (database adapter)
+* Object Mappings
+* Load an object
+* Save an object
+* Repository::Types should load and store Orm::Types
+* Load a complex object that spans more than one table
+* Load an object that uses a Discriminator
+* Save a Collection
+* Load a Collection
+* Load a Collection with filters
+* Save an Association
+* Load an Association
+* Load an Association with filters
+* Load a Collection with complex filters
