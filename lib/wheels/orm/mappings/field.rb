@@ -8,7 +8,7 @@ module Wheels
         def initialize(name, type)
           begin
             assert_kind_of(String, name, "Field#name must be a String")
-            assert(!name.blank?, "Field#name must not be blank")
+            assert_not_blank(name, "Field#name must not be blank")
             @name = name
           rescue Test::Unit::AssertionFailedError => e
             raise ArgumentError.new(e.message)
