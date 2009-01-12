@@ -1,6 +1,6 @@
 require "helper"
 
-class MappingTest < Test::Unit::TestCase
+class SourceTest < Test::Unit::TestCase
   
   # This test describes the internal mappings use by the Wheels O/RM.
   # Some Adapters will retrive most of this mapping information from the database
@@ -13,13 +13,13 @@ class MappingTest < Test::Unit::TestCase
       # Let's assume we're mapping a database here for the sake of clarity and not a
       # mail server, web-service or other such storage provider.
       
-      # The "people" Mapping here would map to the "people" table in our database.
-      people = Wheels::Orm::Mappings::Mapping.new("people")
+      # The "people" Source here would map to the "people" table in our database.
+      people = Wheels::Orm::Mappings::Source.new("people")
       
       # The fields in our mappings are added to an ordered-set. This means their order
       # is deterministic, and should reflect the same order as the underlying schema
       # for best results.
-      # The Mapping#field method accepts two arguments and returns a Field object. The
+      # The Source#field method accepts two arguments and returns a Field object. The
       # first argument is the name of the field, in our case, a column name. The second
       # is the data-type of the field. This is not the type of the object accessor the
       # field is mapped to; it's the data-type of the column in the database.
@@ -29,8 +29,8 @@ class MappingTest < Test::Unit::TestCase
       # isn't necessarily directly related to the type returned by a loaded object's
       # mapped accessor, this information is simply used to optimize how values are stored
       # and provide some flexibility in mapping them uniformally to objects.
-      people.field "age", Wheels::Orm::Repositories::Abstract::Types::Integer
-      people.field "marital_status", Wheels::Orm::Repositories::Abstract::Types::Integer
+      age = people.field "age", Wheels::Orm::Repositories::Abstract::Types::Integer
+      marital_status = people.field "marital_status", Wheels::Orm::Repositories::Abstract::Types::Integer
       
       # Typically we would want our keys to appear first in our mappings, but we needed
       # to talk about fields first.
@@ -40,8 +40,8 @@ class MappingTest < Test::Unit::TestCase
       # same order ensures that if our table is generated from our mappings that we
       # get the expected result.
       #
-      # The Mapping#key method accepts a variable number of fields belonging to the
-      # mapping (to support composite keys). Since the Mapping#field method returns a
+      # The Source#key method accepts a variable number of fields belonging to the
+      # mapping (to support composite keys). Since the Source#field method returns a
       # Field object, we can define our mappings and set the keys in the same step as the
       # code below, or we could define them separately like so:
       #
@@ -52,6 +52,25 @@ class MappingTest < Test::Unit::TestCase
         people.field("first_name", Wheels::Orm::Repositories::Abstract::Types::String),
         people.field("last_name", Wheels::Orm::Repositories::Abstract::Types::String)
       )
+      
+      # You can retrieve fields with the Source#fields method. Any number of field names are
+      # passed in to look up, and an Array of the Fields is returned.
+      assert_equal(people.fields("age"), [ age ])
+      assert_equal(people.fields("age", "marital_status"), [ age, marital_status ])
+      
+      # Alternatively, if you want just one field, you can use the Source#[] method to
+      # fetch it.
+      assert_equal(people["age"], age)
+      
+      # Adding an already defined field will result in a DuplicateFieldError.
+      assert_raise(Wheels::Orm::Mappings::Source::DuplicateFieldError) do
+        people.field("age", Wheels::Orm::Repositories::Abstract::Types::Integer)
+      end
+      
+      # A Source should have one (and only one) key defined.
+      assert_raise(Wheels::Orm::Mappings::Source::MultipleKeyError) do
+        people.key(*people.fields("age"))
+      end
     end
   end
   

@@ -3,6 +3,8 @@ module Wheels
     module Repositories
       class Abstract
         
+        # Repository Types should handle coersion (in both directions) of values
+        # from repository storage to object storage.
         module Types
           
           class String < Type
