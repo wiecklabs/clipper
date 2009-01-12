@@ -3,9 +3,10 @@ Wheels O/RM
 
 TODO:
 
-* Schema Mappings
-* Repository Session helper method
 * Object Repository (database adapter)
+* Repository registration
+* Repository Session
+* Repository Session connection helper method
 * Object Mappings
 * Load an object
 * Save an object
@@ -19,3 +20,7 @@ TODO:
 * Load an Association
 * Load an Association with filters
 * Load a Collection with complex filters
+
+TODONE:
+
+* Schema Mappings: Field, Source and Relation mappings are all tested and in-place. Sam:2009-01-11
