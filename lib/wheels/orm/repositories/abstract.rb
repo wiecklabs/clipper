@@ -1,25 +1,36 @@
 module Wheels
   module Orm
     module Repositories
-      
-      # STUBBED OUT...
-      def register(uri)
-        uri = Wheels::Orm::Uri.new(uri)
-      end
-      
       class Abstract
         
-        # Repository Types should handle coersion (in both directions) of values
-        # from repository storage to object storage.
-        module Types
-          
-          class String < Type
+        include Test::Unit::Assertions
+        
+        def initialize(name, uri)          
+          begin
+            assert_kind_of(String, name, "Repository name must be a String")
+            assert_not_blank(name, "Repository name must not be blank")
+            @name = name
+          rescue Test::Unit::AssertionFailedError => e
+            raise ArgumentError.new(e.message)
           end
-          
-          class Integer < Type
+
+          begin
+            assert_kind_of(Wheels::Orm::Uri, uri, "Repository uri must be a Wheels::Orm::Uri")
+            @uri = uri
+          rescue Test::Unit::AssertionFailedError => e
+            raise ArgumentError.new(e.message)
           end
         end
-      end
-    end
-  end
-end
+        
+        def name
+          @name
+        end
+        
+        def uri
+          @uri
+        end
+        
+      end # class Abstract
+    end # module Repositories
+  end # module Orm
+end # Wheels

@@ -29,8 +29,8 @@ class SourceTest < Test::Unit::TestCase
       # isn't necessarily directly related to the type returned by a loaded object's
       # mapped accessor, this information is simply used to optimize how values are stored
       # and provide some flexibility in mapping them uniformally to objects.
-      age = people.field "age", Wheels::Orm::Repositories::Abstract::Types::Integer
-      marital_status = people.field "marital_status", Wheels::Orm::Repositories::Abstract::Types::Integer
+      age = people.field "age", Wheels::Orm::Repositories::Types::Integer
+      marital_status = people.field "marital_status", Wheels::Orm::Repositories::Types::Integer
       
       # Typically we would want our keys to appear first in our mappings, but we needed
       # to talk about fields first.
@@ -45,12 +45,12 @@ class SourceTest < Test::Unit::TestCase
       # Field object, we can define our mappings and set the keys in the same step as the
       # code below, or we could define them separately like so:
       #
-      #   first_name = people.field("first_name", Wheels::Orm::Adapters::Abstract::Types::String)
-      #   last_name = people.field("last_name", Wheels::Orm::Adapters::Abstract::Types::String)
+      #   first_name = people.field("first_name", Wheels::Orm::Repositories::Types::String)
+      #   last_name = people.field("last_name", Wheels::Orm::Repositories::Types::String)
       #   people.key(first_name, last_name)
       people.key(
-        people.field("first_name", Wheels::Orm::Repositories::Abstract::Types::String),
-        people.field("last_name", Wheels::Orm::Repositories::Abstract::Types::String)
+        people.field("first_name", Wheels::Orm::Repositories::Types::String),
+        people.field("last_name", Wheels::Orm::Repositories::Types::String)
       )
       
       # You can retrieve fields with the Source#fields method. Any number of field names are
@@ -64,7 +64,7 @@ class SourceTest < Test::Unit::TestCase
       
       # Adding an already defined field will result in a DuplicateFieldError.
       assert_raise(Wheels::Orm::Mappings::Source::DuplicateFieldError) do
-        people.field("age", Wheels::Orm::Repositories::Abstract::Types::Integer)
+        people.field("age", Wheels::Orm::Repositories::Types::Integer)
       end
       
       # A Source should have one (and only one) key defined.
