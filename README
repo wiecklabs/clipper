@@ -3,11 +3,11 @@ Wheels O/RM
 
 TODO:
 
-* Object Repository (database adapter)
-* Repository registration
+* IdentityMap
 * Repository Session
 * Repository Session connection helper method
 * Object Mappings
+* Repository interface
 * Load an object
 * Save an object
 * Repository::Types should load and store Orm::Types
@@ -25,3 +25,5 @@ TODONE:
 
 * Schema Mappings: Field, Source and Relation mappings are all tested and in-place. Sam:2009-01-11
 * Uri: Sam:2009-01-11
+* Repository (only class definition, no interface): Sam:2009-01-12
+* Repository registration: Sam:2009-01-12
