@@ -12,6 +12,7 @@ require Pathname(__FILE__).dirname + "orm" + "type"
 require Pathname(__FILE__).dirname + "orm" + "types"
 require Pathname(__FILE__).dirname + "orm" + "mappings" + "mapping"
 require Pathname(__FILE__).dirname + "orm" + "mappings" + "relation"
+require Pathname(__FILE__).dirname + "orm" + "mappings" + "composite_mapping"
 
 require Pathname(__FILE__).dirname + "orm" + "repositories"
 require Pathname(__FILE__).dirname + "orm" + "repositories" + "types"

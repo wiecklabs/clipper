@@ -62,11 +62,6 @@ class MappingTest < Test::Unit::TestCase
         people.field("last_name", Wheels::Orm::Types::String)
       )
 
-      # You can retrieve fields with the Mapping#fields method. Any number of field names are
-      # passed in to look up, and an Array of the Fields is returned.
-      assert_equal(people.fields("age"), [ age ])
-      assert_equal(people.fields("age", "marital_status"), [ age, marital_status ])
-
       # Alternatively, if you want just one field, you can use the Mapping#[] method to
       # fetch it.
       assert_equal(people["age"], age)
@@ -78,39 +73,48 @@ class MappingTest < Test::Unit::TestCase
 
       # A Mapping should have one (and only one) key defined.
       assert_raise(Wheels::Orm::Mappings::Mapping::MultipleKeyError) do
-        people.key(*people.fields("age"))
+        people.key(people["age"])
       end
     end
   end
 
+  def test_related_keys_are_already_defined_when_composing
+    person = Class.new
+    people = orm.map(person, "people") {}
+    assert_raise(ArgumentError) { people.compose("localities", "city", "state") }
+  end
+
   def test_describing_mapping_a_complete_class
-    assert_nothing_raised do
-      person = Class.new do
-        orm.map(self, "people") do |person|
-          person.key person.field("id", Integer)
-          person.field "name", String
-          person.field "organization_id", Integer
-          person.field "address_id", Integer
-
-          # Works like Hibernate's join
-          person.compose("addresses", "address_id") do |address|
-            address.key "id", Integer
-            address.field "city", String
-            address.field "state", String
-          end
-
-          person.proxy("organization") { |p| orm.get(Organization, p.organization_id) }
-          person.proxy("tasks") { |p| orm.all(Task, [:eql, "person_id", p.id]) }
-
-          person.proxy("projects") do |p|
-            task = orm.mappings[Task]
-            orm.all(Projects, [:and, [:eql, task["person_id"], p.id], [:eql, "id", task["project_id"]]])
-          end
-
-        end
-
-      end
+    person = Class.new
+    people = orm.map(person, "people") do |people|
+      people.key people.field("id", Integer)
+      people.field "name", String
+      people.field "organization_id", Integer
+      people.field "address_id", Integer
     end
+
+    # Works like Hibernate's join
+    addresses = people.compose("addresses", "address_id") do |address|
+      address.key address.field("id", Integer)
+      address.field "city", String
+      address.field "state", String
+    end
+
+    assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, addresses)
+
+    people.compose("localities", "city", "state") do |locality|
+      locality.key locality.field("city", String), locality.field("state", String)
+      locality.field "zip", String
+    end
+
+    people.proxy("organization") { |p| orm.get(Organization, p.organization_id) }
+    people.proxy("tasks") { |p| orm.all(Task, [:eql, "person_id", p.id]) }
+
+    people.proxy("projects") do |p|
+      task = orm.mappings[Task]
+      orm.all(Projects, [:and, [:eql, task["person_id"], p.id], [:eql, "id", task["project_id"]]])
+    end
+
   end
 
 end

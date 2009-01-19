@@ -35,10 +35,11 @@ module Wheels
         end
 
         def field(name, type)
-          if @fields.detect { |field| field.name == name }
+          field = Field.new(self, name, type)
+          if @fields.include?(field)
             raise DuplicateFieldError.new("Field #{name}:#{type} is already a member of Mapping #{name.inspect}")
           else
-            @fields << (field = Field.new(name, type))
+            @fields << field
             field
           end
         end
@@ -60,14 +61,32 @@ module Wheels
           @fields.detect { |field| field.name == name }
         end
 
-        def fields(*names)
-          @fields.select { |field| names.include?(field.name) }
-        end
+        def compose(mapped_name, *related_keys)
+          missing_keys = related_keys.reject { |related_key| self[related_key] }
+          raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.") unless missing_keys.empty?
 
-        def compose(mapped_name, related_key)
+          composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name)
+          yield composite_mapping
+          composite_mapping
         end
 
         def proxy(mapped_name)
+        end
+
+        def eql?(other)
+          other.is_a?(Mapping) && name == other.name
+        end
+        alias == eql?
+
+        def hash
+          @hash ||= name.hash
+        end
+
+        ##
+        # @api private
+        # 
+        def fields
+          @fields
         end
       end
     end
