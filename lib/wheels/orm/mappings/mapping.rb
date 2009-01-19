@@ -3,7 +3,7 @@ require Pathname(__FILE__).dirname + "field"
 module Wheels
   module Orm
     module Mappings
-      class Source
+      class Mapping
 
         class DuplicateFieldError < StandardError
         end
@@ -50,7 +50,7 @@ module Wheels
               @key << field
             end
           else
-            raise MultipleKeyError.new("The key for Source<#{name}> is already defined as #{@key.inspect}")
+            raise MultipleKeyError.new("The key for Mapping<#{name}> is already defined as #{@key.inspect}")
           end
           
           self

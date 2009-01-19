@@ -1,9 +1,9 @@
 module Wheels
   module Orm
     class Session
-      
+
       include Test::Unit::Assertions
-      
+
       def initialize(repository_name)
         begin
           assert_kind_of(String, repository_name, "Session repository_name must be a String")
@@ -13,10 +13,15 @@ module Wheels
         rescue Test::Unit::AssertionFailedError => e
           raise ArgumentError.new(e.message)
         end
-        
-        @identity_map = IdentityMap.new(@repository)
+
+        @identity_map = IdentityMap.new
       end
-      
+
+      def map(source, mapped_name)
+        mapping = Wheels::Orm::Mappings::Mapping.new(mapped_name)
+        @repository.mappings[source] = mapping
+      end
+
     end # class Session
   end # module Orm
 end # module Wheels

@@ -15,7 +15,7 @@ module Wheels
           end
 
           begin
-            assert_kind_of(Field, target, "Relation#reference must be a Wheels::Orm::Mappings::Field")
+            assert_kind_of(Field, reference, "Relation#reference must be a Wheels::Orm::Mappings::Field")
             @reference = reference
           rescue Test::Unit::AssertionFailedError => e
             raise ArgumentError.new(e.message)
