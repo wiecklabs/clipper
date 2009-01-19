@@ -33,8 +33,8 @@ class RepositoryTest < Test::Unit::TestCase
     person = Class.new do
       attr_accessor :name, :age
       orm("example").map(self, "people") do |people|
-        people.field :name, String
-        people.field :age, Integer
+        people.field "name", String
+        people.field "age", Integer
       end
     end
 

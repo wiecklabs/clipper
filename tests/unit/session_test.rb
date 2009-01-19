@@ -3,7 +3,11 @@ require "helper"
 class SessionTest < Test::Unit::TestCase
 
   def setup
-     Wheels::Orm::Repositories::register("default", "abstract://localhost/example")
+    Wheels::Orm::Repositories::register("default", "abstract://localhost/example")
+  end
+
+  def teardown
+    Wheels::Orm::Repositories::registrations.delete("default")
   end
 
   def test_can_initialize_a_session

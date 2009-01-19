@@ -4,11 +4,11 @@ class RelationTest < Test::Unit::TestCase
 
   def setup
     @authors = Wheels::Orm::Mappings::Mapping.new("authors")
-    @authors.key(@authors.field "id", Wheels::Orm::Repositories::Types::Integer)
+    @authors.key(@authors.field "id", Wheels::Orm::Types::Integer)
 
     @stories = Wheels::Orm::Mappings::Mapping.new("stories")
-    @stories.key(@stories.field "id", Wheels::Orm::Repositories::Types::Integer)
-    @stories.field "author_id", Wheels::Orm::Repositories::Types::Integer
+    @stories.key(@stories.field "id", Wheels::Orm::Types::Integer)
+    @stories.field "author_id", Wheels::Orm::Types::Integer
   end
 
   def test_requires_two_arguments

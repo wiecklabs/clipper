@@ -17,7 +17,7 @@ class FieldTest < Test::Unit::TestCase
       Wheels::Orm::Mappings::Field.new("name", Wheels::Orm::Types::String)
     end
     
-    assert_raise(ArgumentError) do
+    assert_nothing_raised do
       Wheels::Orm::Mappings::Field.new("name", String)
     end
     

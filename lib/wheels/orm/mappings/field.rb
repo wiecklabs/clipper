@@ -15,6 +15,7 @@ module Wheels
           end
           
           begin
+            type = Wheels::Orm::Types[type.to_s]
             assert_descendant_of(Wheels::Orm::Type, type, "Field#type must be a Wheels::Orm::Type")
             @type = type
           rescue Test::Unit::AssertionFailedError => e

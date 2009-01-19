@@ -3,6 +3,14 @@ require Pathname(__FILE__).dirname.parent + "helper"
 
 class MappingTest < Test::Unit::TestCase
 
+  def setup
+    Wheels::Orm::Repositories::register("default", "abstract://localhost/example")
+  end
+
+  def teardown
+    Wheels::Orm::Repositories::registrations.delete("default")
+  end
+
   # This test describes the internal mappings use by the Wheels O/RM.
   # Some Adapters will retrive most of this mapping information from the database
   # saving you the work of having to define it yourself. When that is not possible,
@@ -30,8 +38,8 @@ class MappingTest < Test::Unit::TestCase
       # isn't necessarily directly related to the type returned by a loaded object's
       # mapped accessor, this information is simply used to optimize how values are stored
       # and provide some flexibility in mapping them uniformally to objects.
-      age = people.field "age", Wheels::Orm::Repositories::Types::Integer
-      marital_status = people.field "marital_status", Wheels::Orm::Repositories::Types::Integer
+      age = people.field "age", Wheels::Orm::Types::Integer
+      marital_status = people.field "marital_status", Wheels::Orm::Types::Integer
 
       # Typically we would want our keys to appear first in our mappings, but we needed
       # to talk about fields first.
@@ -50,8 +58,8 @@ class MappingTest < Test::Unit::TestCase
       #   last_name = people.field("last_name", Wheels::Orm::Repositories::Types::String)
       #   people.key(first_name, last_name)
       people.key(
-        people.field("first_name", Wheels::Orm::Repositories::Types::String),
-        people.field("last_name", Wheels::Orm::Repositories::Types::String)
+        people.field("first_name", Wheels::Orm::Types::String),
+        people.field("last_name", Wheels::Orm::Types::String)
       )
 
       # You can retrieve fields with the Mapping#fields method. Any number of field names are
@@ -65,12 +73,42 @@ class MappingTest < Test::Unit::TestCase
 
       # Adding an already defined field will result in a DuplicateFieldError.
       assert_raise(Wheels::Orm::Mappings::Mapping::DuplicateFieldError) do
-        people.field("age", Wheels::Orm::Repositories::Types::Integer)
+        people.field("age", Wheels::Orm::Types::Integer)
       end
 
       # A Mapping should have one (and only one) key defined.
       assert_raise(Wheels::Orm::Mappings::Mapping::MultipleKeyError) do
         people.key(*people.fields("age"))
+      end
+    end
+  end
+
+  def test_describing_mapping_a_complete_class
+    assert_nothing_raised do
+      person = Class.new do
+        orm.map(self, "people") do |person|
+          person.key person.field("id", Integer)
+          person.field "name", String
+          person.field "organization_id", Integer
+          person.field "address_id", Integer
+
+          # Works like Hibernate's join
+          person.compose("addresses", "address_id") do |address|
+            address.key "id", Integer
+            address.field "city", String
+            address.field "state", String
+          end
+
+          person.proxy("organization") { |p| orm.get(Organization, p.organization_id) }
+          person.proxy("tasks") { |p| orm.all(Task, [:eql, "person_id", p.id]) }
+
+          person.proxy("projects") do |p|
+            task = orm.mappings[Task]
+            orm.all(Projects, [:and, [:eql, task["person_id"], p.id], [:eql, "id", task["project_id"]]])
+          end
+
+        end
+
       end
     end
   end
