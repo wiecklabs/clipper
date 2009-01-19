@@ -6,6 +6,10 @@ class RepositoryTest < Test::Unit::TestCase
     @uri = Wheels::Orm::Uri.new("abstract://localhost/example")
   end
   
+  def teardown
+    Wheels::Orm::Repositories::registrations.delete("example")
+  end
+  
   def test_requires_two_arguments
     assert_equal(2, Wheels::Orm::Repositories::Abstract.instance_method("initialize").arity)
   end
@@ -20,6 +24,17 @@ class RepositoryTest < Test::Unit::TestCase
     repository = Wheels::Orm::Repositories::register("example", @uri.to_s)
     assert_kind_of(Wheels::Orm::Repositories::Abstract, repository)
     assert_equal(1, Wheels::Orm::Repositories::registrations.size)
+  end
+  
+  def test_retrieving_a_mapping_for_an_instance
+    # pending
+    repository = Wheels::Orm::Repositories::register("example", @uri.to_s)
+    
+    person = Class.new do
+      attr_accessor :name, :age
+    end
+    
+    repository.source(person, nil)
   end
   
 end

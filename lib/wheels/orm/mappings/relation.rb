@@ -5,10 +5,11 @@ module Wheels
 
         include Test::Unit::Assertions
 
-        def initialize(target, reference)
+        def initialize(key, reference)
           begin
-            assert_kind_of(Field, target, "Relation#target must be a Wheels::Orm::Mappings::Field")
-            @target = target
+            # Breaks CPK...
+            assert_kind_of(Field, key, "Relation#key must be a Wheels::Orm::Mappings::Field")
+            @key = key
           rescue Test::Unit::AssertionFailedError => e
             raise ArgumentError.new(e.message)
           end
@@ -21,8 +22,8 @@ module Wheels
           end
         end
 
-        def target
-          @target
+        def key
+          @key
         end
 
         def reference
@@ -30,11 +31,11 @@ module Wheels
         end
 
         def eql?(other)
-          other.is_a?(Relation) && target == other.target && reference == other.reference
+          other.is_a?(Relation) && key == other.key && reference == other.reference
         end
 
         def hash
-          @hash ||= [target, reference].hash
+          @hash ||= [key, reference].hash
         end
       end
     end

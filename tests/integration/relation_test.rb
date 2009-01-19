@@ -17,7 +17,7 @@ class RelationTest < Test::Unit::TestCase
   
   def test_has_a_target_and_reference
     relation = Wheels::Orm::Mappings::Relation.new(@authors["id"], @stories["author_id"])
-    assert_equal(relation.target, @authors["id"])
+    assert_equal(relation.key, @authors["id"])
     assert_equal(relation.reference, @stories["author_id"])
   end
   

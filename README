@@ -8,6 +8,7 @@ TODO:
 * Repository Session connection helper method
 * Object Mappings
 * Repository interface
+* ObjectEnumerator
 * Load an object
 * Save an object
 * Repository::Types should load and store Orm::Types
