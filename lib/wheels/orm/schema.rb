@@ -14,6 +14,11 @@ module Wheels
         mapping = @repository.mappings[mapping_class]
         @repository.schema.exists?(mapping.name)
       end
+      
+      def destroy(mapping_class)
+        mapping = @repository.mappings[mapping_class]
+        @repository.schema.destroy(mapping)
+      end
     end
   end
 end

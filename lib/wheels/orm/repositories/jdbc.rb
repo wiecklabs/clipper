@@ -16,7 +16,21 @@ module Wheels
 
         def create_table(mapping)
           sql = <<-EOS.compress_lines
-          CREATE TABLE #{quote_identifier(mapping.name)} (id int, name varchar);
+          CREATE TABLE #{quote_identifier(mapping.name)} (#{mapping.fields.map { |field| self.class::Types[field].to_sql(self) }.join(", ") });
+          EOS
+
+          with_connection do |connection|
+            stmt = connection.prepareStatement(sql)
+            stmt.execute
+            stmt.close
+          end
+
+          nil
+        end
+
+        def drop_table(mapping)
+          sql = <<-EOS.compress_lines
+          DROP TABLE #{quote_identifier(mapping.name)};
           EOS
 
           with_connection do |connection|
@@ -40,6 +54,14 @@ module Wheels
           @schema ||= Wheels::Orm::Repositories::Schema.new(self)
         end
 
+        ##
+        # Quotes the table or column name according the connection's declared
+        # quote string.
+        # 
+        def quote_identifier(identifier)
+          identifier.gsub(/([^\.]+)/, "#{self.quote_string}\\1#{self.quote_string}")
+        end
+
         protected
 
         ##
@@ -51,14 +73,6 @@ module Wheels
           @quote_string ||= with_connection { |connection| connection.getMetaData.getIdentifierQuoteString }
           @quote_string = '"' if @quote_string == " "
           @quote_string
-        end
-
-        ##
-        # Quotes the table or column name according the connection's declared
-        # quote string.
-        # 
-        def quote_identifier(identifier)
-          identifier.gsub(/([^\.]+)/, "#{self.quote_string}\\1#{self.quote_string}")
         end
 
       end

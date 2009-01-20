@@ -19,6 +19,7 @@ class Integration::SqliteTest < Test::Unit::TestCase
     @city = Class.new do
       orm.map(self, "cities") do |cities|
         cities.key cities.field("name", String)
+        cities.field("state", String)
       end
     end
   end
@@ -50,6 +51,7 @@ class Integration::SqliteTest < Test::Unit::TestCase
       schema.create(@zoo)
     end
     assert(schema.exists?(@zoo))
+    schema.destroy(@zoo)
   end
 
   def test_schema_exists
@@ -57,4 +59,21 @@ class Integration::SqliteTest < Test::Unit::TestCase
     assert(!schema.exists?(@city))
   end
 
+  def test_field_exists
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@city)
+    orm.repository.with_connection do |connection|
+      columns = connection.getMetaData.getColumns("", "", "cities", "state")
+      assert(columns.next)
+    end
+    schema.destroy(@city)
+  end
+  
+  def test_schema_destroy
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@zoo)
+    assert_nothing_raised do
+      schema.destroy(@zoo)
+    end
+  end
 end

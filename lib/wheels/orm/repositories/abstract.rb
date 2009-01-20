@@ -1,3 +1,5 @@
+require Pathname(__FILE__).dirname + "type"
+
 module Wheels
   module Orm
     module Repositories

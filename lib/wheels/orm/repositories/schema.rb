@@ -13,6 +13,10 @@ module Wheels
         def create(mapping)
           @repository.create_table(mapping)
         end
+
+        def destroy(mapping)
+          @repository.drop_table(mapping)
+        end
       end
     end
   end
