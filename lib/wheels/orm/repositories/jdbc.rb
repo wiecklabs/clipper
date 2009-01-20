@@ -19,7 +19,7 @@ module Wheels
             mapping = mappings[object.class]
 
             attributes = []
-            mapping.fields.each { |field| value = object.send(field.name); attributes << [field, value] if value }
+            mapping.fields.each { |field| value = field.get(object); attributes << [field, value] if value }
 
             statement = "INSERT INTO #{quote_identifier(mapping.name)} ("
             statement << attributes.map { |field,| quote_identifier(field.name) } * ", "
@@ -50,7 +50,7 @@ module Wheels
                 result = generated_keys(connection)
               end
 
-              object.send(mapping.keys.first.name + "=", result)
+              mapping.keys.first.set(object, result)
 
               stmt.close
 

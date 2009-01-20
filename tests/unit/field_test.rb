@@ -65,4 +65,29 @@ class FieldTest < Test::Unit::TestCase
     assert_respond_to(zoo, :name=)
   end
 
+  def test_field_get_raises_on_different_type_object
+    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    name = zoos.field("name", String)
+
+    assert_raise(ArgumentError) { name.get(Class.new.new) }
+  end
+
+  def test_field_get_returns_instance_value
+    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    name = zoos.field("name", String)
+    zoo = zoos.target.new
+
+    zoo.name = "Dallas"
+    assert_equal("Dallas", name.get(zoo))
+  end
+
+  def test_field_set_sets_instance_value
+    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    name = zoos.field("name", String)
+    zoo = zoos.target.new
+
+    name.set(zoo, "Dallas")
+    assert_equal("Dallas", zoo.name)
+  end
+
 end

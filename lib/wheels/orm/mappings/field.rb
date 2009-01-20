@@ -37,6 +37,18 @@ module Wheels
           EOS
         end
 
+        def get(object)
+          raise ArgumentError.new("Field#get must receive an instance of its declared Mapping target") unless object.is_a?(@mapping.target)
+
+          object.send(self.name)
+        end
+
+        def set(object, value)
+          raise ArgumentError.new("Field#get must receive an instance of its declared Mapping target") unless object.is_a?(@mapping.target)
+
+          object.send(self.name + "=", value)
+        end
+
         def mapping
           @mapping
         end
