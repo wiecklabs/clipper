@@ -20,7 +20,8 @@ module Wheels
       def map(target, mapped_name)
         mapping = Wheels::Orm::Mappings::Mapping.new(target, mapped_name)
         yield mapping
-        @repository.mappings[target] = mapping
+        @repository.mappings << mapping
+        mapping
       end
 
       def save(collection)

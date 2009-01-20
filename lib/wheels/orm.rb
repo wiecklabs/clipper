@@ -1,6 +1,7 @@
 require "pathname"
 require "set"
 require "test/unit"
+require "rubygems"
 
 require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
 require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
@@ -17,11 +18,14 @@ require Pathname(__FILE__).dirname + "orm" + "mappings" + "composite_mapping"
 
 require Pathname(__FILE__).dirname + "orm" + "repositories"
 require Pathname(__FILE__).dirname + "orm" + "repositories" + "types"
+require Pathname(__FILE__).dirname + "orm" + "repositories" + "schema"
 require Pathname(__FILE__).dirname + "orm" + "repositories" + "abstract"
 
 require Pathname(__FILE__).dirname + "orm" + "session"
 require Pathname(__FILE__).dirname + "orm" + "collection"
 require Pathname(__FILE__).dirname + "orm" + "identity_map"
+require Pathname(__FILE__).dirname + "orm" + "mappings"
+require Pathname(__FILE__).dirname + "orm" + "schema"
 
 def orm(name = "default")
   session = Wheels::Orm::Session.new(name)

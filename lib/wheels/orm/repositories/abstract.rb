@@ -17,7 +17,7 @@ module Wheels
             raise ArgumentError.new(e.message)
           end
 
-          @mappings = {}
+          @mappings = Wheels::Orm::Mappings.new
         end
 
         def name

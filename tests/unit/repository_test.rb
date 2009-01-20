@@ -6,4 +6,5 @@ class RepositoryTest < Test::Unit::TestCase
     @uri = Wheels::Orm::Uri.new("abstract://localhost/example")
   end
 
+
 end

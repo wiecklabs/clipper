@@ -41,4 +41,10 @@ class RepositoryTest < Test::Unit::TestCase
     assert_kind_of(Wheels::Orm::Mappings::Mapping, repository.mappings[person])
   end
 
+  def test_mappings_is_a_mappings_collection
+    repository = Wheels::Orm::Repositories::register("example", @uri.to_s)
+
+    assert_kind_of(Wheels::Orm::Mappings, repository.mappings)
+  end
+
 end

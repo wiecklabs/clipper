@@ -1,3 +1,6 @@
+require "jdbc/sqlite3"
+import "org.sqlite.JDBC"
+
 module Wheels
   module Orm
     module Repositories
