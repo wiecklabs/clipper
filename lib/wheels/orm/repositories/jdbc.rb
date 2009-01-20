@@ -37,8 +37,7 @@ module Wheels
               end
 
               attributes.each_with_index do |attribute, index|
-                field, value = attribute
-                bind_value_to_statement(stmt, index + 1, field, value)
+                bind_value_to_statement(stmt, index + 1, *attribute)
               end
 
               stmt.execute
