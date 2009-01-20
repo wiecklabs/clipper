@@ -49,7 +49,7 @@ module Wheels
                 result = generated_keys(connection)
               end
 
-              mapping.keys.first.set(object, result)
+              mapping.keys.first.set(object, result) if result
 
               stmt.close
 
