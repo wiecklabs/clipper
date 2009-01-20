@@ -1,6 +1,6 @@
 module Wheels
   module Orm
-    module Mappings
+    class Mappings
       class Field
 
         include Test::Unit::Assertions

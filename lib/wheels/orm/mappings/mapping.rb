@@ -2,7 +2,8 @@ require Pathname(__FILE__).dirname + "field"
 
 module Wheels
   module Orm
-    module Mappings
+    class Mappings
+
       class Mapping
 
         class DuplicateFieldError < StandardError

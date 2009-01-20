@@ -1,6 +1,6 @@
 module Wheels
   module Orm
-    module Mappings
+    class Mappings
       class Relation
 
         include Test::Unit::Assertions

@@ -1,6 +1,6 @@
 module Wheels
   module Orm
-    module Mappings
+    class Mappings
       class CompositeMapping < Mapping
 
         def initialize(source_mapping, name)
