@@ -19,6 +19,7 @@ require Pathname(__FILE__).dirname + "orm" + "repositories" + "types"
 require Pathname(__FILE__).dirname + "orm" + "repositories" + "abstract"
 
 require Pathname(__FILE__).dirname + "orm" + "session"
+require Pathname(__FILE__).dirname + "orm" + "collection"
 require Pathname(__FILE__).dirname + "orm" + "identity_map"
 
 def orm(name = "default")

@@ -23,6 +23,10 @@ module Wheels
         @repository.mappings[source] = mapping
       end
 
+      def save(collection)
+        collection = Collection.new([collection]) unless collection.is_a?(Collection)
+      end
+
     end # class Session
   end # module Orm
 end # module Wheels
