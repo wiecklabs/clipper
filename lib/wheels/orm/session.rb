@@ -20,7 +20,7 @@ module Wheels
       def repository
         @repository
       end
-      
+
       def map(target, mapped_name)
         mapping = Wheels::Orm::Mappings::Mapping.new(target, mapped_name)
         yield mapping

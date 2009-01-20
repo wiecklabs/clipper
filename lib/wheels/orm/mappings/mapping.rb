@@ -97,7 +97,7 @@ module Wheels
 
         ##
         # @api private
-        # 
+        #
         def fields
           @fields
         end

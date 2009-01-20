@@ -18,7 +18,7 @@ class SessionTest < Test::Unit::TestCase
       session = orm("default")
     end
   end
-  
+
   def test_has_a_repository
     session = Wheels::Orm::Session.new("default")
     assert_respond_to(session, :repository)

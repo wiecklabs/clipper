@@ -68,7 +68,7 @@ class Integration::SqliteTest < Test::Unit::TestCase
     end
     schema.destroy(@city)
   end
-  
+
   def test_schema_destroy
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@zoo)

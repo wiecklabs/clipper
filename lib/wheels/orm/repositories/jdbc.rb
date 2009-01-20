@@ -57,7 +57,7 @@ module Wheels
         ##
         # Quotes the table or column name according the connection's declared
         # quote string.
-        # 
+        #
         def quote_identifier(identifier)
           identifier.gsub(/([^\.]+)/, "#{self.quote_string}\\1#{self.quote_string}")
         end
@@ -68,7 +68,7 @@ module Wheels
         # Retrieve the string user for quoting table and column names for this
         # connection. Default to '"' if the string returned by the connection
         # does not specify a character.
-        # 
+        #
         def quote_string
           @quote_string ||= with_connection { |connection| connection.getMetaData.getIdentifierQuoteString }
           @quote_string = '"' if @quote_string == " "
