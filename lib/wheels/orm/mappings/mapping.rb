@@ -101,6 +101,10 @@ module Wheels
         def fields
           @fields
         end
+
+        def keys
+          @key
+        end
       end
     end
   end

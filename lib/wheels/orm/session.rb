@@ -37,6 +37,9 @@ module Wheels
         @repository.create(collection)
       end
 
+      def load(object, field)
+      end
+
     end # class Session
   end # module Orm
 end # module Wheels

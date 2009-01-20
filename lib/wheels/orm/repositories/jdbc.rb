@@ -14,6 +14,51 @@ module Wheels
           end
         end
 
+        def create(collection)
+          collection.each do |object|
+            mapping = mappings[object.class]
+
+            attributes = []
+            mapping.fields.each { |field| value = object.send(field.name); attributes << [field, value] if value }
+
+            statement = "INSERT INTO #{quote_identifier(mapping.name)} ("
+            statement << attributes.map { |field,| quote_identifier(field.name) } * ", "
+            statement << ") VALUES ("
+            statement << (['?'] * attributes.size) * ", "
+            statement << ")"
+
+            result = nil
+            with_connection do |connection|
+              metadata = connection.getMetaData
+
+              if metadata.supportsGetGeneratedKeys
+                stmt = connection.prepareStatement(statement, 1)
+              else
+                stmt = connection.prepareStatement(statement)
+              end
+
+              attributes.each_with_index do |attribute, index|
+                field, value = attribute
+                bind_value_to_statement(stmt, index + 1, field, value)
+              end
+
+              stmt.execute
+
+              if metadata.supportsGetGeneratedKeys
+                result = generated_keys(connection, stmt)
+              else
+                result = generated_keys(connection)
+              end
+
+              object.send(mapping.keys.first.name + "=", result)
+
+              stmt.close
+
+            end
+
+          end
+        end
+
         def create_table(mapping)
           sql = <<-EOS.compress_lines
           CREATE TABLE #{quote_identifier(mapping.name)} (#{mapping.fields.map { |field| column_definition(field) }.join(", ") });
@@ -87,6 +132,43 @@ module Wheels
           else
             raise Wheels::Orm::UnsupportedTypeError.new(field.type)
           end
+        end
+
+        def bind_value_to_statement(statement, index, field, value)
+          case field.type
+          when Wheels::Orm::Types::Integer
+            statement.setInt(index, value)
+          when Wheels::Orm::Types::String
+            statement.setString(index, value)
+          when Wheels::Orm::Types::Serial
+            statement.setInt(index, value)
+          else
+            raise Wheels::Orm::UnsupportedTypeError.new(field.type)
+          end
+        end
+
+        ##
+        # Returns the generated keys for database drivers which support returning
+        # the keys through the JDBC (DatabaseMetaData.supportsGetGeneratedKeys).
+        # 
+        # Drivers which do not support this (like Sqlite) overwrite this function
+        # to run a query to retrieve the key.
+        # 
+        def generated_keys(connection, statement = nil)
+
+          return nil unless statement
+
+          result_set = statement.getGeneratedKeys
+          metadata = result_set.getMetaData
+          key = nil
+
+          if result_set.next
+            key = result_set.getObject(1)
+          end
+
+          result_set.close
+
+          key == 0 ? nil : key
         end
 
       end

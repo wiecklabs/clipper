@@ -76,4 +76,16 @@ class Integration::SqliteTest < Test::Unit::TestCase
       schema.destroy(@zoo)
     end
   end
+
+  def test_save_object
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@zoo)
+    zoo = @zoo.new
+    zoo.name = "Dallas"
+
+    assert(orm.save(zoo))
+    assert_equal(1, zoo.id)
+
+    schema.destroy(@zoo)
+  end
 end

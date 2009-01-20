@@ -31,5 +31,9 @@ module Wieck
       @values.empty?
     end
 
+    def size
+      @values.size
+    end
+
   end
 end
