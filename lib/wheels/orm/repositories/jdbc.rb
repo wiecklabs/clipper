@@ -18,8 +18,7 @@ module Wheels
           collection.each do |object|
             mapping = mappings[object.class]
 
-            attributes = []
-            mapping.fields.each { |field| value = field.get(object); attributes << [field, value] if value }
+            attributes = mapping.fields.map { |field| [field, field.get(object)] }
 
             statement = "INSERT INTO #{quote_identifier(mapping.name)} ("
             statement << attributes.map { |field,| quote_identifier(field.name) } * ", "
@@ -135,15 +134,24 @@ module Wheels
         end
 
         def bind_value_to_statement(statement, index, field, value)
-          case field.type
-          when Wheels::Orm::Types::Integer
-            statement.setInt(index, value)
-          when Wheels::Orm::Types::String
-            statement.setString(index, value)
-          when Wheels::Orm::Types::Serial
-            statement.setInt(index, value)
+          if value.nil?
+            column = statement.getConnection.getMetaData.getColumns("", "", field.mapping.name, field.name)
+            column.next
+            type = column.getInt("DATA_TYPE")
+            column.close
+
+            statement.setNull(index, type)
           else
-            raise Wheels::Orm::UnsupportedTypeError.new(field.type)
+            case field.type
+            when Wheels::Orm::Types::Integer
+              statement.setInt(index, value)
+            when Wheels::Orm::Types::String
+              statement.setString(index, value)
+            when Wheels::Orm::Types::Serial
+              statement.setInt(index, value)
+            else
+              raise Wheels::Orm::UnsupportedTypeError.new(field.type)
+            end
           end
         end
 
