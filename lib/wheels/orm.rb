@@ -5,6 +5,7 @@ require "test/unit"
 require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
 require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
 require Pathname(__FILE__).dirname.parent + "wieck" + "ordered_set"
+require Pathname(__FILE__).dirname.parent + "wieck" + "string"
 
 require Pathname(__FILE__).dirname + "orm" + "uri"
 
