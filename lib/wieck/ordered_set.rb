@@ -35,5 +35,9 @@ module Wieck
       @values.size
     end
 
+    def first
+      @values.first
+    end
+
   end
 end
