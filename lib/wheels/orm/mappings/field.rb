@@ -22,6 +22,18 @@ module Wheels
           end
         end
 
+        def self.bind!(field, target)
+          target.class_eval <<-EOS
+            def #{field.name}
+              @#{field.name} ||= orm.load(self, #{field.name.inspect})
+            end
+
+            def #{field.name}=(value)
+              @#{field.name} = value
+            end
+          EOS
+        end
+
         def mapping
           @mapping
         end

@@ -1,10 +1,11 @@
-require "helper"
+require "pathname"
+require Pathname(__FILE__).dirname.parent + "helper"
 
 class FieldTest < Test::Unit::TestCase
 
   def setup
-    @people = Wheels::Orm::Mappings::Mapping.new("people")
-    @addresses = Wheels::Orm::Mappings::Mapping.new("addresses")
+    @people = Wheels::Orm::Mappings::Mapping.new(Class.new, "people")
+    @addresses = Wheels::Orm::Mappings::Mapping.new(Class.new, "addresses")
   end
 
   def test_has_a_name_and_type
@@ -54,6 +55,14 @@ class FieldTest < Test::Unit::TestCase
     addresses_id = @addresses.field("id", Integer)
 
     assert_not_equal(people_id, addresses_id)
+  end
+
+  def test_field_generates_an_accessor_on_target
+    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    zoos.field("name", String)
+    zoo = zoos.target.new
+    assert_respond_to(zoo, :name)
+    assert_respond_to(zoo, :name=)
   end
 
 end

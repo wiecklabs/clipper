@@ -1,7 +1,7 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent + "helper"
 
-class MappingTest < Test::Unit::TestCase
+class Integration::MappingTest < Test::Unit::TestCase
 
   def setup
     Wheels::Orm::Repositories::register("default", "abstract://localhost/example")
@@ -23,7 +23,7 @@ class MappingTest < Test::Unit::TestCase
       # mail server, web-service or other such storage provider.
 
       # The "people" Mapping here would map to the "people" table in our database.
-      people = Wheels::Orm::Mappings::Mapping.new("people")
+      people = Wheels::Orm::Mappings::Mapping.new(Class.new, "people")
 
       # The fields in our mappings are added to an ordered-set. This means their order
       # is deterministic, and should reflect the same order as the underlying schema

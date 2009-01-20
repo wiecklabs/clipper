@@ -13,10 +13,17 @@ module Wheels
 
         include Test::Unit::Assertions
 
-        def initialize(name)
-          assert_kind_of(String, name, "Mapping#name must be a String")
-          assert(!name.blank?, "Mapping#name must not be blank")
-          @name = name
+        def initialize(target, name)
+          begin
+            assert_kind_of(Class, target, "Mapping#target must be a Class")
+            @target = target
+
+            assert_kind_of(String, name, "Mapping#name must be a String")
+            assert_not_blank(name, "Mapping#name must not be blank")
+            @name = name
+          rescue Test::Unit::AssertionFailedError => e
+            raise ArgumentError.new(e.message)
+          end
 
           # We need an Set that preserves insertion order here.
           # The Wieck::OrderedSet is a temporary hack, not intended to be a
@@ -34,12 +41,17 @@ module Wheels
           @name
         end
 
+        def target
+          @target
+        end
+
         def field(name, type)
           field = Field.new(self, name, type)
           if @fields.include?(field)
             raise DuplicateFieldError.new("Field #{name}:#{type} is already a member of Mapping #{name.inspect}")
           else
             @fields << field
+            Field.bind!(field, target)
             field
           end
         end

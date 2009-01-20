@@ -17,14 +17,19 @@ module Wheels
         @identity_map = IdentityMap.new
       end
 
-      def map(source, mapped_name)
-        mapping = Wheels::Orm::Mappings::Mapping.new(mapped_name)
+      def map(target, mapped_name)
+        mapping = Wheels::Orm::Mappings::Mapping.new(target, mapped_name)
         yield mapping
-        @repository.mappings[source] = mapping
+        @repository.mappings[target] = mapping
       end
 
       def save(collection)
         collection = Collection.new([collection]) unless collection.is_a?(Collection)
+        create(collection)
+      end
+
+      def create(collection)
+        @repository.create(collection)
       end
 
     end # class Session
