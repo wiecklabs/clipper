@@ -93,7 +93,6 @@ class MappingTest < Test::Unit::TestCase
       people.field "address_id", Integer
     end
 
-    # Works like Hibernate's join
     addresses = people.compose("addresses", "address_id") do |address|
       address.key address.field("id", Integer)
       address.field "city", String
@@ -102,10 +101,12 @@ class MappingTest < Test::Unit::TestCase
 
     assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, addresses)
 
-    people.compose("localities", "city", "state") do |locality|
+    localities = people.compose("localities", "city", "state") do |locality|
       locality.key locality.field("city", String), locality.field("state", String)
       locality.field "zip", String
     end
+
+    assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, localities)
 
     people.proxy("organization") { |p| orm.get(Organization, p.organization_id) }
     people.proxy("tasks") { |p| orm.all(Task, [:eql, "person_id", p.id]) }
