@@ -2,6 +2,8 @@ module Wheels
   module Orm
     module Repositories
 
+      autoload :Jdbc, (Pathname(__FILE__).dirname + "repositories" + "jdbc.rb").to_s
+
       # STUBBED OUT...
       def self.register(name, uri)
         uri = Wheels::Orm::Uri.new(uri)
