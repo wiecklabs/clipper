@@ -18,6 +18,9 @@ module Wheels
       class Integer < Type
       end
 
+      class Serial < Type
+      end
+
     end
   end
 end

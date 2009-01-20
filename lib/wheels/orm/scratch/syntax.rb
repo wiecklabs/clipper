@@ -1,6 +1,6 @@
 module Datos
   module Syntax
-    
+
     def self.serialize(sexp)
       send(*sexp)
     end
@@ -25,7 +25,7 @@ module Datos
     def self.lt(field, value)
       "#{field} < #{value}"
     end
-    
+
     def self.eq(field, value)
       "#{field} = #{value}"
     end

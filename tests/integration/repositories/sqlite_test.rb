@@ -11,7 +11,7 @@ class Integration::SqliteTest < Test::Unit::TestCase
 
     @zoo = Class.new do
       orm.map(self, "zoos") do |zoos|
-        zoos.key zoos.field("id", Integer)
+        zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
         zoos.field "name", String
       end
     end

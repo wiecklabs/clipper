@@ -11,7 +11,7 @@ class FieldTest < Test::Unit::TestCase
   def test_has_a_name_and_type
     field = Wheels::Orm::Mappings::Field.new(@people, "name", String)
     assert_equal("name", field.name)
-    assert_equal(Wheels::Orm::Types::String, field.type)
+    assert_kind_of(Wheels::Orm::Types::String, field.type)
   end
 
   def test_only_accepts_defined_types

@@ -16,7 +16,7 @@ module Wheels
 
         def create_table(mapping)
           sql = <<-EOS.compress_lines
-          CREATE TABLE #{quote_identifier(mapping.name)} (#{mapping.fields.map { |field| self.class::Types[field].to_sql(self) }.join(", ") });
+          CREATE TABLE #{quote_identifier(mapping.name)} (#{mapping.fields.map { |field| column_definition(field) }.join(", ") });
           EOS
 
           with_connection do |connection|
@@ -73,6 +73,20 @@ module Wheels
           @quote_string ||= with_connection { |connection| connection.getMetaData.getIdentifierQuoteString }
           @quote_string = '"' if @quote_string == " "
           @quote_string
+        end
+
+        def column_definition(field)
+          column_name = quote_identifier(field.name)
+          case field.type
+          when Wheels::Orm::Types::Integer
+            "#{column_name} INTEGER"
+          when Wheels::Orm::Types::String
+            "#{column_name} VARCHAR"
+          when Wheels::Orm::Types::Serial
+            "#{column_name} INTEGER PRIMARY KEY AUTOINCREMENT"
+          else
+            raise Wheels::Orm::UnsupportedTypeError.new(field.type)
+          end
         end
 
       end
