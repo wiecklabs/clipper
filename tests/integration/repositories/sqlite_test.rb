@@ -22,6 +22,14 @@ class Integration::SqliteTest < Test::Unit::TestCase
         cities.field("state", String)
       end
     end
+
+    @person = Class.new do
+      orm.map(self, "people") do |people|
+        people.key people.field("id", Wheels::Orm::Types::Serial)
+        people.field "name", String
+        people.field "gpa", Float
+      end
+    end
   end
 
   def teardown
@@ -87,5 +95,30 @@ class Integration::SqliteTest < Test::Unit::TestCase
     assert_equal(1, zoo.id)
 
     schema.destroy(@zoo)
+  end
+
+  def test_support_for_floats
+    schema = Wheels::Orm::Schema.new("default")
+    assert_nothing_raised { schema.create(@person) }
+    assert_nothing_raised do
+      person = @person.new
+      person.gpa = 3.5
+      orm.save(person)
+    end
+
+    schema.destroy(@person)
+  end
+
+  def test_get_object
+    flunk "orm.get is not implemented yet"
+
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@person)
+
+    person = orm.get(@person, 1)
+    assert_equal("Dallas", person.name)
+    assert_equal(3.5, person.gpa)
+
+    schema.destroy(@person)
   end
 end

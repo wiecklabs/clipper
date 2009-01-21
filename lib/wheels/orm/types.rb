@@ -21,6 +21,9 @@ module Wheels
       class Serial < Type
       end
 
+      class Float < Type
+      end
+
     end
   end
 end

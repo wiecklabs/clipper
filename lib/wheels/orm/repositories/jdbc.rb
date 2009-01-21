@@ -123,10 +123,12 @@ module Wheels
           case field.type
           when Wheels::Orm::Types::Integer
             "#{column_name} INTEGER"
-          when Wheels::Orm::Types::String
-            "#{column_name} VARCHAR"
           when Wheels::Orm::Types::Serial
             "#{column_name} INTEGER PRIMARY KEY AUTOINCREMENT"
+          when Wheels::Orm::Types::Float
+            "#{column_name} FLOAT"
+          when Wheels::Orm::Types::String
+            "#{column_name} VARCHAR"
           else
             raise Wheels::Orm::UnsupportedTypeError.new(field.type)
           end
@@ -144,10 +146,12 @@ module Wheels
             case field.type
             when Wheels::Orm::Types::Integer
               statement.setInt(index, value)
-            when Wheels::Orm::Types::String
-              statement.setString(index, value)
             when Wheels::Orm::Types::Serial
               statement.setInt(index, value)
+            when Wheels::Orm::Types::String
+              statement.setString(index, value)
+            when Wheels::Orm::Types::Float
+              statement.setString(index, value.to_s)
             else
               raise Wheels::Orm::UnsupportedTypeError.new(field.type)
             end
