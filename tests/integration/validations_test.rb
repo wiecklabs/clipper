@@ -8,11 +8,11 @@ class Integration::ValidationsTest < Test::Unit::TestCase
     @user = Class.new do
       attr_accessor :password_confirmation
       
-      orm.map(self, "users") do |zoos|
-        zoos.key "id", Integer
-        zoos.field "name", Wheels::Orm::Types::String
-        zoos.field "password", Wheels::Orm::Types::String
-        zoos.field "age", Wheels::Orm::Types::Integer
+      orm.map(self, "users") do |users|
+        users.key "id", Integer
+        users.field "name", Wheels::Orm::Types::String
+        users.field "password", Wheels::Orm::Types::String
+        users.field "age", Wheels::Orm::Types::Integer
       end
     end
   end
