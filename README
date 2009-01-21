@@ -4,7 +4,7 @@ License:
 + Free for non-commercial use
 + Commercial license available for a fee
 + May not redistribute derivative works
-+ May modify for private use only
++ May modify for personal use only
 
   : The strictest CreativeCommons license satisfies most of this, except for the ban against modification even for personal use.
     http://creativecommons.org/licenses/by-nc-nd/3.0/us/
@@ -23,6 +23,10 @@ License:
     for commercial uses. The real carrot for MySQL AB then is the support the commercial license provides. I'm not sure if this is a strong
     enough incentive to license commercially for a new product with a much smaller user base and still generate any meaningful income through
     commercial licensing.
+    
+  : The Jetbrain's licenses look promising:
+    http://www.jetbrains.com/idea/opensource/license.html#openSource_licenseTerms
+    http://www.jetbrains.com/idea/buy/license-matrix.jsp
     
 1.0 Roadmap:
 * Constraints
