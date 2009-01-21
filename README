@@ -27,6 +27,10 @@ License:
   : The Jetbrain's licenses look promising:
     http://www.jetbrains.com/idea/opensource/license.html#openSource_licenseTerms
     http://www.jetbrains.com/idea/buy/license-matrix.jsp
+  
+  : The Sixth and Red River Software license (http://www.sixthandredriver.com/OSEULA.html) is fairly restrictive in section 3, but does
+    otherwise seem to satisfy a number of goals, and it's a license written in fairly plain english that seems like it might make a good
+    basis for a modified proprietary license.
     
 1.0 Roadmap:
 * Constraints
