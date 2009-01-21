@@ -28,6 +28,9 @@ module Wheels
         mapping
       end
 
+      def get(target, *keys)
+      end
+
       def save(collection)
         collection = Collection.new([collection]) unless collection.is_a?(Collection)
         create(collection)
