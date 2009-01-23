@@ -18,8 +18,9 @@ class Integration::SqliteTest < Test::Unit::TestCase
 
     @city = Class.new do
       orm.map(self, "cities") do |cities|
-        cities.key cities.field("name", String)
+        cities.field("name", String)
         cities.field("state", String)
+        cities.key(cities["name"], cities["state"])
       end
     end
 
@@ -131,6 +132,25 @@ class Integration::SqliteTest < Test::Unit::TestCase
     schema.destroy(@person)
   end
 
+  def test_get_object_with_compound_key
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@city)
+
+    city = @city.new
+    city.name = "Dallas"
+    city.state = "Texas"
+    orm.save(city)
+
+    assert_nothing_raised do
+      city = orm.get(@city, "Dallas", "Texas")
+      assert_not_nil(city)
+      assert_equal("Dallas", city.name)
+      assert_equal("Texas", city.state)
+    end
+
+    schema.destroy(@city)
+  end
+
   def test_all
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
@@ -148,6 +168,29 @@ class Integration::SqliteTest < Test::Unit::TestCase
     assert_nothing_raised do
       people = orm.all(@person)
       assert_equal(2, people.size)
+    end
+
+    schema.destroy(@person)
+  end
+
+  def test_all_with_conditions
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@person)
+
+    person = @person.new
+    person.name = "John"
+    person.gpa = 3.5
+    orm.save(person)
+
+    person = @person.new
+    person.name = "James"
+    person.gpa = 2
+    orm.save(person)
+
+    assert_nothing_raised do
+      low_gpa = Wheels::Orm::Query::UnboundCondition.lt(orm.mappings[@person]["gpa"], 3)
+      people = orm.all(@person, low_gpa)
+      assert_equal(1, people.size)
     end
 
     schema.destroy(@person)
