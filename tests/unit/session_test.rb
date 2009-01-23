@@ -24,5 +24,10 @@ class SessionTest < Test::Unit::TestCase
     assert_respond_to(session, :repository)
     assert_equal(Wheels::Orm::Repositories::registrations["default"], session.repository)
   end
-
+  
+  def test_has_a_mappings_shortcut
+    session = Wheels::Orm::Session.new("default")
+    assert_respond_to(session, :mappings)
+    assert_kind_of(Wheels::Orm::Mappings, session.mappings)
+  end
 end
