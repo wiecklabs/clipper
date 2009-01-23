@@ -20,6 +20,12 @@ require Pathname(__FILE__).dirname + "orm" + "repositories"
 require Pathname(__FILE__).dirname + "orm" + "repositories" + "schema"
 require Pathname(__FILE__).dirname + "orm" + "repositories" + "abstract"
 
+require Pathname(__FILE__).dirname + "orm" + "query" + "query"
+require Pathname(__FILE__).dirname + "orm" + "query" + "expression"
+require Pathname(__FILE__).dirname + "orm" + "query" + "unbound_condition"
+
+require Pathname(__FILE__).dirname + "orm" + "syntax" + "sql"
+
 require Pathname(__FILE__).dirname + "orm" + "session"
 require Pathname(__FILE__).dirname + "orm" + "collection"
 require Pathname(__FILE__).dirname + "orm" + "identity_map"

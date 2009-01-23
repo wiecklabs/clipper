@@ -29,6 +29,19 @@ module Wheels
       end
 
       def get(target, *keys)
+        mapping = @repository.mappings[target]
+
+        conditions = Query::AndExpression.new(*mapping.keys.zip(keys).map { |condition| Query::UnboundCondition.eq(*condition) })
+
+        query = Query.new(mapping, conditions)
+
+        @repository.select(query).first
+      end
+
+      def all(target, conditions = nil)
+        mapping = @repository.mappings[target]
+
+        @repository.select(Query.new(mapping, conditions))
       end
 
       def save(collection)

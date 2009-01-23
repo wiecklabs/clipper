@@ -14,6 +14,50 @@ module Wheels
           end
         end
 
+        def syntax
+          @syntax ||= Wheels::Orm::Syntax::Sql.new(self)
+        end
+
+        def select(query)
+          statement = "SELECT #{query.mapping.fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "} "
+          statement << "FROM #{quote_identifier(query.mapping.name)} "
+          statement << "WHERE #{syntax.serialize(query.conditions)}" if query.conditions
+
+          collection = Wheels::Orm::Collection.new([])
+
+          with_connection do |connection|
+            metadata = connection.getMetaData
+
+            if query.paramaters.empty?
+              stmt = connection.createStatement
+              results = stmt.executeQuery(statement)
+            else
+              stmt = connection.prepareStatement(statement)
+
+              query.fields.zip(query.paramaters).each_with_index do |attribute, index|
+                bind_value_to_statement(stmt, index + 1, *attribute)
+              end
+
+              results = stmt.executeQuery
+            end
+
+            results_metadata = results.getMetaData
+
+            while results.next
+              resource = query.mapping.target.new
+              values = (1..results_metadata.getColumnCount).map { |i| results.getObject(i) }
+              query.mapping.fields.zip(values) { |field, value| field.set(resource, value) }
+              collection << resource
+            end
+
+            results.close
+            stmt.close
+
+          end
+
+          collection
+        end
+
         def create(collection)
           collection.each do |object|
             mapping = mappings[object.class]

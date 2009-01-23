@@ -12,5 +12,5 @@ module Datos
     def conditions=(expression)
       @conditions = expression
     end
-  end  
+  end
 end

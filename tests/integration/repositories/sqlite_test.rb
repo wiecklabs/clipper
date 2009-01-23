@@ -47,6 +47,10 @@ class Integration::SqliteTest < Test::Unit::TestCase
     assert(File.exists?(@sqlite_path))
   end
 
+  def test_has_a_schema
+    assert_kind_of(Wheels::Orm::Syntax::Sql, Wheels::Orm::Repositories.registrations["default"].syntax)
+  end
+
   def test_schema_raises_for_unmapped_classes
     schema = Wheels::Orm::Schema.new("default")
     assert_raise(Wheels::Orm::Mappings::UnmappedClassError) { schema.create(Class.new) }
@@ -110,14 +114,41 @@ class Integration::SqliteTest < Test::Unit::TestCase
   end
 
   def test_get_object
-    flunk "orm.get is not implemented yet"
-
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
 
-    person = orm.get(@person, 1)
-    assert_equal("Dallas", person.name)
-    assert_equal(3.5, person.gpa)
+    person = @person.new
+    person.name = "John"
+    person.gpa = 3.5
+    orm.save(person)
+
+    assert_nothing_raised do
+      person = orm.get(@person, 1)
+      assert_equal("John", person.name)
+      assert_equal(3.5, person.gpa)
+    end
+
+    schema.destroy(@person)
+  end
+
+  def test_all
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@person)
+
+    person = @person.new
+    person.name = "John"
+    person.gpa = 3.5
+    orm.save(person)
+
+    person = @person.new
+    person.name = "James"
+    person.gpa = 3.2
+    orm.save(person)
+
+    assert_nothing_raised do
+      people = orm.all(@person)
+      assert_equal(2, people.size)
+    end
 
     schema.destroy(@person)
   end
