@@ -96,7 +96,7 @@ class Integration::SqliteTest < Test::Unit::TestCase
     zoo = @zoo.new
     zoo.name = "Dallas"
 
-    assert(orm.save(zoo))
+    assert_nothing_raised { orm.save(zoo) }
     assert_equal(1, zoo.id)
 
     schema.destroy(@zoo)

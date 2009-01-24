@@ -3,6 +3,11 @@ module Wheels
     module Repositories
       class Jdbc < Abstract
         autoload :Sqlite, (Pathname(__FILE__).dirname + "jdbc" + "sqlite.rb").to_s
+        autoload :Hsqldb, (Pathname(__FILE__).dirname + "jdbc" + "hsqldb.rb").to_s
+
+        def initialize(*args)
+          super
+        end
 
         def with_connection
           connection = nil
@@ -23,7 +28,7 @@ module Wheels
           statement << "FROM #{quote_identifier(query.mapping.name)} "
           statement << "WHERE #{syntax.serialize(query.conditions)}" if query.conditions
 
-          collection = Wheels::Orm::Collection.new([])
+          collection = Wheels::Orm::Collection.new(query.mapping, [])
 
           with_connection do |connection|
             metadata = connection.getMetaData
@@ -59,45 +64,52 @@ module Wheels
         end
 
         def create(collection)
-          collection.each do |object|
-            mapping = mappings[object.class]
+          with_connection do |connection|
+            metadata = connection.getMetaData
+            supports_generated_keys = metadata.supportsGetGeneratedKeys
 
-            attributes = mapping.fields.map { |field| [field, field.get(object)] }
+            fields = collection.mapping.fields
 
-            statement = "INSERT INTO #{quote_identifier(mapping.name)} ("
-            statement << attributes.map { |field,| quote_identifier(field.name) } * ", "
+            statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
+            statement << fields.map { |field| quote_identifier(field.name) } * ", "
             statement << ") VALUES ("
-            statement << (['?'] * attributes.size) * ", "
+            statement << (['?'] * fields.size) * ", "
             statement << ")"
 
-            result = nil
-            with_connection do |connection|
-              metadata = connection.getMetaData
+            if supports_generated_keys
+              stmt = connection.prepareStatement(statement, 1)
+            end
 
-              if metadata.supportsGetGeneratedKeys
-                stmt = connection.prepareStatement(statement, 1)
-              else
+            collection.each do |object|
+              unless supports_generated_keys
                 stmt = connection.prepareStatement(statement)
               end
 
-              attributes.each_with_index do |attribute, index|
+              mapping = mappings[object.class]
+
+              result = nil
+
+              fields.map { |field| [field, field.get(object)] }.each_with_index do |attribute, index|
                 bind_value_to_statement(stmt, index + 1, *attribute)
               end
 
-              stmt.execute
-
-              if metadata.supportsGetGeneratedKeys
-                result = generated_keys(connection, stmt)
+              if supports_generated_keys
+                stmt.addBatch
+                stmt.executeBatch
               else
+                stmt.execute
+                stmt.close
+
                 result = generated_keys(connection)
+
+                mapping.keys.first.set(object, result) if result
               end
-
-              mapping.keys.first.set(object, result) if result
-
-              stmt.close
 
             end
 
+            if supports_generated_keys
+              stmt.close
+            end
           end
         end
 
@@ -168,7 +180,7 @@ module Wheels
           when Wheels::Orm::Types::Integer
             "#{column_name} INTEGER"
           when Wheels::Orm::Types::Serial
-            "#{column_name} INTEGER PRIMARY KEY AUTOINCREMENT"
+            "#{column_name} #{column_definition_serial}"
           when Wheels::Orm::Types::Float
             "#{column_name} FLOAT"
           when Wheels::Orm::Types::String
@@ -178,14 +190,13 @@ module Wheels
           end
         end
 
+        def column_definition_serial
+          "INTEGER PRIMARY KEY AUTO_INCREMENT"
+        end
+
         def bind_value_to_statement(statement, index, field, value)
           if value.nil?
-            column = statement.getConnection.getMetaData.getColumns("", "", field.mapping.name, field.name)
-            column.next
-            type = column.getInt("DATA_TYPE")
-            column.close
-
-            statement.setNull(index, type)
+            statement.setNull(index, statement.getParameterMetaData.getParameterType(index))
           else
             case field.type
             when Wheels::Orm::Types::Integer

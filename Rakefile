@@ -11,7 +11,7 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['tests/**/*_test.rb']
   t.verbose = true
 end
-  
+
 # Gem
 require "rake/gempackagetask"
 
@@ -45,4 +45,18 @@ task :publish do
   STDOUT.flush
   `ssh gems@able.wieck.com "cd #{NAME} && git pull &> /dev/null && rake repackage &> /dev/null && cp pkg/* ../site/gems && cd ../site && gem generate_index"`
   STDOUT.puts "done"
+end
+
+desc "Run performance benchmarks"
+task :perf do
+  if RUBY_PLATFORM =~ /java/
+    sh("jruby -r'lib/wheels/orm' script/performance.rb")
+  else
+    sh("ruby -r'lib/wheels/orm' script/performance.rb dm")
+  end
+end
+
+desc "Run profiling"
+task :profile do
+  sh("jruby -r'lib/wheels/orm' -rprofile script/profile.rb")
 end

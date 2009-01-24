@@ -1,19 +1,19 @@
-require "jdbc/sqlite3"
-import "org.sqlite.JDBC"
+require "jdbc/hsqldb"
+import "org.hsqldb.jdbcDriver"
 
 module Wheels
   module Orm
     module Repositories
       class Jdbc
-        class Sqlite < Jdbc
+        class Hsqldb < Jdbc
 
           def column_definition_serial
-            "INTEGER PRIMARY KEY AUTOINCREMENT"
+            "IDENTITY"
           end
 
           def generated_keys(connection)
             statement = connection.createStatement
-            result_set = statement.executeQuery("select last_insert_rowid()")
+            result_set = statement.executeQuery("call identity()")
             metadata = result_set.getMetaData
 
             keys = nil

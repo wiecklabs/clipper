@@ -17,8 +17,8 @@ module Wheels
 
         @s = uri.dup
 
-        if @s =~ /^(.+:.+)+:\//
-          uri = uri.gsub(/^((.+)(:)(.+))+(?=:\/)/, '\2+\4')
+        if @s =~ /^jdbc:/
+          uri = uri.sub(/^jdbc:/, "jdbc+")
         end
 
         uri = ::URI::parse(uri)

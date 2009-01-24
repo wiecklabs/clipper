@@ -6,9 +6,15 @@ module Wheels
 
       include Enumerable
 
-      def initialize(collection)
+      def initialize(mapping, collection)
         raise ArgumentError.new("Collection must be initialized with an array") unless collection.is_a?(Array)
         @collection = collection
+
+        @mapping = mapping
+      end
+
+      def mapping
+        @mapping
       end
 
       def each
@@ -22,6 +28,10 @@ module Wheels
 
       def size
         @collection.size
+      end
+
+      def first
+        @collection.first
       end
 
     end

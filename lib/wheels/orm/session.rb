@@ -49,7 +49,7 @@ module Wheels
       end
 
       def save(collection)
-        collection = Collection.new([collection]) unless collection.is_a?(Collection)
+        collection = Collection.new(mappings[collection.class], [collection]) unless collection.is_a?(Collection)
         create(collection)
       end
 
