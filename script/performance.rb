@@ -69,4 +69,8 @@ Benchmark.bmbm do |x|
       ORM == "dm" ? Person.get(i) : orm.get(Person, i)
     end
   end
+
+  x.report("all") do
+    1.upto(TIMES / 10) { ORM == "dm" ? Person.all.entries : orm.all(Person) }
+  end
 end
