@@ -20,7 +20,7 @@ module Wheels
             result_set = statement.executeQuery("call identity()")
             metadata = result_set.getMetaData
 
-            keys = nil
+            key = nil
 
             if result_set.next
               key = result_set.getObject(1)
@@ -29,7 +29,7 @@ module Wheels
             result_set.close
             statement.close
 
-            key == 0 ? nil : key
+            key
           end
 
         end # class Sqlite

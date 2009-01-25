@@ -5,7 +5,6 @@ require 'rubygems'
 ORM = ARGV.first || "worm"
 ADAPTER = ENV["ADAPTER"] || "sqlite"
 
-
 if ORM == "dm"
   gem "dm-core"
   require "dm-core"
@@ -84,6 +83,15 @@ Benchmark.bmbm do |x|
       1.upto(10) { Person.all.entries }
     else
       orm { |session| 1.upto(10) { session.all(Person) } }
+    end
+  end
+
+  x.report("#{ORM} #{ADAPTER} all(id < 10) x #{TIMES}") do
+    if ORM == "dm"
+      1.upto(TIMES) { Person.all(:id.lt => 10).entries }
+    else
+      conditions = Wheels::Orm::Query::UnboundCondition.lt(orm.mappings[Person]["id"], 10)
+      orm { |session| 1.upto(TIMES) { session.all(Person, conditions) } }
     end
   end
 end

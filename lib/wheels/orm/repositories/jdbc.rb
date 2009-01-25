@@ -151,7 +151,7 @@ module Wheels
         def table_exists?(table_name)
           with_connection do |connection|
             metadata = connection.getMetaData()
-            table = metadata.getTables("", "", table_name, ["TABLE"].to_java(:String))
+            table = metadata.getTables(nil, nil, table_name, ["TABLE"].to_java(:String))
             !!table.next
           end
         end
