@@ -1,6 +1,6 @@
 Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem:test")
 
-TIMES = (ENV["x"] || 100).to_i
+TIMES = (ENV["x"] || 500).to_i
 
 class Person
   orm.map(self, "people") do |people|

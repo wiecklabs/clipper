@@ -48,6 +48,8 @@ puts "You can specify how many times you want to run the benchmarks with rake:pe
 puts "Some tasks will be run 10 and 1000 times less than (number)"
 puts "Benchmarks will now run #{TIMES} times"
 
+session = orm
+
 Benchmark.bmbm do |x|
   x.report("create") do
     people = (1..TIMES).map do
@@ -60,17 +62,17 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       repository.create(people)
     else
-      orm.save(Wheels::Orm::Collection.new(orm.mappings[Person], people))
+      session.save(Wheels::Orm::Collection.new(session.mappings[Person], people))
     end
   end
 
   x.report("get") do
     (1..TIMES).each do |i|
-      ORM == "dm" ? Person.get(i) : orm.get(Person, i)
+      ORM == "dm" ? Person.get(i) : session.get(Person, i)
     end
   end
 
   x.report("all") do
-    1.upto(TIMES / 10) { ORM == "dm" ? Person.all.entries : orm.all(Person) }
+    1.upto(TIMES / 10) { ORM == "dm" ? Person.all.entries : session.all(Person) }
   end
 end
