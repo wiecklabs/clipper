@@ -4,6 +4,7 @@ module Wheels
       class Jdbc < Abstract
         autoload :Sqlite, (Pathname(__FILE__).dirname + "jdbc" + "sqlite.rb").to_s
         autoload :Hsqldb, (Pathname(__FILE__).dirname + "jdbc" + "hsqldb.rb").to_s
+        autoload :Mysql, (Pathname(__FILE__).dirname + "jdbc" + "mysql.rb").to_s
 
         def initialize(*args)
           super
@@ -68,7 +69,9 @@ module Wheels
             metadata = connection.getMetaData
             supports_generated_keys = metadata.supportsGetGeneratedKeys
 
-            fields = collection.mapping.fields
+            mapping = collection.mapping
+
+            fields = mapping.fields
 
             statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
             statement << fields.map { |field| quote_identifier(field.name) } * ", "
@@ -85,8 +88,6 @@ module Wheels
                 stmt = connection.prepareStatement(statement)
               end
 
-              mapping = mappings[object.class]
-
               result = nil
 
               fields.map { |field| [field, field.get(object)] }.each_with_index do |attribute, index|
@@ -95,7 +96,6 @@ module Wheels
 
               if supports_generated_keys
                 stmt.addBatch
-                stmt.executeBatch
               else
                 stmt.execute
                 stmt.close
@@ -108,6 +108,13 @@ module Wheels
             end
 
             if supports_generated_keys
+              stmt.executeBatch
+
+              keys = generated_keys(connection, stmt)
+              key = mapping.keys.first
+
+              collection.zip(keys) { |object, value| key.set(object, value) }
+
               stmt.close
             end
           end
@@ -184,7 +191,7 @@ module Wheels
           when Wheels::Orm::Types::Float
             "#{column_name} FLOAT"
           when Wheels::Orm::Types::String
-            "#{column_name} VARCHAR"
+            "#{column_name} VARCHAR(255)"
           else
             raise Wheels::Orm::UnsupportedTypeError.new(field.type)
           end
@@ -196,7 +203,7 @@ module Wheels
 
         def bind_value_to_statement(statement, index, field, value)
           if value.nil?
-            statement.setNull(index, statement.getParameterMetaData.getParameterType(index))
+            statement.setNull(index, 4)
           else
             case field.type
             when Wheels::Orm::Types::Integer
@@ -226,15 +233,16 @@ module Wheels
 
           result_set = statement.getGeneratedKeys
           metadata = result_set.getMetaData
-          key = nil
 
-          if result_set.next
-            key = result_set.getObject(1)
+          keys = []
+
+          while result_set.next
+            keys << result_set.getObject(1)
           end
 
           result_set.close
 
-          key == 0 ? nil : key
+          keys
         end
 
       end

@@ -1,4 +1,4 @@
-Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem")
+Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem:test")
 
 TIMES = (ENV["x"] || 100).to_i
 

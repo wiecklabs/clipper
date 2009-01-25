@@ -27,7 +27,7 @@ if ORM == "dm"
   Person.auto_migrate!
 else
 
-  Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem")
+  Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem:test")
 
   class Person
     orm.map(self, "people") do |people|
