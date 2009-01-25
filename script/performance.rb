@@ -3,6 +3,8 @@ require 'pathname'
 require 'rubygems'
 
 ORM = ARGV.first || "worm"
+ADAPTER = ENV["ADAPTER"] || "sqlite"
+
 
 if ORM == "dm"
   gem "dm-core"
@@ -23,11 +25,16 @@ if ORM == "dm"
     property :gpa, Float
   end
 
-  DataMapper.setup(:default, "sqlite3:///tmp/dm_sqlite.db")
+  case ADAPTER
+  when "sqlite" then DataMapper.setup(:default, "sqlite3::memory:")
+  when "mysql" then DataMapper.setup(:default, "mysql://localhost/dm_worm_performance")
+  end
   Person.auto_migrate!
 else
-
-  Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem:test")
+  case ADAPTER
+  when "sqlite" then Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem:test")
+  when "mysql" then Wheels::Orm::Repositories.register("default", "jdbc:mysql://localhost:3306/dm_worm_performance?user=root")
+  end
 
   class Person
     orm.map(self, "people") do |people|
@@ -48,10 +55,8 @@ puts "You can specify how many times you want to run the benchmarks with rake:pe
 puts "Some tasks will be run 10 and 1000 times less than (number)"
 puts "Benchmarks will now run #{TIMES} times"
 
-session = orm
-
 Benchmark.bmbm do |x|
-  x.report("create") do
+  x.report("#{ORM} #{ADAPTER} create x #{TIMES}") do
     people = (1..TIMES).map do
       person = Person.new
       person.name = Faker::Name.name
@@ -62,17 +67,23 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       repository.create(people)
     else
-      session.save(Wheels::Orm::Collection.new(session.mappings[Person], people))
+      orm.save(Wheels::Orm::Collection.new(orm.mappings[Person], people))
     end
   end
 
-  x.report("get") do
-    (1..TIMES).each do |i|
-      ORM == "dm" ? Person.get(i) : session.get(Person, i)
+  x.report("#{ORM} #{ADAPTER} get x #{TIMES}") do
+    if ORM == "dm"
+      1.upto(TIMES) { |i| Person.get(i) }
+    else
+      orm { |session| 1.upto(TIMES) { |i| session.get(Person, i) } }
     end
   end
 
-  x.report("all") do
-    1.upto(TIMES / 10) { ORM == "dm" ? Person.all.entries : session.all(Person) }
+  x.report("#{ORM} #{ADAPTER} all x #{10}") do
+    if ORM == "dm"
+      1.upto(10) { Person.all.entries }
+    else
+      orm { |session| 1.upto(10) { session.all(Person) } }
+    end
   end
 end

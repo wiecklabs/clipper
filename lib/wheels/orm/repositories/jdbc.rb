@@ -189,12 +189,16 @@ module Wheels
           when Wheels::Orm::Types::Serial
             "#{column_name} #{column_definition_serial}"
           when Wheels::Orm::Types::Float
-            "#{column_name} FLOAT"
+            "#{column_name} #{column_definition_float}"
           when Wheels::Orm::Types::String
             "#{column_name} VARCHAR(255)"
           else
             raise Wheels::Orm::UnsupportedTypeError.new(field.type)
           end
+        end
+
+        def column_definition_float
+          "FLOAT(7,2)"
         end
 
         def column_definition_serial

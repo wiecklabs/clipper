@@ -11,6 +11,10 @@ module Wheels
             "IDENTITY"
           end
 
+          def column_definition_float
+            "FLOAT"
+          end
+
           def generated_keys(connection)
             statement = connection.createStatement
             result_set = statement.executeQuery("call identity()")
