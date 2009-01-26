@@ -39,5 +39,9 @@ module Wieck
       @values.first
     end
 
+    def to_a
+      @values
+    end
+
   end
 end

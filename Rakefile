@@ -60,3 +60,10 @@ desc "Run profiling"
 task :profile do
   sh("jruby -r'lib/wheels/orm' -rprofile script/profile.rb")
 end
+
+namespace :profile do
+  desc "Run profiling for get"
+  task :get do
+    sh("TARGET=get jruby -r'lib/wheels/orm' script/profile/get.rb")
+  end
+end

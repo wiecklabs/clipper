@@ -25,22 +25,21 @@ module Wheels
         end
 
         def select(query)
-          statement = "SELECT #{query.mapping.fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "} "
+          mapping_fields = query.mapping.fields.to_a
+          statement = "SELECT #{mapping_fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "} "
           statement << "FROM #{quote_identifier(query.mapping.name)} "
           statement << "WHERE #{syntax.serialize(query.conditions)}" if query.conditions
 
           collection = Wheels::Orm::Collection.new(query.mapping, [])
 
           with_connection do |connection|
-            metadata = connection.getMetaData
-
             if query.paramaters.empty?
               stmt = connection.createStatement
               results = stmt.executeQuery(statement)
             else
               stmt = connection.prepareStatement(statement)
 
-              query.fields.zip(query.paramaters).each_with_index do |attribute, index|
+              query.fields.to_a.zip(query.paramaters).each_with_index do |attribute, index|
                 bind_value_to_statement(stmt, index + 1, *attribute)
               end
 
@@ -52,7 +51,7 @@ module Wheels
             while results.next
               resource = query.mapping.target.new
               values = (1..results_metadata.getColumnCount).map { |i| results.getObject(i) }
-              query.mapping.fields.zip(values) { |field, value| field.set(resource, value) }
+              mapping_fields.zip(values) { |field, value| field.set(resource, value) }
               collection << resource
             end
 
@@ -165,7 +164,8 @@ module Wheels
         # quote string.
         #
         def quote_identifier(identifier)
-          identifier.gsub(/([^\.]+)/, "#{self.quote_string}\\1#{self.quote_string}")
+          quote_string = self.quote_string
+          identifier.gsub(/([^\.]+)/, "#{quote_string}\\1#{quote_string}")
         end
 
         protected
@@ -176,9 +176,10 @@ module Wheels
         # does not specify a character.
         #
         def quote_string
-          @quote_string ||= with_connection { |connection| connection.getMetaData.getIdentifierQuoteString }
-          @quote_string = '"' if @quote_string == " "
-          @quote_string
+          @quote_string ||= begin
+            quote_string = with_connection { |connection| connection.getMetaData.getIdentifierQuoteString }
+            quote_string == " " ? '"' : quote_string
+          end
         end
 
         def column_definition(field)

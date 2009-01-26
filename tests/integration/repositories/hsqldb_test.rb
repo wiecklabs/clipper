@@ -69,4 +69,5 @@ class Integration::HsqldbTest < Test::Unit::TestCase
   ensure
     schema.destroy(@person)
   end
+
 end
