@@ -55,7 +55,23 @@ puts "Some tasks will be run 10 and 1000 times less than (number)"
 puts "Benchmarks will now run #{TIMES} times"
 
 Benchmark.bmbm do |x|
+
   x.report("#{ORM} #{ADAPTER} create x #{TIMES}") do
+    person = proc do
+      p = Person.new
+      p.name = Faker::Name.name
+      p.gpa = "#{rand(4)}.#{rand(9)}".to_f
+      p
+    end
+
+    if ORM == "dm"
+      1.upto(TIMES) { person[].save }
+    else
+      orm { |session| 1.upto(TIMES) { session.save(person[]) } }
+    end
+  end
+
+  x.report("#{ORM} #{ADAPTER} batch create #{TIMES} records") do
     people = (1..TIMES).map do
       person = Person.new
       person.name = Faker::Name.name

@@ -70,7 +70,8 @@ module Wheels
 
             mapping = collection.mapping
 
-            fields = mapping.fields
+            fields = mapping.fields.to_a
+            key = mapping.keys.first
 
             statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
             statement << fields.map { |field| quote_identifier(field.name) } * ", "
@@ -101,7 +102,7 @@ module Wheels
 
                 result = generated_keys(connection)
 
-                mapping.keys.first.set(object, result) if result
+                key.set(object, result) if result
               end
 
             end

@@ -66,4 +66,9 @@ namespace :profile do
   task :get do
     sh("TARGET=get jruby -r'lib/wheels/orm' script/profile/get.rb")
   end
+
+  desc "Run profiling for create"
+  task :create do
+    sh("TARGET=create jruby -r'lib/wheels/orm' script/profile/create.rb")
+  end
 end
