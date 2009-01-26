@@ -1,4 +1,5 @@
 require "jdbc/mysql"
+import "com.mysql.jdbc.Driver"
 
 module Wheels
   module Orm
@@ -11,7 +12,6 @@ module Wheels
 
             @data_source = com.mchange.v2.c3p0.ComboPooledDataSource.new
             @data_source.setJdbcUrl(uri.to_s)
-            @data_source.setDriverClass("com.mysql.jdbc.Driver")
           end
 
           def column_definition_serial

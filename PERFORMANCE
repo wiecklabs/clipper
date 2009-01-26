@@ -86,11 +86,11 @@ dm mysql all(id < 10) x 1000            1.100000   0.080000   1.180000 (  1.4676
 
 ===================[ c3p0 connection pooling, default config ]=====================
                                             user     system      total        real
-worm hsqldb create x 1000               1.784000   0.000000   1.784000 (  1.784007)
-worm hsqldb batch create 1000 records   1.769000   0.000000   1.769000 (  1.768935)
-worm hsqldb get x 1000                  0.615000   0.000000   0.615000 (  0.614848)
-worm hsqldb all x 10                    2.450000   0.000000   2.450000 (  2.450921)
-worm hsqldb all(id < 10) x 1000         0.967000   0.000000   0.967000 (  0.966148)
+worm hsqldb create x 1000               1.866000   0.000000   1.866000 (  1.865487)
+worm hsqldb batch create 1000 records   1.751000   0.000000   1.751000 (  1.751333)
+worm hsqldb get x 1000                  0.493000   0.000000   0.493000 (  0.493073)
+worm hsqldb all x 10                    2.384000   0.000000   2.384000 (  2.384220)
+worm hsqldb all(id < 10) x 1000         0.827000   0.000000   0.827000 (  0.826086)
 
 worm mysql create x 1000                2.375000   0.000000   2.375000 (  2.375025)
 worm mysql batch create 1000 records    1.918000   0.000000   1.918000 (  1.918213)

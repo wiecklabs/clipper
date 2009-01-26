@@ -1,4 +1,5 @@
 require "jdbc/hsqldb"
+import "org.hsqldb.jdbcDriver"
 
 module Wheels
   module Orm
@@ -9,9 +10,7 @@ module Wheels
           def initialize(name, uri)
             super
 
-            @data_source = com.mchange.v2.c3p0.ComboPooledDataSource.new
-            @data_source.setJdbcUrl(uri.to_s)
-            @data_source.setDriverClass("org.hsqldb.jdbcDriver")
+            @data_source = com.mchange.v2.c3p0.DataSources.unpooledDataSource(uri.to_s)
           end
 
           def column_definition_serial
