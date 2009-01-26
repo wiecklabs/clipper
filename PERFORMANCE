@@ -82,3 +82,30 @@ dm mysql batch create 1000 records      1.310000   0.130000   1.440000 (  2.3198
 dm mysql get x 1000                     0.780000   0.080000   0.860000 (  1.071209)
 dm mysql all x 10                       3.270000   0.050000   3.320000 (  3.542396)
 dm mysql all(id < 10) x 1000            1.100000   0.080000   1.180000 (  1.467613)
+
+
+===================[ c3p0 connection pooling, default config ]=====================
+                                            user     system      total        real
+worm hsqldb create x 1000               1.784000   0.000000   1.784000 (  1.784007)
+worm hsqldb batch create 1000 records   1.769000   0.000000   1.769000 (  1.768935)
+worm hsqldb get x 1000                  0.615000   0.000000   0.615000 (  0.614848)
+worm hsqldb all x 10                    2.450000   0.000000   2.450000 (  2.450921)
+worm hsqldb all(id < 10) x 1000         0.967000   0.000000   0.967000 (  0.966148)
+
+worm mysql create x 1000                2.375000   0.000000   2.375000 (  2.375025)
+worm mysql batch create 1000 records    1.918000   0.000000   1.918000 (  1.918213)
+worm mysql get x 1000                   0.696000   0.000000   0.696000 (  0.695261)
+worm mysql all x 10                     2.612000   0.000000   2.612000 (  2.611171)
+worm mysql all(id < 10) x 1000          1.460000   0.000000   1.460000 (  1.459856)
+
+dm sqlite create x 1000                 1.440000   0.020000   1.460000 (  1.468180)
+dm sqlite batch create 1000 records     1.240000   0.010000   1.250000 (  1.255686)
+dm sqlite get x 1000                    0.820000   0.010000   0.830000 (  0.844022)
+dm sqlite all x 10                      3.360000   0.020000   3.380000 (  3.408616)
+dm sqlite all(id < 10) x 1000           1.340000   0.010000   1.350000 (  1.359224)
+
+dm mysql create x 1000                  1.950000   0.130000   2.080000 (  2.897048)
+dm mysql batch create 1000 records      1.150000   0.130000   1.280000 (  2.150448)
+dm mysql get x 1000                     0.610000   0.060000   0.670000 (  0.837893)
+dm mysql all x 10                       3.160000   0.020000   3.180000 (  3.310640)
+dm mysql all(id < 10) x 1000            1.130000   0.070000   1.200000 (  1.455336)

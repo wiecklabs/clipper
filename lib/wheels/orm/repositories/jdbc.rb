@@ -1,3 +1,5 @@
+require Pathname(__FILE__).dirname.parent.parent.parent + "vendor" + "c3p0-0.9.1.2.jar"
+
 module Wheels
   module Orm
     module Repositories
@@ -6,14 +8,14 @@ module Wheels
         autoload :Hsqldb, (Pathname(__FILE__).dirname + "jdbc" + "hsqldb.rb").to_s
         autoload :Mysql, (Pathname(__FILE__).dirname + "jdbc" + "mysql.rb").to_s
 
-        def initialize(*args)
+        def initialize(name, uri)
           super
         end
 
         def with_connection
           connection = nil
           begin
-            connection = java.sql.DriverManager.getConnection(@uri.to_s)
+            connection = @data_source.getConnection
             return yield(connection) if block_given?
           ensure
             connection.close if connection

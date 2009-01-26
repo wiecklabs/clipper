@@ -7,6 +7,12 @@ module Wheels
       class Jdbc
         class Sqlite < Jdbc
 
+          def initialize(name, uri)
+            super
+
+            @data_source = com.mchange.v2.c3p0.DataSources.unpooledDataSource(uri.to_s)
+          end
+
           def column_definition_serial
             "INTEGER PRIMARY KEY AUTOINCREMENT"
           end
