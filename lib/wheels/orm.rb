@@ -5,7 +5,9 @@ require "rubygems"
 
 require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
 require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
-require Pathname(__FILE__).dirname.parent + "wieck" + "ordered_set"
+
+require Pathname(__FILE__).dirname.parent + "worm_internal.jar"
+
 require Pathname(__FILE__).dirname.parent + "wieck" + "string"
 
 require Pathname(__FILE__).dirname + "orm" + "uri"

@@ -31,8 +31,8 @@ module Wheels
           # long term solution. I suspect jRuby offers an "out of box"
           # solution. Possibly jRuby's own Set preserves insertion order since
           # Java Hashes do?
-          @fields = Wieck::OrderedSet.new
-          @key = Wieck::OrderedSet.new
+          @fields = Java::OrderedSet.new
+          @key = Java::OrderedSet.new
         end
 
         # The name of this mapping. In database terms this would map to a

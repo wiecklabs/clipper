@@ -1,2 +1,4 @@
 mem.*
 profile.txt
+*.jar
+pkg
