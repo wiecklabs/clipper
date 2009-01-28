@@ -26,6 +26,7 @@ module Wheels
             raise ArgumentError.new(e.message)
           end
 
+          @composite_mappings = []
           @fields = java.util.LinkedHashSet.new
           @key = java.util.LinkedHashSet.new
         end
@@ -74,7 +75,7 @@ module Wheels
           raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.") unless missing_keys.empty?
 
           composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name)
-          yield composite_mapping
+          @composite_mappings << yield(composite_mapping)
           composite_mapping
         end
 
@@ -99,6 +100,10 @@ module Wheels
 
         def keys
           @key
+        end
+
+        def composite_mappings
+          @composite_mappings
         end
       end
     end

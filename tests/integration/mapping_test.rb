@@ -107,6 +107,7 @@ class Integration::MappingTest < Test::Unit::TestCase
     end
 
     assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, localities)
+    assert_equal(2, people.composite_mappings.size)
 
     people.proxy("organization") { |p| orm.get(Organization, p.organization_id) }
     people.proxy("tasks") { |p| orm.all(Task, [:eql, "person_id", p.id]) }
