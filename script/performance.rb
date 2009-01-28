@@ -9,6 +9,8 @@ if ORM == "dm"
   gem "dm-core"
   require "dm-core"
 else
+  require 'java'
+  $CLASSPATH << File.dirname(__FILE__)
   require Pathname(__FILE__).dirname.parent + "lib" + "wheels" + "orm"
 end
 
