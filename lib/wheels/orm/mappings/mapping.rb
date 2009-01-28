@@ -26,11 +26,6 @@ module Wheels
             raise ArgumentError.new(e.message)
           end
 
-          # We need an Set that preserves insertion order here.
-          # The Wieck::OrderedSet is a temporary hack, not intended to be a
-          # long term solution. I suspect jRuby offers an "out of box"
-          # solution. Possibly jRuby's own Set preserves insertion order since
-          # Java Hashes do?
           @fields = java.util.LinkedHashSet.new
           @key = java.util.LinkedHashSet.new
         end
