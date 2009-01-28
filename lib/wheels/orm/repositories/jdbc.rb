@@ -4,11 +4,17 @@ module Wheels
   module Orm
     module Repositories
       class Jdbc < Abstract
+
+        import 'org.apache.log4j.Logger'
+
         autoload :Sqlite, (Pathname(__FILE__).dirname + "jdbc" + "sqlite.rb").to_s
         autoload :Hsqldb, (Pathname(__FILE__).dirname + "jdbc" + "hsqldb.rb").to_s
         autoload :Mysql, (Pathname(__FILE__).dirname + "jdbc" + "mysql.rb").to_s
 
+        attr_accessor :logger
+
         def initialize(name, uri)
+          @logger = Logger.getLogger(self.class.name)
           super
         end
 
@@ -27,10 +33,12 @@ module Wheels
         end
 
         def select(query)
-          mapping_fields = query.mapping.fields.to_a
+          mapping_fields = query.mapping.fields
           statement = "SELECT #{mapping_fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "} "
           statement << "FROM #{quote_identifier(query.mapping.name)} "
           statement << "WHERE #{syntax.serialize(query.conditions)}" if query.conditions
+
+          logger.debug(statement)
 
           collection = Wheels::Orm::Collection.new(query.mapping, [])
 
@@ -41,7 +49,7 @@ module Wheels
             else
               stmt = connection.prepareStatement(statement)
 
-              query.fields.to_a.zip(query.paramaters).each_with_index do |attribute, index|
+              query.fields.zip(query.paramaters).each_with_index do |attribute, index|
                 bind_value_to_statement(stmt, index + 1, *attribute)
               end
 
@@ -72,7 +80,7 @@ module Wheels
 
             mapping = collection.mapping
 
-            fields = mapping.fields.to_a
+            fields = mapping.fields
             serial_key = mapping.keys.detect { |field| field.type.is_a?(Wheels::Orm::Types::Serial) }
 
             statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
@@ -92,7 +100,11 @@ module Wheels
 
               result = nil
 
-              fields.map { |field| [field, field.get(object)] }.each_with_index do |attribute, index|
+              attributes = fields.map { |field| [field, field.get(object)] }
+
+              logger.debug(statement + " -> #{attributes.transpose[1].inspect}")
+
+              attributes.each_with_index do |attribute, index|
                 bind_value_to_statement(stmt, index + 1, *attribute)
               end
 
@@ -128,6 +140,8 @@ module Wheels
           CREATE TABLE #{quote_identifier(mapping.name)} (#{mapping.fields.map { |field| column_definition(field) }.join(", ") });
           EOS
 
+          logger.debug(sql)
+
           with_connection do |connection|
             stmt = connection.prepareStatement(sql)
             stmt.execute
@@ -141,6 +155,8 @@ module Wheels
           sql = <<-EOS.compress_lines
           DROP TABLE #{quote_identifier(mapping.name)};
           EOS
+
+          logger.debug(sql)
 
           with_connection do |connection|
             stmt = connection.prepareStatement(sql)
