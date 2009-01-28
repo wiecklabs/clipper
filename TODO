@@ -1,0 +1,27 @@
+TODO:
+
+* IdentityMap
+* Repository Session
+* Repository Session connection helper method
+* Object Mappings
+* Repository interface
+* ObjectEnumerator
+* Load an object
+* Save an object
+* Repository::Types should load and store Orm::Types
+* Load a complex object that spans more than one table
+* Load an object that uses a Discriminator
+* Save a Collection
+* Load a Collection
+* Load a Collection with filters
+* Save an Association
+* Load an Association
+* Load an Association with filters
+* Load a Collection with complex filters
+
+TODONE:
+
+* Schema Mappings: Field, Source and Relation mappings are all tested and in-place. Sam:2009-01-11
+* Uri: Sam:2009-01-11
+* Repository (only class definition, no interface): Sam:2009-01-12
+* Repository registration: Sam:2009-01-12
