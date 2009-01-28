@@ -3,6 +3,8 @@ require "set"
 require "test/unit"
 require "rubygems"
 
+require Pathname(__FILE__).dirname.parent + "vendor" + "log4j-1.2.15.jar"
+
 require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
 require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
 
