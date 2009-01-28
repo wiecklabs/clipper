@@ -73,7 +73,7 @@ module Wheels
             mapping = collection.mapping
 
             fields = mapping.fields.to_a
-            key = mapping.keys.first
+            serial_key = mapping.keys.detect { |field| field.type.is_a?(Wheels::Orm::Types::Serial) }
 
             statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
             statement << fields.map { |field| quote_identifier(field.name) } * ", "
@@ -82,7 +82,7 @@ module Wheels
             statement << ")"
 
             if supports_generated_keys
-              stmt = connection.prepareStatement(statement, 1)
+              stmt = serial_key ? connection.prepareStatement(statement, 1) : connection.prepareStatement(statement)
             end
 
             collection.each do |object|
@@ -104,7 +104,7 @@ module Wheels
 
                 result = generated_keys(connection)
 
-                key.set(object, result) if result
+                serial_key.set(object, result) if serial_key && result
               end
 
             end
@@ -112,10 +112,11 @@ module Wheels
             if supports_generated_keys
               stmt.executeBatch
 
-              keys = generated_keys(connection, stmt)
-              key = mapping.keys.first
+              if serial_key
+                keys = generated_keys(connection, stmt)
 
-              collection.zip(keys) { |object, value| key.set(object, value) }
+                collection.zip(keys) { |object, value| serial_key.set(object, value) }
+              end
 
               stmt.close
             end

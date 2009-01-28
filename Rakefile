@@ -4,7 +4,7 @@ require "rake"
 require "rake/testtask"
 
 # Tests
-task :default => [:java_compile, :test]
+task :default => [:test]
 
 Rake::TestTask.new do |t|
   t.libs << "tests"
