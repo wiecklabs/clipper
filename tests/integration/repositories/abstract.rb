@@ -170,7 +170,7 @@ module Integration::AbstractRepositoryTest
     schema.destroy(@person)
   end
 
-  def test_all_with_conditions
+  def test_all_with_raw_conditions
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
 
@@ -190,6 +190,23 @@ module Integration::AbstractRepositoryTest
       assert_equal(1, people.size)
     end
 
+  ensure
+    schema.destroy(@person)
+  end
+  
+  def test_all_with_nice_conditions
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@person)
+    
+    jimmy = @person.new
+    jimmy.name = "Jimmy"
+    jimmy.gpa = 3.5
+    orm.save(jimmy)
+    
+    assert_nothing_raised do
+      people = orm.all(@person, :limit => 1) { |person| person.gpa.gt(3).or(person.name.eq("Jimmy")) }
+      assert_equal(1, people.size)
+    end
   ensure
     schema.destroy(@person)
   end
