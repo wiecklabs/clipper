@@ -35,7 +35,7 @@ module Wheels
       def get(target, *keys)
         mapping = @repository.mappings[target]
 
-        conditions = Query::AndExpression.new(*mapping.keys.zip(keys).map { |condition| Query::UnboundCondition.eq(*condition) })
+        conditions = Query::AndExpression.new(*mapping.keys.zip(keys).map { |condition| Query::Condition.eq(*condition) })
 
         query = Query.new(mapping, conditions)
 

@@ -230,6 +230,7 @@ module Integration::AbstractRepositoryTest
   ensure
     schema.destroy(@zoo)
     schema.destroy(@city)
+  end
   
   def test_all_with_nice_conditions
     schema = Wheels::Orm::Schema.new("default")
@@ -246,6 +247,5 @@ module Integration::AbstractRepositoryTest
     end
   ensure
     schema.destroy(@person)
-
   end
 end

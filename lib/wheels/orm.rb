@@ -26,7 +26,7 @@ require Pathname(__FILE__).dirname + "orm" + "repositories" + "abstract"
 
 require Pathname(__FILE__).dirname + "orm" + "query" + "query"
 require Pathname(__FILE__).dirname + "orm" + "query" + "expression"
-require Pathname(__FILE__).dirname + "orm" + "query" + "unbound_condition"
+require Pathname(__FILE__).dirname + "orm" + "query" + "condition"
 
 require Pathname(__FILE__).dirname + "orm" + "syntax" + "sql"
 
