@@ -3,7 +3,7 @@ module Wheels
     class Mappings
       class CompositeMapping < Mapping
 
-        def initialize(source_mapping, name)
+        def initialize(source_mapping, name, source_keys)
           begin
             assert_kind_of(Mapping, source_mapping, "CompositeMapping#source_mapping must be a Mapping")
             @source_mapping = source_mapping
@@ -16,20 +16,14 @@ module Wheels
           end
 
           @target = @source_mapping.target
+          @source_keys = source_keys
 
-          # We need an Set that preserves insertion order here.
-          # The Wieck::OrderedSet is a temporary hack, not intended to be a
-          # long term solution. I suspect jRuby offers an "out of box"
-          # solution. Possibly jRuby's own Set preserves insertion order since
-          # Java Hashes do?
           @fields = java.util.LinkedHashSet.new
           @key = java.util.LinkedHashSet.new
         end
 
-        def field(*args)
-          field = super
-          @source_mapping.fields << field
-          field
+        def source_keys
+          @source_keys
         end
 
       end

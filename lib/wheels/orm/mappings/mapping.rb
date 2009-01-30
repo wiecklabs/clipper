@@ -74,7 +74,7 @@ module Wheels
           missing_keys = related_keys.reject { |related_key| self[related_key] }
           raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.") unless missing_keys.empty?
 
-          composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name)
+          composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name, related_keys)
           @composite_mappings << yield(composite_mapping)
           composite_mapping
         end
@@ -96,6 +96,12 @@ module Wheels
         #
         def fields
           @fields
+        end
+
+        def composite_fields
+          composite_fields = java.util.LinkedHashSet.new
+          @composite_mappings.each { |mapping| mapping.fields.each { |field| composite_fields.add(field) } }
+          composite_fields
         end
 
         def keys

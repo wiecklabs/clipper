@@ -1,10 +1,22 @@
 module Integration::AbstractRepositoryTest
 
+  class Zoo
+  end
+
   def setup_abstract
-    @zoo = Class.new do
-      orm.map(self, "zoos") do |zoos|
-        zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
-        zoos.field "name", String
+    @zoo = Zoo
+    orm.map(@zoo, "zoos") do |zoos|
+      zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
+      zoos.field "name", String
+      zoos.field "city", String
+      zoos.field "state", String
+
+      zoos.compose("cities", "city", "state") do |cities|
+        cities.field("name", String)
+        cities.field("state", String)
+        cities.field("region", String)
+
+        cities.key(cities["name"], cities["state"])
       end
     end
 
@@ -12,6 +24,8 @@ module Integration::AbstractRepositoryTest
       orm.map(self, "cities") do |cities|
         cities.field("name", String)
         cities.field("state", String)
+        cities.field("region", String)
+
         cities.key(cities["name"], cities["state"])
       end
     end
@@ -192,5 +206,29 @@ module Integration::AbstractRepositoryTest
 
   ensure
     schema.destroy(@person)
+  end
+
+  def test_get_with_composite_mapping
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@zoo)
+    schema.create(@city)
+
+    city = @city.new
+    city.name = "Dallas"
+    city.state = "Texas"
+    city.region = "South"
+    orm.save(city)
+
+    zoo = @zoo.new
+    zoo.name = "Dallas Zoo"
+    zoo.city = "Dallas"
+    zoo.state = "Texas"
+    orm.save(zoo)
+
+    assert_equal("South", orm.get(@zoo, zoo.id).region)
+
+  ensure
+    schema.destroy(@zoo)
+    schema.destroy(@city)
   end
 end
