@@ -108,7 +108,7 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       1.upto(TIMES) { Person.all(:id.lt => 10).entries }
     else
-      conditions = Wheels::Orm::Query::UnboundCondition.lt(orm.mappings[Person]["id"], 10)
+      conditions = Wheels::Orm::Query::Condition.lt(orm.mappings[Person]["id"], 10)
       orm { |session| 1.upto(TIMES) { session.all(Person, conditions) } }
     end
   end

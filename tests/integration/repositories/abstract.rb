@@ -185,7 +185,7 @@ module Integration::AbstractRepositoryTest
     orm.save(person)
 
     assert_nothing_raised do
-      low_gpa = Wheels::Orm::Query::UnboundCondition.lt(orm.mappings[@person]["gpa"], 3)
+      low_gpa = Wheels::Orm::Query::Condition.lt(orm.mappings[@person]["gpa"], 3)
       people = orm.all(@person, low_gpa)
       assert_equal(1, people.size)
     end

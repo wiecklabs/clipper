@@ -1,7 +1,7 @@
 module Wheels
   module Orm
     class Query
-      class UnboundCondition
+      class Condition
         def self.gt(field, value)
           new(:gt, field, value)
         end

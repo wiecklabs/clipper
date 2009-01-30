@@ -17,7 +17,7 @@ module Wheels
       def paramaters
         case @conditions
         when nil then []
-        when UnboundCondition then [@conditions.value]
+        when Condition then [@conditions.value]
         else
           @conditions.values.map { |condition| condition.value }
         end
@@ -26,7 +26,7 @@ module Wheels
       def fields
         case @conditions
         when nil then []
-        when UnboundCondition then [@conditions.field]
+        when Condition then [@conditions.field]
         else
           @conditions.values.map { |condition| condition.field }
         end

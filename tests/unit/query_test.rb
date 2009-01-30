@@ -19,12 +19,12 @@ class QueryTest < Test::Unit::TestCase
   end
 
   def test_query
-    # id_conditions = Wheels::Orm::Query::UnboundCondition.new(:eq, @zoos["id"], 1)
+    # id_conditions = Wheels::Orm::Query::Condition.new(:eq, @zoos["id"], 1)
     # query = Wheels::Orm::Query.new(@zoos, id_conditions)
     # puts Wheels::Orm::Syntax::Sql.new(@repository).serialize(query.conditions)
     # 
-    # city_condition = Wheels::Orm::Query::UnboundCondition.new(:eq, @cities["city"], "Dallas")
-    # state_condition = Wheels::Orm::Query::UnboundCondition.new(:eq, @cities["state"], "Texas")
+    # city_condition = Wheels::Orm::Query::Condition.new(:eq, @cities["city"], "Dallas")
+    # state_condition = Wheels::Orm::Query::Condition.new(:eq, @cities["state"], "Texas")
     # 
     # city_state = Wheels::Orm::Query::AndExpression.new(city_condition, state_condition)
     # 
@@ -33,15 +33,15 @@ class QueryTest < Test::Unit::TestCase
   end
 
   def test_query_paramaters_with_unbound_condition
-    id_conditions = Wheels::Orm::Query::UnboundCondition.new(:eq, @zoos["id"], 1)
+    id_conditions = Wheels::Orm::Query::Condition.new(:eq, @zoos["id"], 1)
     query = Wheels::Orm::Query.new(@zoos, id_conditions)
 
     assert_equal([1], query.paramaters)
   end
 
   def test_query_paramaters_with_expression
-    city_condition = Wheels::Orm::Query::UnboundCondition.new(:eq, @cities["city"], "Dallas")
-    state_condition = Wheels::Orm::Query::UnboundCondition.new(:eq, @cities["state"], "Texas")
+    city_condition = Wheels::Orm::Query::Condition.new(:eq, @cities["city"], "Dallas")
+    state_condition = Wheels::Orm::Query::Condition.new(:eq, @cities["state"], "Texas")
 
     city_state = Wheels::Orm::Query::AndExpression.new(city_condition, state_condition)
     query = Wheels::Orm::Query.new(@cities, city_state)
