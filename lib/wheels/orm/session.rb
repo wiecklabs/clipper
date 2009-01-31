@@ -46,12 +46,8 @@ module Wheels
         raise ArgumentError.new("Wheels::Orm::Session#all requires a block") unless block_given?
         
         mapping = @repository.mappings[target]
-        criteria = yield(Wheels::Orm::Query::Criteria.new(mapping))
-        
-        unless criteria.is_a?(Wheels::Orm::Query::Criteria)
-          raise ArgumentError.new("Wheels::Orm::Session#all requires the block to return a Wheels::Orm::Query::Criteria instance")
-        end
-        
+        criteria = Wheels::Orm::Query::Criteria.new(mapping)
+        yield(criteria)
         @repository.select(Query.new(mapping, criteria.conditions))
       end
       
