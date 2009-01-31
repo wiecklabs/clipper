@@ -27,6 +27,7 @@ require Pathname(__FILE__).dirname + "orm" + "repositories" + "abstract"
 require Pathname(__FILE__).dirname + "orm" + "query" + "query"
 require Pathname(__FILE__).dirname + "orm" + "query" + "expression"
 require Pathname(__FILE__).dirname + "orm" + "query" + "condition"
+require Pathname(__FILE__).dirname + "orm" + "query" + "criteria"
 
 require Pathname(__FILE__).dirname + "orm" + "syntax" + "sql"
 

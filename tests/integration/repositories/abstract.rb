@@ -161,7 +161,7 @@ module Integration::AbstractRepositoryTest
     schema.destroy(@city)
   end
 
-  def test_all
+  def test_find
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
 
@@ -176,7 +176,7 @@ module Integration::AbstractRepositoryTest
     orm.save(person)
 
     assert_nothing_raised do
-      people = orm.all(@person)
+      people = orm.find(@person)
       assert_equal(2, people.size)
     end
 
@@ -184,7 +184,7 @@ module Integration::AbstractRepositoryTest
     schema.destroy(@person)
   end
 
-  def test_all_with_raw_conditions
+  def test_find_with_conditions
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
 
@@ -200,7 +200,7 @@ module Integration::AbstractRepositoryTest
 
     assert_nothing_raised do
       low_gpa = Wheels::Orm::Query::Condition.lt(orm.mappings[@person]["gpa"], 3)
-      people = orm.all(@person, low_gpa)
+      people = orm.find(@person, low_gpa)
       assert_equal(1, people.size)
     end
 
@@ -232,7 +232,7 @@ module Integration::AbstractRepositoryTest
     schema.destroy(@city)
   end
   
-  def test_all_with_nice_conditions
+  def test_all_with_conditions
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
     
