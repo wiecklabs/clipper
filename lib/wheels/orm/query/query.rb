@@ -19,7 +19,12 @@ module Wheels
         when nil then []
         when Condition then [@conditions.value]
         else
-          @conditions.values.map { |condition| condition.value }
+          begin
+            @conditions.values.map { |condition| condition.value }
+          rescue NoMethodError => nme
+            p @conditions
+            raise
+          end
         end
       end
 

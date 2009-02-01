@@ -16,7 +16,7 @@ module Wheels
               field_methods = mapping.fields.map do |field|
                 <<-EOS
                 def #{field.name}
-                  Wheels::Orm::Query::Criteria::Field.new(self, self.class.mapping[#{field.name}])
+                  Wheels::Orm::Query::Criteria::Field.new(self, self.class.mapping[#{field.name.inspect}])
                 end
                 EOS
               end.join
@@ -32,24 +32,24 @@ module Wheels
             @mapping
           end
         end # class << self
-
-        def initialize
-          @conditions = java.util.LinkedHashSet.new
+        
+        def merge(condition)
+          @condition = condition
+          self
         end
         
         def and(*others)
-          AndExpression.new(self, *others)
-        end
-
-        def or(*others)
-          @conditions.reject! { |condition| others.include?(condition) }
-          puts "OR: @conditions => #{@conditions.inspect}, others => #{others.inspect}"
-          @conditions << OrExpression.new(@conditions.pop, *others)
+          AndExpression.new(@condition, *others)
           self
         end
 
-        def conditions
-          @conditions
+        def or(*others)
+          OrExpression.new(@condition, *others)
+          self
+        end
+        
+        def condition
+          @condition
         end
       end
     end

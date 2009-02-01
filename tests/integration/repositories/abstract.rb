@@ -232,7 +232,24 @@ module Integration::AbstractRepositoryTest
     schema.destroy(@city)
   end
   
-  def test_all_with_conditions
+  def test_all_with_single_condition
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@person)
+    
+    bob = @person.new
+    bob.name = "Bob"
+    bob.gpa = 4.0
+    orm.save(bob)
+    
+    assert_nothing_raised do
+      people = orm.all(@person, :limit => 1) { |person| person.name.eq("Bob") }
+      assert_equal(1, people.size)
+    end
+  ensure
+    schema.destroy(@person)
+  end
+  
+  def test_all_with_multiple_conditions
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
     

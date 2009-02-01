@@ -10,18 +10,15 @@ module Wheels
           end
           
           def eq(value)
-            @criteria.conditions << Wheels::Orm::Query::Condition.new(:eq, @field, value)
-            @criteria
+            @criteria.merge(Wheels::Orm::Query::Condition::eq(@field, value))
           end
           
           def lt(value)
-            @criteria.conditions << Wheels::Orm::Query::Condition.new(:lt, @field, value)
-            @criteria
+            @criteria.merge(Wheels::Orm::Query::Condition::lt(@field, value))
           end
           
           def gt(value)
-            @criteria.conditions << Wheels::Orm::Query::Condition.new(:gt, @field, value)
-            @criteria
+            @criteria.merge(Wheels::Orm::Query::Condition::gt(@field, value))
           end
           
         end # class Field

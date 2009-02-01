@@ -48,7 +48,8 @@ module Wheels
         mapping = @repository.mappings[target]
         criteria = Wheels::Orm::Query::Criteria.new(mapping)
         yield(criteria)
-        @repository.select(Query.new(mapping, criteria.conditions))
+
+        @repository.select(Query.new(mapping, criteria.condition))
       end
       
       def find(target, conditions = nil)
