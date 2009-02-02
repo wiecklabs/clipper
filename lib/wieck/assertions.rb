@@ -9,6 +9,14 @@ module Test
       def assert_not_blank(value, message)
         assert(!value.blank?, message)
       end
+      
+      def assert_empty(value)
+        assert(value.empty?, "Expected #{value.inspect} to be empty")
+      end
+      
+      def assert_not_empty(value)
+        assert(!value.empty?, "Expected #{value.inspect} to not be empty")
+      end
     end
   end
 end

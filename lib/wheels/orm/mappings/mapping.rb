@@ -29,6 +29,7 @@ module Wheels
           @composite_mappings = []
           @fields = java.util.LinkedHashSet.new
           @key = java.util.LinkedHashSet.new
+          @contexts = Wheels::Orm::Validations::Contexts.new(self)
         end
 
         # The name of this mapping. In database terms this would map to a
@@ -72,7 +73,10 @@ module Wheels
 
         def compose(mapped_name, *related_keys)
           missing_keys = related_keys.reject { |related_key| self[related_key] }
-          raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.") unless missing_keys.empty?
+          
+          unless missing_keys.empty?
+            raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.")
+          end
 
           composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name, related_keys)
           @composite_mappings << yield(composite_mapping)
@@ -80,6 +84,10 @@ module Wheels
         end
 
         def proxy(mapped_name)
+        end
+        
+        def constrain(context_name, &block)
+          @contexts.define(context_name, &block)
         end
 
         def eql?(other)

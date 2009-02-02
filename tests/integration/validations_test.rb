@@ -22,22 +22,8 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   def teardown
     Wheels::Orm::Repositories::registrations.delete("default")
   end
-  
-  # Validators:
-  # Absent
-  # Acceptance
-  # Confirmation => equal
-  # Format
-  # Custom
-  # Length
-  # isNumeric
-  # Required
-  # Unique
-  # Range
-  # WithinSet
     
   def test_constraint_declarations
-    flunk("Mapping#constrain not yet implemented")
     assert_nothing_raised do
       @users.constrain("test_constraint_declarations") do |check|
         check.size("name", 50) { |instance| instance.active? }
@@ -50,9 +36,5 @@ class Integration::ValidationsTest < Test::Unit::TestCase
         check.equal("password", "password_confirmation")
       end
     end
-  end
-  
-  def test_acceptance_constraint
-    flunk("AcceptanceValidation not yet implemented")
   end
 end
