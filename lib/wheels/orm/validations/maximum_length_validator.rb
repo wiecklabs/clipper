@@ -2,15 +2,15 @@ module Wheels
   module Orm
     module Validations
       
-      class MinimumLengthValidator
+      class MaximumLengthValidator
         def initialize(field, length)
           @field = field
           @length = length
         end
         
         def call(instance, errors)
-          if instance.send(@field).length < @length
-            errors.append(instance, "%1$s is too short! Must %2$s characters or longer." % [@field, @length], @field)
+          if instance.send(@field).length > @length
+            errors.append(instance, "%1$s is too long! Must %2$s characters or shorter." % [@field, @length], @field)
           end
         end
       end

@@ -11,8 +11,11 @@ class Integration::ValidationsTest < Test::Unit::TestCase
       orm.map(self, "users") do |users|
         users.key "id", Integer
         users.field "name", Wheels::Orm::Types::String
+        users.field "email", Wheels::Orm::Types::String
         users.field "password", Wheels::Orm::Types::String
         users.field "age", Wheels::Orm::Types::Integer
+        users.field "gender", Wheels::Orm::Types::String
+        users.field "title", Wheels::Orm::Types::String
       end
     end
     
@@ -34,6 +37,12 @@ class Integration::ValidationsTest < Test::Unit::TestCase
         
         check.required("password")
         check.equal("password", "password_confirmation")
+
+        check.format('email', /\w+@\w+\.com/)
+        check.within('gender', %w{M F})
+        check.within('age', 21..35)
+
+        check.size('address', 21..200)
       end
     end
   end

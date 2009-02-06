@@ -3,9 +3,10 @@ module Wheels
     module Validations
       class Context
         
-        def initialize(mapping, name)
+        def initialize(mapping, name, &block)
           @mapping = mapping
           @name = name
+          
         end
         
         def mapping
