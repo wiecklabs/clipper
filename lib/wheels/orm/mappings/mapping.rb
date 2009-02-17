@@ -73,7 +73,7 @@ module Wheels
 
         def compose(mapped_name, *related_keys)
           missing_keys = related_keys.reject { |related_key| self[related_key] }
-          
+
           unless missing_keys.empty?
             raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.")
           end
@@ -84,8 +84,21 @@ module Wheels
         end
 
         def proxy(mapped_name)
+          mapping = self
+          criteria = Wheels::Orm::Query::Criteria.new(self)
+
+          target.send(:instance_variable_set, "@#{mapped_name}_criteria", yield(criteria))
+
+          target.send(:define_method, mapped_name) do
+            # @proxy_query = yield(mapping)
+            # @proxy_query.call(self)
+          end
+
+          target.send(:define_method, mapped_name+"=") do |object|
+            self.send(mapped_name)
+          end
         end
-        
+
         def constrain(context_name, &block)
           @contexts.define(context_name, &block)
         end
