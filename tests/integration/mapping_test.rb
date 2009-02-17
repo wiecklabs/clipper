@@ -117,6 +117,15 @@ class Integration::MappingTest < Test::Unit::TestCase
       orm.all(Projects, [:and, [:eql, task["person_id"], p.id], [:eql, "id", task["project_id"]]])
     end
 
+    people.proxy("watched_tasks") do |p|
+      people_tasks = orm.map(Class.new, "people_tasks") do |people_tasks|
+        people_tasks.field("person_id", Integer)
+        people_tasks.field("task_id", Integer)
+      end
+
+      orm.all(Task, [:and, [:eql, people_tasks["person_id"], p.id], [:eql, "id", people_tasks["task_id"]]])
+    end
+
   end
 
 end
