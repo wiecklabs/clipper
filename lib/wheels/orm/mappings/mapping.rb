@@ -85,17 +85,17 @@ module Wheels
 
         def proxy(mapped_name)
           mapping = self
-          criteria = Wheels::Orm::Query::Criteria.new(self)
-
-          target.send(:instance_variable_set, "@#{mapped_name}_criteria", yield(criteria))
+          criteria = yield Wheels::Orm::Query::Criteria.new(self)
 
           target.send(:define_method, mapped_name) do
-            # @proxy_query = yield(mapping)
-            # @proxy_query.call(self)
+            c = criteria.condition.dup
+            c.value = c.value.field.get(self)
+            orm.find(c.field.mapping.target, c).first
           end
 
           target.send(:define_method, mapped_name+"=") do |object|
-            self.send(mapped_name)
+            c = criteria.condition
+            c.value.field.set(self, c.field.get(object))
           end
         end
 

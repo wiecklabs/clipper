@@ -28,6 +28,10 @@ module Wheels
           @value
         end
 
+        def value=(value)
+          @value = value
+        end
+
         def and(*others)
           AndExpression.new(self, *others)
         end

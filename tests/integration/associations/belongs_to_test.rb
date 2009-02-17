@@ -2,20 +2,29 @@ require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
 
 class BelongsToTest < Test::Unit::TestCase
+  class Zoo
+  end
+
+  class Exhibit
+  end
+
   def setup
     @uri = Wheels::Orm::Uri.new("jdbc:hsqldb:mem:test")
     Wheels::Orm::Repositories::register("default", @uri.to_s)
 
-    @zoo = Class.new
+    @zoo = Zoo
     orm.map(@zoo, "zoos") do |zoos|
       zoos.key(zoos.field("id", Wheels::Orm::Types::Serial))
     end
 
-    @exhibit = Class.new
+    @exhibit = Exhibit
     orm.map(@exhibit, "exhibits") do |exhibits|
       exhibits.key(exhibits.field("id", Wheels::Orm::Types::Serial))
       exhibits.field("zoo_id", Integer)
-      exhibits.proxy("zoo") { |exhibit| orm.mappings[@zoo]["id"].eq(exhibit.zoo_id) }
+      exhibits.proxy("zoo") do |exhibit|
+        zoo = Wheels::Orm::Query::Criteria.new(orm.mappings[@zoo])
+        zoo.id.eq(exhibit.zoo_id)
+      end
     end
 
     @schema = Wheels::Orm::Schema.new("default")
