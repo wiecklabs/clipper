@@ -1,7 +1,7 @@
 module Wheels
   module Orm
     module Validations
-      
+
       class WithinValidator
         def initialize(field, set)
           @field = field
