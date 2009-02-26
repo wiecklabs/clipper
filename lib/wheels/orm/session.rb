@@ -37,7 +37,7 @@ module Wheels
 
         conditions = Query::AndExpression.new(*mapping.keys.zip(keys).map { |condition| Query::Condition.eq(*condition) })
 
-        query = Query.new(mapping, conditions)
+        query = Query.new(mapping, nil, conditions)
 
         @repository.select(query).first
       end
@@ -49,13 +49,13 @@ module Wheels
         criteria = Wheels::Orm::Query::Criteria.new(mapping)
         yield(criteria)
 
-        @repository.select(Query.new(mapping, criteria.condition))
+        @repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__))
       end
       
-      def find(target, conditions = nil)
+      def find(target, options, conditions)
         mapping = @repository.mappings[target]
 
-        @repository.select(Query.new(mapping, conditions))
+        @repository.select(Query.new(mapping, options, conditions))
       end
 
       def save(collection)

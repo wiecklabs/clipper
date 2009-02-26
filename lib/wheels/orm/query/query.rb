@@ -1,15 +1,33 @@
 module Wheels
   module Orm
     class Query
-      def initialize(mapping, conditions = nil)
+      def initialize(mapping, options, conditions)
         @mapping = mapping
         @conditions = conditions
+        
+        if options
+          @limit = options.fetch(:limit, nil)
+          @offset = options.fetch(:offset, nil)
+          @order = options.fetch(:order, nil)
+        end
       end
 
       def mapping
         @mapping
       end
 
+      def limit
+        @limit
+      end
+      
+      def offset
+        @offset
+      end
+      
+      def order
+        @order
+      end
+      
       def conditions
         @conditions
       end

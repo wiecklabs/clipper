@@ -176,7 +176,7 @@ module Integration::AbstractRepositoryTest
     orm.save(person)
 
     assert_nothing_raised do
-      people = orm.find(@person)
+      people = orm.find(@person, nil, nil)
       assert_equal(2, people.size)
     end
 
@@ -200,7 +200,7 @@ module Integration::AbstractRepositoryTest
 
     assert_nothing_raised do
       low_gpa = Wheels::Orm::Query::Condition.lt(orm.mappings[@person]["gpa"], 3)
-      people = orm.find(@person, low_gpa)
+      people = orm.find(@person, nil, low_gpa)
       assert_equal(1, people.size)
     end
 

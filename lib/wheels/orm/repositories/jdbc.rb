@@ -47,6 +47,17 @@ module Wheels
           end
           statement << " WHERE #{syntax.serialize(query.conditions)}" if query.conditions
 
+          if query.order
+            statement << " ORDER BY "
+            statement << query.order.map do |field, direction|
+              field_name = quote_identifier("#{field.mapping.name}.#{field.name}")
+              direction == :desc ? field_name + " DESC" : field_name
+            end * ", "
+          end
+          
+          statement << " LIMIT #{query.limit}" if query.limit
+          statement << " OFFSET #{query.offset}" if query.offset
+          
           logger.debug(statement)
 
           collection = Wheels::Orm::Collection.new(query.mapping, [])

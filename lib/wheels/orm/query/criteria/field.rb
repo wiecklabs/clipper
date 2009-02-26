@@ -7,6 +7,7 @@ module Wheels
           def initialize(criteria, field)
             @criteria = criteria
             @field = field
+            @direction = :asc
           end
 
           def field
@@ -23,6 +24,20 @@ module Wheels
 
           def gt(value)
             @criteria.merge(Wheels::Orm::Query::Condition::gt(@field, value))
+          end
+          
+          def desc
+            @direction = :desc
+            self
+          end
+          
+          def asc
+            @direction = :asc
+            self
+          end
+          
+          def direction
+            @direction
           end
 
         end # class Field
