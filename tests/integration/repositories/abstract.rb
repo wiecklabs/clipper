@@ -259,8 +259,50 @@ module Integration::AbstractRepositoryTest
     orm.save(jimmy)
     
     assert_nothing_raised do
-      people = orm.all(@person, :limit => 1) { |person| person.gpa.gt(3).or(person.name.eq("Jimmy")) }
+      people = orm.all(@person) do |person|
+        person.gpa.gt(3).or(person.name.eq("Jimmy"))
+      end
+      
       assert_equal(1, people.size)
+    end
+  ensure
+    schema.destroy(@person)
+  end
+  
+  def test_all_with_limit_and_order
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@person)
+    
+    mike = @person.new
+    mike.name = "Mike"
+    mike.gpa = 1.2
+    orm.save(mike)
+    
+    scott = @person.new
+    scott.name = "Scott"
+    scott.gpa = 4.0
+    orm.save(scott)
+    
+    bernerd = @person.new
+    bernerd.name = "Bernerd"
+    bernerd.gpa = 3.6
+    orm.save(bernerd)
+    
+    sam = @person.new
+    sam.name = "Sam"
+    sam.gpa = 0.1
+    orm.save(sam)
+    
+    assert_nothing_raised do
+      people = orm.all(@person) do |person|
+        person.limit 3
+        person.order(person.gpa.desc, person.name)
+      end
+      
+      assert_equal(3, people.size)
+      assert_equal(scott.gpa, people[0].gpa)
+      assert_equal(bernerd.gpa, people[1].gpa)
+      assert_equal(mike.gpa, people[2].gpa)
     end
   ensure
     schema.destroy(@person)
