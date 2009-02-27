@@ -37,9 +37,9 @@ module Wheels
           mapping_fields.addAll(query.mapping.composite_fields)
 
           statement = "SELECT #{mapping_fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "} "
-          statement << "FROM #{quote_identifier(query.mapping.name)} "
+          statement << "FROM #{quote_identifier(query.mapping.name)}"
           query.mapping.composite_mappings.each do |mapping|
-            statement << "INNER JOIN #{quote_identifier(mapping.name)} ON "
+            statement << " INNER JOIN #{quote_identifier(mapping.name)} ON "
             statement << mapping.keys.zip(mapping.source_keys).map do |mapping_key, source_key|
               j = "#{quote_identifier("#{query.mapping.name}.#{source_key}")} = "
               j << "#{quote_identifier("#{mapping.name}.#{mapping_key.name}")}"
@@ -52,7 +52,7 @@ module Wheels
             statement << query.order.map do |field, direction|
               field_name = quote_identifier("#{field.mapping.name}.#{field.name}")
               direction == :desc ? field_name + " DESC" : field_name
-            end * ", "
+            end.join(", ")
           end
           
           statement << " LIMIT #{query.limit}" if query.limit
