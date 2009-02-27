@@ -1,22 +1,23 @@
 module Integration::AbstractRepositoryTest
 
-  class Zoo
-  end
+  # class Zoo
+  # end
 
   def setup_abstract
-    @zoo = Zoo
-    orm.map(@zoo, "zoos") do |zoos|
-      zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
-      zoos.field "name", String
-      zoos.field "city", String
-      zoos.field "state", String
+    @zoo = Class.new do
+      orm.map(self, "zoos") do |zoos|
+        zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
+        zoos.field "name", String
+        zoos.field "city", String
+        zoos.field "state", String
 
-      zoos.compose("cities", "city", "state") do |cities|
-        cities.field("name", String)
-        cities.field("state", String)
-        cities.field("region", String)
+        zoos.compose("cities", "city", "state") do |cities|
+          cities.field("name", String)
+          cities.field("state", String)
+          cities.field("region", String)
 
-        cities.key(cities["name"], cities["state"])
+          cities.key(cities["name"], cities["state"])
+        end
       end
     end
 
