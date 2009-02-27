@@ -85,6 +85,8 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_describing_mapping_a_complete_class
+    flunk("Composite mappings using keys from other composite mappings is unsupported.")
+
     person = Class.new
     people = orm.map(person, "people") do |people|
       people.key people.field("id", Integer)
