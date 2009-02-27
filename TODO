@@ -11,6 +11,7 @@ TODO:
 
 TODONE:
 
+* Added OFFSET, LIMIT and ORDER BY support. Sam:2009-02-27
 * Schema Mappings: Field, Source and Relation mappings are all tested and in-place. Sam:2009-01-11
 * Uri: Sam:2009-01-11
 * Repository (only class definition, no interface): Sam:2009-01-12
