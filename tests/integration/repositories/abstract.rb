@@ -300,9 +300,9 @@ module Integration::AbstractRepositoryTest
       end
       
       assert_equal(3, people.size)
-      assert_equal(scott.gpa, people[0].gpa)
-      assert_equal(bernerd.gpa, people[1].gpa)
-      assert_equal(mike.gpa, people[2].gpa)
+      assert_equal('%1.1f' % [scott.gpa],     '%1.1f' % [people[0].gpa])
+      assert_equal('%1.1f' % [bernerd.gpa],   '%1.1f' % [people[1].gpa])
+      assert_equal('%1.1f' % [mike.gpa],      '%1.1f' % [people[2].gpa])
     end
   ensure
     schema.destroy(@person)
