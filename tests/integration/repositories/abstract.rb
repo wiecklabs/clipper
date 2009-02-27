@@ -231,74 +231,76 @@ module Integration::AbstractRepositoryTest
     schema.destroy(@zoo)
     schema.destroy(@city)
   end
-  
+
   def test_all_with_single_condition
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
-    
+
     bob = @person.new
     bob.name = "Bob"
     bob.gpa = 4.0
     orm.save(bob)
-    
+
     assert_nothing_raised do
-      people = orm.all(@person, :limit => 1) { |person| person.name.eq("Bob") }
+      people = orm.all(@person) { |person| person.name.eq("Bob") }
       assert_equal(1, people.size)
     end
   ensure
     schema.destroy(@person)
   end
-  
+
   def test_all_with_multiple_conditions
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
-    
+
     jimmy = @person.new
     jimmy.name = "Jimmy"
     jimmy.gpa = 3.5
     orm.save(jimmy)
-    
+
     assert_nothing_raised do
       people = orm.all(@person) do |person|
         person.gpa.gt(3).or(person.name.eq("Jimmy"))
       end
-      
+
       assert_equal(1, people.size)
     end
   ensure
     schema.destroy(@person)
   end
-  
+
   def test_all_with_limit_and_order
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@person)
-    
+
     mike = @person.new
     mike.name = "Mike"
     mike.gpa = 1.2
     orm.save(mike)
-    
+
     scott = @person.new
     scott.name = "Scott"
     scott.gpa = 4.0
     orm.save(scott)
-    
+
     bernerd = @person.new
     bernerd.name = "Bernerd"
     bernerd.gpa = 3.6
     orm.save(bernerd)
-    
+
     sam = @person.new
     sam.name = "Sam"
     sam.gpa = 0.1
     orm.save(sam)
-    
+
+    assert_equal(4, orm.all(@person).size)
+
     assert_nothing_raised do
       people = orm.all(@person) do |person|
         person.limit 3
         person.order(person.gpa.desc, person.name)
       end
-      
+
       assert_equal(3, people.size)
       assert_equal('%1.1f' % [scott.gpa],     '%1.1f' % [people[0].gpa])
       assert_equal('%1.1f' % [bernerd.gpa],   '%1.1f' % [people[1].gpa])

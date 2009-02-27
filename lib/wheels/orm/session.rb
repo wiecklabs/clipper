@@ -42,16 +42,15 @@ module Wheels
         @repository.select(query).first
       end
 
-      def all(target, options = nil)
-        raise ArgumentError.new("Wheels::Orm::Session#all requires a block") unless block_given?
-        
+      def all(target)
         mapping = @repository.mappings[target]
         criteria = Wheels::Orm::Query::Criteria.new(mapping)
-        yield(criteria)
+
+        yield(criteria) if block_given?
 
         @repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__))
       end
-      
+
       def find(target, options, conditions)
         mapping = @repository.mappings[target]
 
