@@ -1,7 +1,7 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
 
-class BelongsToTest < Test::Unit::TestCase
+class BelongsToTest # PENDING < Test::Unit::TestCase
   class Zoo
   end
 
