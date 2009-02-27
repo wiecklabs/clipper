@@ -54,19 +54,21 @@ module Wheels
               direction == :desc ? field_name + " DESC" : field_name
             end.join(", ")
           end
-          
+
           statement << " LIMIT #{query.limit}" if query.limit
           statement << " OFFSET #{query.offset}" if query.offset
-          
-          logger.debug(statement)
 
           collection = Wheels::Orm::Collection.new(query.mapping, [])
 
           with_connection do |connection|
             if query.paramaters.empty?
+              logger.debug(statement)
+
               stmt = connection.createStatement
               results = stmt.executeQuery(statement)
             else
+              logger.debug(statement + " -> #{query.paramaters.inspect}")
+
               stmt = connection.prepareStatement(statement)
 
               query.fields.zip(query.paramaters).each_with_index do |attribute, index|
