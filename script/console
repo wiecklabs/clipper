@@ -1,5 +1,7 @@
 #!/usr/bin/env jruby
 
+# This just creates a "people" table in Sqlite3 and adds a few records for you to play with.
+
 require "pathname"
 require Pathname(__FILE__).dirname.parent + "lib" + "wheels" + "orm"
 
