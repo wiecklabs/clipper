@@ -36,12 +36,12 @@ module Wheels
           mapping_fields = query.mapping.fields
           mapping_fields.addAll(query.mapping.composite_fields)
 
-          statement = "SELECT #{mapping_fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "} "
+          statement = "SELECT #{mapping_fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "}"
           statement << "FROM #{quote_identifier(query.mapping.name)}"
           query.mapping.composite_mappings.each do |mapping|
-            statement << " INNER JOIN #{quote_identifier(mapping.name)} ON "
+            statement << " LEFT JOIN #{quote_identifier(mapping.name)} ON "
             statement << mapping.keys.zip(mapping.source_keys).map do |mapping_key, source_key|
-              j = "#{quote_identifier("#{query.mapping.name}.#{source_key}")} = "
+              j = "#{quote_identifier("#{source_key.mapping.name}.#{source_key.name}")} = "
               j << "#{quote_identifier("#{mapping.name}.#{mapping_key.name}")}"
             end.join(" AND ")
           end

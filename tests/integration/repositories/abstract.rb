@@ -11,13 +11,29 @@ module Integration::AbstractRepositoryTest
         zoos.field "city", String
         zoos.field "state", String
 
-        zoos.compose("cities", "city", "state") do |cities|
+        cities = zoos.compose("cities", "city", "state") do |cities|
           cities.field("name", String)
           cities.field("state", String)
           cities.field("region", String)
 
           cities.key(cities["name"], cities["state"])
         end
+
+        zoos.compose("climates", "region") do |climates|
+          climates.field("region", String)
+          climates.field("climate", String)
+
+          climates.key(climates["region"])
+        end
+      end
+    end
+
+    @climate = Class.new do
+      orm.map(self, "climates") do |climates|
+        climates.field("region", String)
+        climates.field("climate", String)
+
+        climates.key(climates["region"])
       end
     end
 
@@ -213,6 +229,7 @@ module Integration::AbstractRepositoryTest
     schema = Wheels::Orm::Schema.new("default")
     schema.create(@zoo)
     schema.create(@city)
+    schema.create(@climate)
 
     city = @city.new
     city.name = "Dallas"
@@ -231,6 +248,39 @@ module Integration::AbstractRepositoryTest
   ensure
     schema.destroy(@zoo)
     schema.destroy(@city)
+    schema.destroy(@climate)
+  end
+
+  def test_get_with_multiple_composite_mappings
+    schema = Wheels::Orm::Schema.new("default")
+    schema.create(@zoo)
+    schema.create(@city)
+    schema.create(@climate)
+
+    city = @city.new
+    city.name = "Dallas"
+    city.state = "Texas"
+    city.region = "South"
+    orm.save(city)
+
+    climate = @climate.new
+    climate.region = "South"
+    climate.climate = "Hot"
+    orm.save(climate)
+
+    zoo = @zoo.new
+    zoo.name = "Dallas Zoo"
+    zoo.city = "Dallas"
+    zoo.state = "Texas"
+    orm.save(zoo)
+
+    assert_equal("South", orm.get(@zoo, zoo.id).region)
+    assert_equal("Hot", orm.get(@zoo, zoo.id).climate)
+
+  ensure
+    schema.destroy(@zoo)
+    schema.destroy(@city)
+    schema.destroy(@climate)
   end
 
   def test_all_with_single_condition

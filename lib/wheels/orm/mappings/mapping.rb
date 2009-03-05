@@ -68,7 +68,7 @@ module Wheels
         end
 
         def [](name)
-          @fields.detect { |field| field.name == name }
+          @fields.detect { |field| field.name == name } || composite_fields.detect { |field| field.name == name }
         end
 
         def compose(mapped_name, *related_keys)
@@ -78,8 +78,11 @@ module Wheels
             raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.")
           end
 
+          related_keys.map! { |key| self[key] }
+
           composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name, related_keys)
-          @composite_mappings << yield(composite_mapping)
+          yield(composite_mapping)
+          @composite_mappings << composite_mapping
           composite_mapping
         end
 
@@ -121,7 +124,11 @@ module Wheels
 
         def composite_fields
           composite_fields = java.util.LinkedHashSet.new
-          @composite_mappings.each { |mapping| mapping.fields.each { |field| composite_fields.add(field) } }
+          @composite_mappings.each do |mapping|
+            mapping.fields.each do |field|
+              composite_fields.add(field) unless mapping.keys.include?(field)
+            end
+          end
           composite_fields
         end
 

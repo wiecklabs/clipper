@@ -85,8 +85,6 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_describing_mapping_a_complete_class
-    flunk("Composite mappings using keys from other composite mappings is unsupported.")
-
     person = Class.new
     people = orm.map(person, "people") do |people|
       people.key people.field("id", Integer)
@@ -110,24 +108,6 @@ class Integration::MappingTest < Test::Unit::TestCase
 
     assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, localities)
     assert_equal(2, people.composite_mappings.size)
-
-    people.proxy("organization") { |p| orm.get(Organization, p.organization_id) }
-    people.proxy("tasks") { |p| orm.all(Task, [:eql, "person_id", p.id]) }
-
-    people.proxy("projects") do |p|
-      task = orm.mappings[Task]
-      orm.all(Projects, [:and, [:eql, task["person_id"], p.id], [:eql, "id", task["project_id"]]])
-    end
-
-    people.proxy("watched_tasks") do |p|
-      people_tasks = orm.map(Class.new, "people_tasks") do |people_tasks|
-        people_tasks.field("person_id", Integer)
-        people_tasks.field("task_id", Integer)
-      end
-
-      orm.all(Task, [:and, [:eql, people_tasks["person_id"], p.id], [:eql, "id", people_tasks["task_id"]]])
-    end
-
   end
 
 end
