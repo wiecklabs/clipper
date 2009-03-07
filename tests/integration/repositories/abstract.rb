@@ -54,6 +54,16 @@ module Integration::AbstractRepositoryTest
         people.field "gpa", Float
       end
     end
+
+    @article = Class.new do
+      orm.map(self, "articles") do |articles|
+        articles.field("id", Wheels::Orm::Types::Serial)
+        articles.field("time", Time)
+        articles.field("date", Date)
+        articles.field("datetime", DateTime)
+        articles.key(articles["id"])
+      end
+    end
   end
 
   def test_schema_create
@@ -117,6 +127,31 @@ module Integration::AbstractRepositoryTest
     assert_equal(3.5, orm.get(@person, person.id).gpa)
   ensure
     schema.destroy(@person)
+  end
+
+  def test_support_for_date_and_time_fields
+    schema = Wheels::Orm::Schema.new("default")
+    assert_nothing_raised { schema.create(@article) }
+    assert(schema.exists?(@article))
+
+    article = @article.new
+
+    date = Date.today
+    time = Time.now
+    datetime = DateTime.now
+
+    article.datetime = datetime
+    article.date = date
+    article.time = time
+
+    assert_nothing_raised { orm.save(article) }
+    assert_not_nil(article.id)
+
+    assert_equal(time.to_s, orm.get(@article, article.id).time.to_s)
+    assert_equal(date.to_s, orm.get(@article, article.id).date.to_s)
+    assert_equal(datetime.to_s, orm.get(@article, article.id).datetime.to_s)
+  ensure
+    schema.destroy(@article) rescue nil
   end
 
   def test_insert_multiple_records

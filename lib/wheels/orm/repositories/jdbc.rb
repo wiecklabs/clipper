@@ -6,6 +6,7 @@ module Wheels
       class Jdbc < Abstract
 
         import 'org.apache.log4j.Logger'
+        import 'java.sql.Types'
 
         autoload :Sqlite, (Pathname(__FILE__).dirname + "jdbc" + "sqlite.rb").to_s
         autoload :Hsqldb, (Pathname(__FILE__).dirname + "jdbc" + "hsqldb.rb").to_s
@@ -82,7 +83,9 @@ module Wheels
 
             while results.next
               resource = query.mapping.target.new
-              values = (1..results_metadata.getColumnCount).map { |i| results.getObject(i) }
+              values = (1..results_metadata.getColumnCount).zip(mapping_fields).map do |i, field|
+                get_value_from_result_set(results, i, field.type)
+              end
               mapping_fields.zip(values) { |field, value| field.set(resource, value) }
               collection << resource
             end
@@ -93,6 +96,22 @@ module Wheels
           end
 
           collection
+        end
+
+        def get_value_from_result_set(results, index, type)
+          case type
+          when Wheels::Orm::Types::Time
+            t = results.getTime(index)
+            Time.local(t.seconds, t.minutes, t.hours, *Time.now.to_a[3..-1])
+          when Wheels::Orm::Types::Date
+            d = results.getDate(index)
+            Date.new(d.year + 1900, d.month + 1, d.day + 1)
+          when Wheels::Orm::Types::DateTime
+            t = results.getTimestamp(index)
+            Time.at(*t.getTime.divmod(1000)).send(:to_datetime)
+          else
+            results.getObject(index)
+          end
         end
 
         def create(collection)
@@ -235,6 +254,12 @@ module Wheels
             "#{column_name} #{column_definition_float}"
           when Wheels::Orm::Types::String
             "#{column_name} VARCHAR(255)"
+          when Wheels::Orm::Types::DateTime
+            "#{column_name} TIMESTAMP"
+          when Wheels::Orm::Types::Date
+            "#{column_name} DATE"
+          when Wheels::Orm::Types::Time
+            "#{column_name} TIME"
           else
             raise Wheels::Orm::UnsupportedTypeError.new(field.type)
           end
@@ -261,6 +286,20 @@ module Wheels
               statement.setString(index, value)
             when Wheels::Orm::Types::Float
               statement.setString(index, value.to_s)
+            when Wheels::Orm::Types::Time
+              statement.setTime(index, java.sql.Time.new(value.to_f * 1000))
+            when Wheels::Orm::Types::Date
+              statement.setDate(index, java.sql.Date.new(Time.local(value.year, value.month, value.day).to_f * 1000))
+            when Wheels::Orm::Types::DateTime
+              case value
+              when Time
+                time = value.utc
+              else
+                d = value.new_offset
+                time = Time.utc(d.year, d.month, d.day, d.hour, d.min, d.sec, d.sec_fraction * 86400000000)
+              end
+
+              statement.setTimestamp(index, java.sql.Timestamp.new(time.to_f * 1000))
             else
               raise Wheels::Orm::UnsupportedTypeError.new(field.type)
             end

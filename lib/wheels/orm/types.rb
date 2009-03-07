@@ -24,6 +24,16 @@ module Wheels
       class Float < Type
       end
 
+      class Time < Type
+      end
+
+      class Date < Type
+      end
+
+      class DateTime < Type
+        require 'date'
+      end
+
     end
   end
 end
