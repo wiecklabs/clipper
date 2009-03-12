@@ -105,7 +105,7 @@ module Wheels
             Time.local(t.seconds, t.minutes, t.hours, *Time.now.to_a[3..-1])
           when Wheels::Orm::Types::Date
             d = results.getDate(index)
-            Date.new(d.year + 1900, d.month + 1, d.day + 1)
+            Date.new(d.year + 1900, d.month + 1, d.date)
           when Wheels::Orm::Types::DateTime
             t = results.getTimestamp(index)
             Time.at(*t.getTime.divmod(1000)).send(:to_datetime)
