@@ -10,12 +10,12 @@ class Integration::ValidationsTest < Test::Unit::TestCase
       
       orm.map(self, "users") do |users|
         users.key "id", Integer
-        users.field "name", Wheels::Orm::Types::String
-        users.field "email", Wheels::Orm::Types::String
-        users.field "password", Wheels::Orm::Types::String
+        users.field "name", Wheels::Orm::Types::String.new(200)
+        users.field "email", Wheels::Orm::Types::String.new(200)
+        users.field "password", Wheels::Orm::Types::String.new(200)
         users.field "age", Wheels::Orm::Types::Integer
-        users.field "gender", Wheels::Orm::Types::String
-        users.field "title", Wheels::Orm::Types::String
+        users.field "gender", Wheels::Orm::Types::String.new(200)
+        users.field "title", Wheels::Orm::Types::String.new(200)
       end
     end
     

@@ -22,7 +22,21 @@ class MappingsTest < Test::Unit::TestCase
     mappings = Wheels::Orm::Mappings.new
 
     assert_raise(ArgumentError) { mappings << nil }
+  end
 
+  def test_mappings_should_be_enumerable
+    mappings = Wheels::Orm::Mappings.new
+
+    assert_respond_to(mappings, :each)
+    assert_kind_of(Enumerable, mappings)
+
+    cows = Wheels::Orm::Mappings::Mapping.new(Class.new, 'cows')
+    pigs = Wheels::Orm::Mappings::Mapping.new(Class.new, 'pigs')
+
+    mappings << cows
+    mappings << pigs
+
+    mappings.each { |m| assert([cows, pigs].include?(m), "#{m} isn't one of: #{cows}, #{pigs}") }
   end
 
 end

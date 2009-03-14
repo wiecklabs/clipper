@@ -5,7 +5,7 @@ module Wheels
 
         include Test::Unit::Assertions
 
-        def initialize(mapping, name, type)
+        def initialize(mapping, name, type, default = nil)
           begin
             assert_kind_of(Wheels::Orm::Mappings::Mapping, mapping, "Field#mapping must be a Mapping")
             @mapping = mapping
@@ -18,23 +18,31 @@ module Wheels
               type = Wheels::Orm::Types[type.to_s].new
             end
 
-            assert_descendant_of(Wheels::Orm::Type, type.class, "Field#type must be a Wheels::Orm::Type")
+            assert_kind_of(Wheels::Orm::Type, type, "Field#type must be a Wheels::Orm::Type")
             @type = type
+
+            @default = default
           rescue Test::Unit::AssertionFailedError => e
             raise ArgumentError.new(e.message)
           end
         end
 
         def self.bind!(field, target)
-          target.class_eval <<-EOS
-            def #{field.name}
-               @#{field.name}
+
+          target.class_eval do
+            define_method(field.name) do
+              instance_variable_get("@#{field.name}") || instance_variable_set("@#{field.name}", field.default_value(self))
             end
 
-            def #{field.name}=(value)
-              @#{field.name} = value
+            define_method("#{field.name}=") do |value|
+              instance_variable_set("@#{field.name}", value)
             end
-          EOS
+          end
+
+        end
+
+        def default_value(object)
+          @default.is_a?(Proc) ? @default.call(object) : @default
         end
 
         def get(object)

@@ -7,21 +7,22 @@ module Integration::AbstractRepositoryTest
     @zoo = Class.new do
       orm.map(self, "zoos") do |zoos|
         zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
-        zoos.field "name", String
-        zoos.field "city", String
-        zoos.field "state", String
+        zoos.field "name", Wheels::Orm::Types::String.new(200)
+        zoos.field "city", Wheels::Orm::Types::String.new(200)
+        zoos.field "state", Wheels::Orm::Types::String.new(200)
+        zoos.field "notes", Wheels::Orm::Types::Text
 
         cities = zoos.compose("cities", "city", "state") do |cities|
-          cities.field("name", String)
-          cities.field("state", String)
-          cities.field("region", String)
+          cities.field("name", Wheels::Orm::Types::String.new(200))
+          cities.field("state", Wheels::Orm::Types::String.new(200))
+          cities.field("region", Wheels::Orm::Types::String.new(200))
 
           cities.key(cities["name"], cities["state"])
         end
 
         zoos.compose("climates", "region") do |climates|
-          climates.field("region", String)
-          climates.field("climate", String)
+          climates.field("region", Wheels::Orm::Types::String.new(200))
+          climates.field("climate", Wheels::Orm::Types::String.new(200))
 
           climates.key(climates["region"])
         end
@@ -30,8 +31,8 @@ module Integration::AbstractRepositoryTest
 
     @climate = Class.new do
       orm.map(self, "climates") do |climates|
-        climates.field("region", String)
-        climates.field("climate", String)
+        climates.field("region", Wheels::Orm::Types::String.new(200))
+        climates.field("climate", Wheels::Orm::Types::String.new(200))
 
         climates.key(climates["region"])
       end
@@ -39,9 +40,9 @@ module Integration::AbstractRepositoryTest
 
     @city = Class.new do
       orm.map(self, "cities") do |cities|
-        cities.field("name", String)
-        cities.field("state", String)
-        cities.field("region", String)
+        cities.field("name", Wheels::Orm::Types::String.new(200))
+        cities.field("state", Wheels::Orm::Types::String.new(200))
+        cities.field("region", Wheels::Orm::Types::String.new(200))
 
         cities.key(cities["name"], cities["state"])
       end
@@ -50,8 +51,8 @@ module Integration::AbstractRepositoryTest
     @person = Class.new do
       orm.map(self, "people") do |people|
         people.key people.field("id", Wheels::Orm::Types::Serial)
-        people.field "name", String
-        people.field "gpa", Float
+        people.field "name", Wheels::Orm::Types::String.new(200)
+        people.field "gpa", Wheels::Orm::Types::Float(7, 2)
       end
     end
 

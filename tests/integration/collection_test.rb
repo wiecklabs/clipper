@@ -10,8 +10,8 @@ class Integration::CollectionTest < Test::Unit::TestCase
     @person = Class.new do
       orm("example").map(self, "people") do |people|
         people.key people.field("id", Wheels::Orm::Types::Serial)
-        people.field "name", String
-        people.field "gpa", Float
+        people.field "name", Wheels::Orm::Types::String.new(200)
+        people.field "gpa", Wheels::Orm::Types::Float(7, 2)
       end
     end
     

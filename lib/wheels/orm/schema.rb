@@ -5,18 +5,18 @@ module Wheels
         @repository = Wheels::Orm::Repositories.registrations[repository]
       end
 
-      def create(mapping_class)
-        mapping = @repository.mappings[mapping_class]
+      def create(mapped_class)
+        mapping = @repository.mappings[mapped_class]
         @repository.schema.create(mapping)
       end
 
-      def exists?(mapping_class)
-        mapping = @repository.mappings[mapping_class]
+      def exists?(mapped_class)
+        mapping = @repository.mappings[mapped_class]
         @repository.schema.exists?(mapping.name)
       end
 
-      def destroy(mapping_class)
-        mapping = @repository.mappings[mapping_class]
+      def destroy(mapped_class)
+        mapping = @repository.mappings[mapped_class]
         @repository.schema.destroy(mapping)
       end
     end

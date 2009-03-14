@@ -177,8 +177,14 @@ module Wheels
         end
 
         def create_table(mapping)
+
+          components = [
+            mapping.fields.map { |field| column_definition(field) }.join(", "),
+            key_definition(mapping)
+          ].compact
+
           sql = <<-EOS.compress_lines
-          CREATE TABLE #{quote_identifier(mapping.name)} (#{mapping.fields.map { |field| column_definition(field) }.join(", ") });
+          CREATE TABLE #{quote_identifier(mapping.name)} (#{components.join(',')});
           EOS
 
           logger.debug(sql)
@@ -243,17 +249,25 @@ module Wheels
           end
         end
 
+        def key_definition(mapping)
+          return nil unless mapping.keys.any?
+
+          "CONSTRAINT #{quote_identifier(mapping.name + '_pkey')} PRIMARY KEY (#{mapping.keys.map { |field| quote_identifier(field.name) }.join(', ')})"
+        end
+
         def column_definition(field)
           column_name = quote_identifier(field.name)
           case field.type
           when Wheels::Orm::Types::Integer
             "#{column_name} INTEGER"
           when Wheels::Orm::Types::Serial
-            "#{column_name} #{column_definition_serial}"
+            "#{column_name} #{column_definition_serial(field)}"
           when Wheels::Orm::Types::Float
-            "#{column_name} #{column_definition_float}"
+            "#{column_name} #{column_definition_float(field)}"
           when Wheels::Orm::Types::String
-            "#{column_name} VARCHAR(255)"
+            "#{column_name} #{column_definition_string(field)}"
+          when Wheels::Orm::Types::Text
+            "#{column_name} #{column_definition_text(field)}"
           when Wheels::Orm::Types::DateTime
             "#{column_name} TIMESTAMP"
           when Wheels::Orm::Types::Date
@@ -265,12 +279,20 @@ module Wheels
           end
         end
 
-        def column_definition_float
-          "FLOAT(7,2)"
+        def column_definition_float(field)
+          "FLOAT(#{field.type.scale}, #{field.type.precision})"
         end
 
-        def column_definition_serial
-          "INTEGER PRIMARY KEY AUTO_INCREMENT"
+        def column_definition_serial(field)
+          "INTEGER AUTO_INCREMENT"
+        end
+
+        def column_definition_string(field)
+          "VARCHAR(#{field.type.size})"
+        end
+
+        def column_definition_text(field)
+          "TEXT"
         end
 
         def bind_value_to_statement(statement, index, field, value)
@@ -283,6 +305,8 @@ module Wheels
             when Wheels::Orm::Types::Serial
               statement.setInt(index, value)
             when Wheels::Orm::Types::String
+              statement.setString(index, value)
+            when Wheels::Orm::Types::Text
               statement.setString(index, value)
             when Wheels::Orm::Types::Float
               statement.setString(index, value.to_s)

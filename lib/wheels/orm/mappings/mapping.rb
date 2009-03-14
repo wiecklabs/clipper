@@ -43,8 +43,8 @@ module Wheels
           @target
         end
 
-        def field(name, type)
-          field = Field.new(self, name, type)
+        def field(name, type, default_value = nil)
+          field = Field.new(self, name, type, default_value)
           if @fields.include?(field)
             raise DuplicateFieldError.new("Field #{name}:#{type} is already a member of Mapping #{name.inspect}")
           else
@@ -132,6 +132,7 @@ module Wheels
           composite_fields
         end
 
+        # TODO: Mapping#keys? This doesn't really make sense, maybe key_fields?
         def keys
           @key
         end

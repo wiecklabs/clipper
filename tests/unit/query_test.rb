@@ -13,8 +13,8 @@ class QueryTest < Test::Unit::TestCase
     @zoos.field "city_id", Integer
 
     @cities = Wheels::Orm::Mappings::Mapping.new(Class.new, "cities")
-    @cities.field("city", String)
-    @cities.field("state", String)
+    @cities.field("city", Wheels::Orm::Types::String.new(200))
+    @cities.field("state", Wheels::Orm::Types::String.new(200))
     @cities.key(@cities["city"], @cities["state"])
   end
 
