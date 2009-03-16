@@ -4,6 +4,8 @@ module Wheels
       class UnmappedClassError < StandardError
       end
 
+      include Enumerable
+
       def initialize
         @mappings = {}
       end
@@ -16,6 +18,11 @@ module Wheels
         raise ArgumentError.new("Mappings#<< must be passed a Mapping") unless mapping.is_a?(Wheels::Orm::Mappings::Mapping)
         @mappings[mapping.target] = mapping
       end
+
+      def each
+        @mappings.values.each { |mapping| yield mapping }
+      end
+
     end
   end
 end

@@ -43,8 +43,8 @@ module Wheels
           @target
         end
 
-        def field(name, type)
-          field = Field.new(self, name, type)
+        def field(name, type, default_value = nil)
+          field = Field.new(self, name, type, default_value)
           if @fields.include?(field)
             raise DuplicateFieldError.new("Field #{name}:#{type} is already a member of Mapping #{name.inspect}")
           else
@@ -68,24 +68,40 @@ module Wheels
         end
 
         def [](name)
-          @fields.detect { |field| field.name == name }
+          @fields.detect { |field| field.name == name } || composite_fields.detect { |field| field.name == name }
         end
 
         def compose(mapped_name, *related_keys)
           missing_keys = related_keys.reject { |related_key| self[related_key] }
-          
+
           unless missing_keys.empty?
             raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.")
           end
 
+          related_keys.map! { |key| self[key] }
+
           composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name, related_keys)
-          @composite_mappings << yield(composite_mapping)
+          yield(composite_mapping)
+          @composite_mappings << composite_mapping
           composite_mapping
         end
 
         def proxy(mapped_name)
+          mapping = self
+          criteria = yield Wheels::Orm::Query::Criteria.new(self)
+
+          target.send(:define_method, mapped_name) do
+            c = criteria.condition.dup
+            c.value = c.value.field.get(self)
+            orm.find(c.field.mapping.target, c).first
+          end
+
+          target.send(:define_method, mapped_name+"=") do |object|
+            c = criteria.condition
+            c.value.field.set(self, c.field.get(object))
+          end
         end
-        
+
         def constrain(context_name, &block)
           @validation_contexts.define(context_name, &block)
         end
@@ -112,10 +128,15 @@ module Wheels
 
         def composite_fields
           composite_fields = java.util.LinkedHashSet.new
-          @composite_mappings.each { |mapping| mapping.fields.each { |field| composite_fields.add(field) } }
+          @composite_mappings.each do |mapping|
+            mapping.fields.each do |field|
+              composite_fields.add(field) unless mapping.keys.include?(field)
+            end
+          end
           composite_fields
         end
 
+        # TODO: Mapping#keys? This doesn't really make sense, maybe key_fields?
         def keys
           @key
         end

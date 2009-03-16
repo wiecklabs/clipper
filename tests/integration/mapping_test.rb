@@ -58,8 +58,8 @@ class Integration::MappingTest < Test::Unit::TestCase
       #   last_name = people.field("last_name", Wheels::Orm::Repositories::Types::String)
       #   people.key(first_name, last_name)
       people.key(
-        people.field("first_name", Wheels::Orm::Types::String),
-        people.field("last_name", Wheels::Orm::Types::String)
+        people.field("first_name", Wheels::Orm::Types::String.new(200)),
+        people.field("last_name", Wheels::Orm::Types::String.new(200))
       )
 
       # Alternatively, if you want just one field, you can use the Mapping#[] method to
@@ -88,35 +88,26 @@ class Integration::MappingTest < Test::Unit::TestCase
     person = Class.new
     people = orm.map(person, "people") do |people|
       people.key people.field("id", Integer)
-      people.field "name", String
+      people.field "name", Wheels::Orm::Types::String.new(200)
       people.field "organization_id", Integer
       people.field "address_id", Integer
     end
 
     addresses = people.compose("addresses", "address_id") do |address|
       address.key address.field("id", Integer)
-      address.field "city", String
-      address.field "state", String
+      address.field "city", Wheels::Orm::Types::String.new(200)
+      address.field "state", Wheels::Orm::Types::String.new(200)
     end
 
     assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, addresses)
 
     localities = people.compose("localities", "city", "state") do |locality|
-      locality.key locality.field("city", String), locality.field("state", String)
-      locality.field "zip", String
+      locality.key locality.field("city", Wheels::Orm::Types::String.new(200)), locality.field("state", Wheels::Orm::Types::String.new(200))
+      locality.field "zip", Wheels::Orm::Types::String.new(200)
     end
 
     assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, localities)
     assert_equal(2, people.composite_mappings.size)
-
-    people.proxy("organization") { |p| orm.get(Organization, p.organization_id) }
-    people.proxy("tasks") { |p| orm.all(Task, [:eql, "person_id", p.id]) }
-
-    people.proxy("projects") do |p|
-      task = orm.mappings[Task]
-      orm.all(Projects, [:and, [:eql, task["person_id"], p.id], [:eql, "id", task["project_id"]]])
-    end
-
   end
 
 end

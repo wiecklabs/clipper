@@ -13,8 +13,18 @@ module Wheels
             @data_source = com.mchange.v2.c3p0.DataSources.unpooledDataSource(uri.to_s)
           end
 
-          def column_definition_serial
+          # If you define an auto-increment field in Sqlite3, it has to also be the primary key
+          def column_definition_serial(field)
             "INTEGER PRIMARY KEY AUTOINCREMENT"
+          end
+
+          protected
+
+          def key_definition(mapping)
+            # If we've already declared a serial column, don't worry about the key definition
+            return nil if mapping.keys.any? { |field| field.type.is_a?(Wheels::Orm::Types::Serial) }
+
+            "PRIMARY KEY (#{mapping.keys.map { |field| quote_identifier(field.name) }.join(', ')})"
           end
 
           def generated_keys(connection)

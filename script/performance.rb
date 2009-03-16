@@ -23,7 +23,7 @@ if ORM == "dm"
 
     property :id, Serial
     property :name, String
-    property :gpa, Float
+    property :gpa, Wheels::Orm::Types::Float(7, 2)
   end
 
   case ADAPTER
@@ -41,7 +41,7 @@ else
     orm.map(self, "people") do |people|
       people.key people.field("id", Wheels::Orm::Types::Serial)
       people.field("name", String)
-      people.field("gpa", Float)
+      people.field("gpa", Wheels::Orm::Types::Float(7, 2))
     end
   end
 

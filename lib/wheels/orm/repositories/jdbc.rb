@@ -6,6 +6,7 @@ module Wheels
       class Jdbc < Abstract
 
         import 'org.apache.log4j.Logger'
+        import 'java.sql.Types'
 
         autoload :Sqlite, (Pathname(__FILE__).dirname + "jdbc" + "sqlite.rb").to_s
         autoload :Hsqldb, (Pathname(__FILE__).dirname + "jdbc" + "hsqldb.rb").to_s
@@ -36,26 +37,39 @@ module Wheels
           mapping_fields = query.mapping.fields
           mapping_fields.addAll(query.mapping.composite_fields)
 
-          statement = "SELECT #{mapping_fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "} "
-          statement << "FROM #{quote_identifier(query.mapping.name)} "
+          statement = "SELECT #{mapping_fields.map { |field| quote_identifier("#{field.mapping.name}.#{field.name}") } * ", "}"
+          statement << "FROM #{quote_identifier(query.mapping.name)}"
           query.mapping.composite_mappings.each do |mapping|
-            statement << "INNER JOIN #{quote_identifier(mapping.name)} ON "
+            statement << " LEFT JOIN #{quote_identifier(mapping.name)} ON "
             statement << mapping.keys.zip(mapping.source_keys).map do |mapping_key, source_key|
-              j = "#{quote_identifier("#{query.mapping.name}.#{source_key}")} = "
+              j = "#{quote_identifier("#{source_key.mapping.name}.#{source_key.name}")} = "
               j << "#{quote_identifier("#{mapping.name}.#{mapping_key.name}")}"
             end.join(" AND ")
           end
           statement << " WHERE #{syntax.serialize(query.conditions)}" if query.conditions
 
-          logger.debug(statement)
+          if query.order
+            statement << " ORDER BY "
+            statement << query.order.map do |field, direction|
+              field_name = quote_identifier("#{field.mapping.name}.#{field.name}")
+              direction == :desc ? field_name + " DESC" : field_name
+            end.join(", ")
+          end
+
+          statement << " LIMIT #{query.limit}" if query.limit
+          statement << " OFFSET #{query.offset}" if query.offset
 
           collection = Wheels::Orm::Collection.new(query.mapping, [])
 
           with_connection do |connection|
             if query.paramaters.empty?
+              logger.debug(statement)
+
               stmt = connection.createStatement
               results = stmt.executeQuery(statement)
             else
+              logger.debug(statement + " -> #{query.paramaters.inspect}")
+
               stmt = connection.prepareStatement(statement)
 
               query.fields.zip(query.paramaters).each_with_index do |attribute, index|
@@ -69,7 +83,9 @@ module Wheels
 
             while results.next
               resource = query.mapping.target.new
-              values = (1..results_metadata.getColumnCount).map { |i| results.getObject(i) }
+              values = (1..results_metadata.getColumnCount).zip(mapping_fields).map do |i, field|
+                get_value_from_result_set(results, i, field.type)
+              end
               mapping_fields.zip(values) { |field, value| field.set(resource, value) }
               collection << resource
             end
@@ -80,6 +96,22 @@ module Wheels
           end
 
           collection
+        end
+
+        def get_value_from_result_set(results, index, type)
+          case type
+          when Wheels::Orm::Types::Time
+            t = results.getTime(index)
+            Time.local(t.seconds, t.minutes, t.hours, *Time.now.to_a[3..-1])
+          when Wheels::Orm::Types::Date
+            d = results.getDate(index)
+            Date.new(d.year + 1900, d.month + 1, d.date)
+          when Wheels::Orm::Types::DateTime
+            t = results.getTimestamp(index)
+            Time.at(*t.getTime.divmod(1000)).send(:to_datetime)
+          else
+            results.getObject(index)
+          end
         end
 
         def create(collection)
@@ -145,8 +177,14 @@ module Wheels
         end
 
         def create_table(mapping)
+
+          components = [
+            mapping.fields.map { |field| column_definition(field) }.join(", "),
+            key_definition(mapping)
+          ].compact
+
           sql = <<-EOS.compress_lines
-          CREATE TABLE #{quote_identifier(mapping.name)} (#{mapping.fields.map { |field| column_definition(field) }.join(", ") });
+          CREATE TABLE #{quote_identifier(mapping.name)} (#{components.join(',')});
           EOS
 
           logger.debug(sql)
@@ -211,28 +249,50 @@ module Wheels
           end
         end
 
+        def key_definition(mapping)
+          return nil unless mapping.keys.any?
+
+          "CONSTRAINT #{quote_identifier(mapping.name + '_pkey')} PRIMARY KEY (#{mapping.keys.map { |field| quote_identifier(field.name) }.join(', ')})"
+        end
+
         def column_definition(field)
           column_name = quote_identifier(field.name)
           case field.type
           when Wheels::Orm::Types::Integer
             "#{column_name} INTEGER"
           when Wheels::Orm::Types::Serial
-            "#{column_name} #{column_definition_serial}"
+            "#{column_name} #{column_definition_serial(field)}"
           when Wheels::Orm::Types::Float
-            "#{column_name} #{column_definition_float}"
+            "#{column_name} #{column_definition_float(field)}"
           when Wheels::Orm::Types::String
-            "#{column_name} VARCHAR(255)"
+            "#{column_name} #{column_definition_string(field)}"
+          when Wheels::Orm::Types::Text
+            "#{column_name} #{column_definition_text(field)}"
+          when Wheels::Orm::Types::DateTime
+            "#{column_name} TIMESTAMP"
+          when Wheels::Orm::Types::Date
+            "#{column_name} DATE"
+          when Wheels::Orm::Types::Time
+            "#{column_name} TIME"
           else
             raise Wheels::Orm::UnsupportedTypeError.new(field.type)
           end
         end
 
-        def column_definition_float
-          "FLOAT(7,2)"
+        def column_definition_float(field)
+          "FLOAT(#{field.type.scale}, #{field.type.precision})"
         end
 
-        def column_definition_serial
-          "INTEGER PRIMARY KEY AUTO_INCREMENT"
+        def column_definition_serial(field)
+          "INTEGER AUTO_INCREMENT"
+        end
+
+        def column_definition_string(field)
+          "VARCHAR(#{field.type.size})"
+        end
+
+        def column_definition_text(field)
+          "TEXT"
         end
 
         def bind_value_to_statement(statement, index, field, value)
@@ -246,8 +306,24 @@ module Wheels
               statement.setInt(index, value)
             when Wheels::Orm::Types::String
               statement.setString(index, value)
+            when Wheels::Orm::Types::Text
+              statement.setString(index, value)
             when Wheels::Orm::Types::Float
               statement.setString(index, value.to_s)
+            when Wheels::Orm::Types::Time
+              statement.setTime(index, java.sql.Time.new(value.to_f * 1000))
+            when Wheels::Orm::Types::Date
+              statement.setDate(index, java.sql.Date.new(Time.local(value.year, value.month, value.day).to_f * 1000))
+            when Wheels::Orm::Types::DateTime
+              case value
+              when Time
+                time = value.utc
+              else
+                d = value.new_offset
+                time = Time.utc(d.year, d.month, d.day, d.hour, d.min, d.sec, d.sec_fraction * 86400000000)
+              end
+
+              statement.setTimestamp(index, java.sql.Timestamp.new(time.to_f * 1000))
             else
               raise Wheels::Orm::UnsupportedTypeError.new(field.type)
             end

@@ -17,7 +17,7 @@ require "rake/gempackagetask"
 
 NAME = "worm"
 SUMMARY = "Wheels O/RM"
-GEM_VERSION = "0.1"
+GEM_VERSION = "0.1.1"
 
 spec = Gem::Specification.new do |s|
   s.name = NAME

@@ -14,10 +14,6 @@ module Wheels
             @data_source.setJdbcUrl(uri.to_s)
           end
 
-          def column_definition_serial
-            "INTEGER PRIMARY KEY AUTO_INCREMENT"
-          end
-
         end # class Sqlite
       end # class Jdbc
     end # module Repositories

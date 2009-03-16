@@ -1,3 +1,4 @@
 mem.*
 profile.txt
 pkg
+*.db

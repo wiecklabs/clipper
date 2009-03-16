@@ -25,3 +25,4 @@ TODONE:
 * Save a Collection: 2009-01-28
 * Load a Collection: 2009-01-28
 * Load a Collection with filters: 2009-01-28
+* Added OFFSET, LIMIT and ORDER BY support. Sam:2009-02-27

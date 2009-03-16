@@ -1,0 +1,52 @@
+#!/usr/bin/env jruby
+
+# This just creates a "people" table in Sqlite3 and adds a few records for you to play with.
+
+require "pathname"
+require Pathname(__FILE__).dirname.parent + "lib" + "wheels" + "orm"
+
+sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
+@uri = Wheels::Orm::Uri.new("jdbc:sqlite://#{sqlite_path}")
+Wheels::Orm::Repositories::register("default", @uri.to_s)
+
+class Person
+  orm.map(self, "people") do |people|
+    people.key people.field("id", Wheels::Orm::Types::Serial)
+    people.field "name", String
+    people.field "gpa", Wheels::Orm::Types::Float(7, 2)
+  end
+end
+
+$schema = Wheels::Orm::Schema.new("default")
+$schema.create(Person)
+
+mike = Person.new
+mike.name = "Mike"
+mike.gpa = 1.2
+orm.save(mike)
+
+scott = Person.new
+scott.name = "Scott"
+scott.gpa = 4.0
+orm.save(scott)
+
+bernerd = Person.new
+bernerd.name = "Bernerd"
+bernerd.gpa = 3.6
+orm.save(bernerd)
+
+sam = Person.new
+sam.name = "Sam"
+sam.gpa = 0.1
+orm.save(sam)
+
+at_exit { $schema.destroy(Person) }
+
+require 'irb'
+require 'irb/completion'
+
+if File.exists? ".irbrc"
+  ENV['IRBRC'] = ".irbrc"
+end
+
+IRB.start

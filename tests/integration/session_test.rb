@@ -8,7 +8,7 @@ class Integration::SessionTest < Test::Unit::TestCase
     @zoo = Class.new do
       orm.map(self, "zoos") do |zoos|
         zoos.key "id", Integer
-        zoos.field "name", String
+        zoos.field "name", Wheels::Orm::Types::String.new(200)
       end
     end
   end
