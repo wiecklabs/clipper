@@ -67,6 +67,13 @@ module Wheels
         @repository.create(collection)
       end
 
+      def validate(object, context_name = 'default')
+        mapping = @repository.mappings[object.class]
+        mapping.validate(object, context_name)
+        # context = mapping.validation_contexts(context_name)
+        # context.validate(target)
+      end
+
       def load(object, field)
       end
 

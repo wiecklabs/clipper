@@ -22,7 +22,7 @@ require Pathname(__FILE__).dirname + "orm" + "mappings" + "composite_mapping"
 
 require Pathname(__FILE__).dirname + "orm" + "validations" + "contexts"
 require Pathname(__FILE__).dirname + "orm" + "validations" + "context"
-require Pathname(__FILE__).dirname + "orm" + "validations" + "validation_errors"
+require Pathname(__FILE__).dirname + "orm" + "validations" + "validation_result"
 require Pathname(__FILE__).dirname + "orm" + "validations" + "validation_error"
 require Pathname(__FILE__).dirname + "orm" + "validations" + "absence_validator"
 require Pathname(__FILE__).dirname + "orm" + "validations" + "acceptance_validator"

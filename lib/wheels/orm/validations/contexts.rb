@@ -20,6 +20,16 @@ module Wheels
           @hash ||= [self.class, @mapping].hash
         end
         
+        def [](name)
+          if context = @contexts[name]
+            return context
+          elsif name == 'default'
+            define('default') { |check| }
+          else
+            raise ArgumentError.new("There is no context named '#{name}' defined")
+          end
+        end
+
         def define(name, &block)
           unless name.is_a?(String)
             raise ArgumentError.new("Wheels::Orm::Validations::Contexts#define:name must be a String")

@@ -4,61 +4,63 @@ module Wheels
 
       class ConstraintEvaluator
 
-        attr_reader :errors
+        attr_reader :validation_result
 
         def initialize(instance)
           @instance = instance
-          @errors = Wheels::Orm::Validations::ValidationErrors.new
+          @validation_result = Wheels::Orm::Validations::ValidationResult.new
         end
 
         def absent(field)
           return if block_given? && !yield(@instance)
-          AbsenceValidator.new(field).call(@instance, @errors)
+          AbsenceValidator.new(field).call(@instance, @validation_result)
         end
 
         def within(field, set)
           return if block_given? && !yield(@instance)
-          WithinValidator.new(field, set).call(@instance, @errors)
+          WithinValidator.new(field, set).call(@instance, @validation_result)
         end
 
         def acceptance(field)
           return if block_given? && !yield(@instance)
-          AcceptanceValidator.new(field).call(@instance, @errors)
+          AcceptanceValidator.new(field).call(@instance, @validation_result)
         end
 
         def format(field, format)
           return if block_given? && !yield(@instance)
-          FormatValidator.new(field, format).call(@instance, @errors)
+          FormatValidator.new(field, format).call(@instance, @validation_result)
         end
 
         def maximum(field, length)
           return if block_given? && !yield(@instance)
-          MaximumLengthValidator.new(field, foramt).call(@instance, @errors)
+          MaximumLengthValidator.new(field, foramt).call(@instance, @validation_result)
         end
 
         def minimum(field, length)
           return if block_given? && !yield(@instance)
-          MinimumLengthValidator.new(field, foramt).call(@instance, @errors)
+          MinimumLengthValidator.new(field, foramt).call(@instance, @validation_result)
         end
 
         def required(field)
           return if block_given? && !yield(@instance)
-          RequiredValidator.new(field).call(@instance, @errors)
+          RequiredValidator.new(field).call(@instance, @validation_result)
         end
 
         def size(field, size)
           return if block_given? && !yield(@instance)
-          SizeValidator.new(field).call(@instance, @errors)
+          SizeValidator.new(field).call(@instance, @validation_result)
         end
 
         def within(field, set)
           return if block_given? && !yield(@instance)
-          WithinValidator.new(field, set).call(@instance, @errors)
+          WithinValidator.new(field, set).call(@instance, @validation_result)
         end
       end
 
       class Context
 
+        # TODO: Re-do the way validations are executed.  The block should be executed
+        # upon creation of the context
         def initialize(mapping, name, &block)
           @mapping = mapping
           @name = name
@@ -83,7 +85,8 @@ module Wheels
 
         def validate(instance)
           evaluator = ConstraintEvaluator.new(instance)
-          @validation_block.call(evaluator).errors
+          @validation_block.call(evaluator)
+          evaluator.validation_result
         end
 
       end

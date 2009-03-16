@@ -25,7 +25,7 @@ class ValidationTest < Test::Unit::TestCase
   end
   
   def setup
-    @errors = Wheels::Orm::Validations::ValidationErrors.new
+    @errors = Wheels::Orm::Validations::ValidationResult.new
   end
   
   def test_absent_validator

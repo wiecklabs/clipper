@@ -29,7 +29,7 @@ module Wheels
           @composite_mappings = []
           @fields = java.util.LinkedHashSet.new
           @key = java.util.LinkedHashSet.new
-          @contexts = Wheels::Orm::Validations::Contexts.new(self)
+          @validation_contexts = Wheels::Orm::Validations::Contexts.new(self)
         end
 
         # The name of this mapping. In database terms this would map to a
@@ -87,7 +87,7 @@ module Wheels
         end
         
         def constrain(context_name, &block)
-          @contexts.define(context_name, &block)
+          @validation_contexts.define(context_name, &block)
         end
 
         def eql?(other)
@@ -97,6 +97,10 @@ module Wheels
 
         def hash
           @hash ||= name.hash
+        end
+
+        def validate(object, context_name)
+          @validation_contexts[context_name].validate(object)
         end
 
         ##
