@@ -18,8 +18,6 @@ module Wheels
           rescue Test::Unit::AssertionFailedError => e
             raise ArgumentError.new(e.message)
           end
-
-          @mappings = Wheels::Orm::Mappings.new
         end
 
         def name
@@ -31,7 +29,7 @@ module Wheels
         end
 
         def mappings
-          @mappings
+          Wheels::Orm::Mappings[name]
         end
 
         def save(collection)

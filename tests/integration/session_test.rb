@@ -6,7 +6,7 @@ class Integration::SessionTest < Test::Unit::TestCase
   def setup
     Wheels::Orm::Repositories::register("default", "abstract://localhost/example")
     @zoo = Class.new do
-      orm.map(self, "zoos") do |zoos|
+      Wheels::Orm::Mappings["default"].map(self, "zoos") do |zoos|
         zoos.key "id", Integer
         zoos.field "name", Wheels::Orm::Types::String.new(200)
       end

@@ -8,11 +8,11 @@ class QueryTest < Test::Unit::TestCase
 
     @syntax = Wheels::Orm::Syntax::Sql.new(@repository)
 
-    @zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    @zoos = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, "zoos")
     @zoos.key @zoos.field("id", Wheels::Orm::Types::Serial)
     @zoos.field "city_id", Integer
 
-    @cities = Wheels::Orm::Mappings::Mapping.new(Class.new, "cities")
+    @cities = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, "cities")
     @cities.field("city", Wheels::Orm::Types::String.new(200))
     @cities.field("state", Wheels::Orm::Types::String.new(200))
     @cities.key(@cities["city"], @cities["state"])

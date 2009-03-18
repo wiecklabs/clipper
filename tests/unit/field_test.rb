@@ -4,8 +4,9 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class FieldTest < Test::Unit::TestCase
 
   def setup
-    @people = Wheels::Orm::Mappings::Mapping.new(Class.new, "people")
-    @addresses = Wheels::Orm::Mappings::Mapping.new(Class.new, "addresses")
+    @mappings = Wheels::Orm::Mappings.new
+    @people = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "people")
+    @addresses = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "addresses")
     @string_type = Wheels::Orm::Types::String.new(255)
   end
 
@@ -59,7 +60,7 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_field_generates_an_accessor_on_target
-    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    zoos = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "zoos")
     zoos.field("name", Wheels::Orm::Types::String.new(200))
     zoo = zoos.target.new
     assert_respond_to(zoo, :name)
@@ -67,14 +68,14 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_field_get_raises_on_different_type_object
-    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    zoos = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "zoos")
     name = zoos.field("name", @string_type)
 
     assert_raise(ArgumentError) { name.get(Class.new.new) }
   end
 
   def test_field_get_returns_instance_value
-    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    zoos = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "zoos")
     name = zoos.field("name", @string_type)
     zoo = zoos.target.new
 
@@ -83,7 +84,7 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_field_set_sets_instance_value
-    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    zoos = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "zoos")
     name = zoos.field("name", @string_type)
     zoo = zoos.target.new
 
@@ -93,7 +94,7 @@ class FieldTest < Test::Unit::TestCase
 
   def test_field_returns_scalar_default_value
     default_value = "Dallas"
-    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    zoos = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "zoos")
     name = zoos.field("name", @string_type, default_value)
 
     zoo = zoos.target.new
@@ -105,7 +106,7 @@ class FieldTest < Test::Unit::TestCase
 
   def test_field_returns_default_value_from_lambda
     default_value = lambda { "Dallas" }
-    zoos = Wheels::Orm::Mappings::Mapping.new(Class.new, "zoos")
+    zoos = Wheels::Orm::Mappings::Mapping.new(@mappings, Class.new, "zoos")
     name = zoos.field("name", @string_type, default_value)
     objid = zoos.field("objid", Wheels::Orm::Types::Integer, lambda { |instance| instance.object_id } )
 

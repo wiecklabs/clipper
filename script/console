@@ -10,7 +10,7 @@ sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
 Wheels::Orm::Repositories::register("default", @uri.to_s)
 
 class Person
-  orm.map(self, "people") do |people|
+  Wheels::Orm::Mappings["default"].map(self, "people") do |people|
     people.key people.field("id", Wheels::Orm::Types::Serial)
     people.field "name", String
     people.field "gpa", Wheels::Orm::Types::Float(7, 2)

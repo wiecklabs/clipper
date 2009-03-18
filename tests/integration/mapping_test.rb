@@ -23,7 +23,7 @@ class Integration::MappingTest < Test::Unit::TestCase
       # mail server, web-service or other such storage provider.
 
       # The "people" Mapping here would map to the "people" table in our database.
-      people = Wheels::Orm::Mappings::Mapping.new(Class.new, "people")
+      people = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, "people")
 
       # The fields in our mappings are added to an ordered-set. This means their order
       # is deterministic, and should reflect the same order as the underlying schema
@@ -80,13 +80,13 @@ class Integration::MappingTest < Test::Unit::TestCase
 
   def test_related_keys_are_already_defined_when_composing
     person = Class.new
-    people = orm.map(person, "people") {}
+    people = Wheels::Orm::Mappings["default"].map(person, "people") {}
     assert_raise(ArgumentError) { people.compose("localities", "city", "state") }
   end
 
   def test_describing_mapping_a_complete_class
     person = Class.new
-    people = orm.map(person, "people") do |people|
+    people = Wheels::Orm::Mappings["default"].map(person, "people") do |people|
       people.key people.field("id", Integer)
       people.field "name", Wheels::Orm::Types::String.new(200)
       people.field "organization_id", Integer

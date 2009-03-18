@@ -5,7 +5,7 @@ module Integration::AbstractRepositoryTest
 
   def setup_abstract
     @zoo = Class.new do
-      orm.map(self, "zoos") do |zoos|
+      Wheels::Orm::Mappings["default"].map(self, "zoos") do |zoos|
         zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
         zoos.field "name", Wheels::Orm::Types::String.new(200)
         zoos.field "city", Wheels::Orm::Types::String.new(200)
@@ -30,7 +30,7 @@ module Integration::AbstractRepositoryTest
     end
 
     @climate = Class.new do
-      orm.map(self, "climates") do |climates|
+      Wheels::Orm::Mappings["default"].map(self, "climates") do |climates|
         climates.field("region", Wheels::Orm::Types::String.new(200))
         climates.field("climate", Wheels::Orm::Types::String.new(200))
 
@@ -39,7 +39,7 @@ module Integration::AbstractRepositoryTest
     end
 
     @city = Class.new do
-      orm.map(self, "cities") do |cities|
+      Wheels::Orm::Mappings["default"].map(self, "cities") do |cities|
         cities.field("name", Wheels::Orm::Types::String.new(200))
         cities.field("state", Wheels::Orm::Types::String.new(200))
         cities.field("region", Wheels::Orm::Types::String.new(200))
@@ -49,7 +49,7 @@ module Integration::AbstractRepositoryTest
     end
 
     @person = Class.new do
-      orm.map(self, "people") do |people|
+      Wheels::Orm::Mappings["default"].map(self, "people") do |people|
         people.key people.field("id", Wheels::Orm::Types::Serial)
         people.field "name", Wheels::Orm::Types::String.new(200)
         people.field "gpa", Wheels::Orm::Types::Float(7, 2)
@@ -57,7 +57,7 @@ module Integration::AbstractRepositoryTest
     end
 
     @article = Class.new do
-      orm.map(self, "articles") do |articles|
+      Wheels::Orm::Mappings["default"].map(self, "articles") do |articles|
         articles.field("id", Wheels::Orm::Types::Serial)
         articles.field("time", Time)
         articles.field("date", Date)
@@ -165,7 +165,7 @@ module Integration::AbstractRepositoryTest
     person2 = @person.new
     person2.name = "Jane"
 
-    people = Wheels::Orm::Collection.new(orm.mappings[@person], [person1, person2])
+    people = Wheels::Orm::Collection.new(Wheels::Orm::Mappings["default"].mappings[@person], [person1, person2])
 
     orm.save(people)
 
@@ -252,7 +252,7 @@ module Integration::AbstractRepositoryTest
     orm.save(person)
 
     assert_nothing_raised do
-      low_gpa = Wheels::Orm::Query::Condition.lt(orm.mappings[@person]["gpa"], 3)
+      low_gpa = Wheels::Orm::Query::Condition.lt(Wheels::Orm::Mappings["default"].mappings[@person]["gpa"], 3)
       people = orm.find(@person, nil, low_gpa)
       assert_equal(1, people.size)
     end
