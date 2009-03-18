@@ -8,7 +8,7 @@ class Integration::CriteriaTest < Test::Unit::TestCase
     Wheels::Orm::Repositories::register("example", @uri.to_s)
     
     @person = Class.new do
-      orm("example").map(self, "people") do |people|
+      Wheels::Orm::Mappings["example"].map(self, "people") do |people|
         people.key people.field("id", Wheels::Orm::Types::Serial)
         people.field "name", Wheels::Orm::Types::String.new(200)
         people.field "gpa", Wheels::Orm::Types::Float(7, 2)

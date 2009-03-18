@@ -93,15 +93,24 @@ module Wheels
 
         def belongs_to(name, mapped_name, &match_criteria)
           mapping = self
-
+          associated_mapping = mapping.mappings[mapped_name]
+          
           target.send(:define_method, name) do
-            c = match_criteria.call(mapping, mapping.mappings[mapped_name])
-            c.value = c.value.field.get(self)
-            orm.find(c.field.mapping.target, c).first
+            criteria1 = Wheels::Orm::Query::Criteria.new(mapping)
+            criteria = match_criteria.call(self, Wheels::Orm::Query::Criteria.new(associated_mapping))
+
+            # c = criteria.__conditions__
+            # c.field.get(self)
+
+            # __session__ ? __session__.find(mapping, criteria.__options__, criteria.__conditions__) : nil
+            orm.find(associated_mapping, criteria.__options__, criteria.__conditions__).first
           end
 
           target.send(:define_method, "#{name}=") do |object|
-            c = criteria.condition
+            criteria1 = Wheels::Orm::Query::Criteria.new(mapping)
+            criteria = match_criteria.call(criteria1, Wheels::Orm::Query::Criteria.new(mapping.mappings[mapped_name]))
+
+            c = criteria.__conditions__
             c.value.field.set(self, c.field.get(object))
           end
         end

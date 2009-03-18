@@ -165,7 +165,7 @@ module Integration::AbstractRepositoryTest
     person2 = @person.new
     person2.name = "Jane"
 
-    people = Wheels::Orm::Collection.new(Wheels::Orm::Mappings["default"].mappings[@person], [person1, person2])
+    people = Wheels::Orm::Collection.new(Wheels::Orm::Mappings["default"][@person], [person1, person2])
 
     orm.save(people)
 
@@ -252,7 +252,7 @@ module Integration::AbstractRepositoryTest
     orm.save(person)
 
     assert_nothing_raised do
-      low_gpa = Wheels::Orm::Query::Condition.lt(Wheels::Orm::Mappings["default"].mappings[@person]["gpa"], 3)
+      low_gpa = Wheels::Orm::Query::Condition.lt(Wheels::Orm::Mappings["default"][@person]["gpa"], 3)
       people = orm.find(@person, nil, low_gpa)
       assert_equal(1, people.size)
     end

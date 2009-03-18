@@ -20,7 +20,7 @@ class BelongsToTest < Test::Unit::TestCase
     @exhibit = Exhibit
     Wheels::Orm::Mappings["default"].map(@exhibit, "exhibits") do |exhibits|
       exhibits.key(exhibits.field("id", Wheels::Orm::Types::Serial))
-      exhibits.field("zoo_id", Integer)
+      exhibits.field("zoo_id", Wheels::Orm::Types::Integer)
 
 
       # Exhibit#inhabitants returns an animal or keeper:
@@ -38,8 +38,8 @@ class BelongsToTest < Test::Unit::TestCase
       #   keepers.exhibit_id.eq(exhibits.id)
       # end
 
-      exhibits.belong_to('zoo', 'zoos') do |exhibit, zoo|
-        exhibit.zoo_id.eq(zoo.id)
+      exhibits.belong_to('zoo', Zoo) do |exhibit, zoo|
+        zoo.id.eq(exhibit.zoo_id)
       end
 
       # animals.belongs_to('exhibit', 'animals') do |exhibit, animals|
@@ -75,7 +75,7 @@ class BelongsToTest < Test::Unit::TestCase
     exhibit = @exhibit.new
     assert_respond_to(exhibit, :zoo=)
   end
-
+  
   def test_proxy_sets_association_key
     exhibit = @exhibit.new
     orm.save(zoo = @zoo.new)

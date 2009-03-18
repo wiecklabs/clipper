@@ -52,7 +52,7 @@ module Wheels
       end
 
       def find(target, options, conditions)
-        mapping = @repository.mappings[target]
+        mapping = target.is_a?(Wheels::Orm::Mappings::Mapping) ? target : @repository.mappings[target]
 
         @repository.select(Query.new(mapping, options, conditions))
       end
