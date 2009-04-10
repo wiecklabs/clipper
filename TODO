@@ -2,7 +2,7 @@ TODO:
 
 * IdentityMap
 * ObjectEnumerator
-* Load a complex object that spans more than one table
+* Save a complex object that spans more than one table
 * Load an object that uses a Discriminator
 * Save an Association
 * Load an Association

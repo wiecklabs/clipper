@@ -4,6 +4,12 @@ module Wheels
       class UnmappedClassError < StandardError
       end
 
+      class UnsupportedTypeError < StandardError
+        def initialize(type)
+          super("#{type.inspect} is not a registered Wheels::Orm::Type (#{Wheels::Orm::Types.inspect})")
+        end
+      end
+
       include Enumerable
 
       def initialize

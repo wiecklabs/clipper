@@ -3,22 +3,24 @@ module Wheels
     class Mappings
       class Field
 
-        include Test::Unit::Assertions
-
         def initialize(mapping, name, type, default = nil)
           begin
-            assert_kind_of(Wheels::Orm::Mappings::Mapping, mapping, "Field#mapping must be a Mapping")
+            raise ArgumentError.new("Field#mapping must be a Mapping") unless mapping.kind_of?(Wheels::Orm::Mappings::Mapping)
             @mapping = mapping
 
-            assert_kind_of(String, name, "Field#name must be a String")
-            assert_not_blank(name, "Field#name must not be blank")
+            raise ArgumentError.new("Field#name must be a String") unless name.is_a?(String)
+            raise ArgumentError.new("Field#name must not be blank") if name.blank?
             @name = name
 
             if type.is_a?(Class)
-              type = Wheels::Orm::Types[type.to_s].new
+              if defined_type = Wheels::Orm::Types[type.to_s]
+                type = defined_type.new
+              else
+                raise Wheels::Orm::Mappings::UnsupportedTypeError.new(type)
+              end
             end
 
-            assert_kind_of(Wheels::Orm::Type, type, "Field#type must be a Wheels::Orm::Type")
+            raise ArgumentError.new("Field#type must be a Wheels::Orm::Type") unless type.is_a?(Wheels::Orm::Type)
             @type = type
 
             @default = default
