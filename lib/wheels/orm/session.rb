@@ -2,17 +2,18 @@ module Wheels
   module Orm
     class Session
 
-      include Test::Unit::Assertions
+      class RepositoryMissingError < StandardError
+        def initialize(name)
+          super("Repository #{name.inspect} not a registered repository, can't initiate a Session")
+        end
+      end
 
       def initialize(repository_name)
-        begin
-          assert_kind_of(String, repository_name, "Session repository_name must be a String")
-          assert_not_blank(repository_name, "Session repository_name must not be blank")
-          @repository = Wheels::Orm::Repositories::registrations[repository_name]
-          assert_not_nil(@repository, "Repository #{@repository.inspect} not a registered repository, can't initiate a Session")
-        rescue Test::Unit::AssertionFailedError => e
-          raise ArgumentError.new(e.message)
-        end
+        raise ArgumentError.new("Session repository_name must be a String") unless repository_name.is_a?(String)
+        raise ArgumentError.new("Session repository_name must not be blank") if repository_name.blank?
+
+        @repository = Wheels::Orm::Repositories::registrations[repository_name]
+        raise RepositoryMissingError.new(reponsitory_name) if @repository.nil?
 
         @identity_map = IdentityMap.new
       end
