@@ -3,7 +3,7 @@ Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem:test")
 TIMES = (ENV["x"] || 500).to_i
 
 class Person
-  orm.map(self, "people") do |people|
+  Wheels::Orm::Mappings["default"].map(self, "people") do |people|
     people.key people.field("id", Wheels::Orm::Types::Serial)
     people.field("name", String)
     people.field("gpa", Wheels::Orm::Types::Float(7, 2))

@@ -12,7 +12,7 @@ class MappingsTest < Test::Unit::TestCase
     mappings = Wheels::Orm::Mappings.new
     assert_nothing_raised do
       cow = Class.new
-      mapping = Wheels::Orm::Mappings::Mapping.new(cow, "cows")
+      mapping = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, cow, "cows")
       mappings << mapping
       assert_equal(mapping, mappings[cow])
     end
@@ -30,8 +30,8 @@ class MappingsTest < Test::Unit::TestCase
     assert_respond_to(mappings, :each)
     assert_kind_of(Enumerable, mappings)
 
-    cows = Wheels::Orm::Mappings::Mapping.new(Class.new, 'cows')
-    pigs = Wheels::Orm::Mappings::Mapping.new(Class.new, 'pigs')
+    cows = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, 'cows')
+    pigs = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, 'pigs')
 
     mappings << cows
     mappings << pigs

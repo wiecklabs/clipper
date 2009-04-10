@@ -25,12 +25,12 @@ module Wheels
         @repository.mappings
       end
 
-      def map(target, mapped_name)
-        mapping = Wheels::Orm::Mappings::Mapping.new(target, mapped_name)
-        yield mapping
-        @repository.mappings << mapping
-        mapping
-      end
+      # def map(target, mapped_name)
+      #   mapping = Wheels::Orm::Mappings::Mapping.new(target, mapped_name)
+      #   yield mapping
+      #   @repository.mappings << mapping
+      #   mapping
+      # end
 
       def get(target, *keys)
         mapping = @repository.mappings[target]
@@ -52,7 +52,7 @@ module Wheels
       end
 
       def find(target, options, conditions)
-        mapping = @repository.mappings[target]
+        mapping = target.is_a?(Wheels::Orm::Mappings::Mapping) ? target : @repository.mappings[target]
 
         @repository.select(Query.new(mapping, options, conditions))
       end

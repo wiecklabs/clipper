@@ -14,18 +14,19 @@ module Wheels
 
         include Test::Unit::Assertions
 
-        def initialize(target, name)
+        def initialize(mappings, target, name)
           begin
-            assert_kind_of(Class, target, "Mapping#target must be a Class")
+            raise ArgumentError.new("Mapping#target must be a Class") unless target.kind_of?(Class)
             @target = target
 
-            assert_kind_of(String, name, "Mapping#name must be a String")
+            raise ArgumentError.new("Mapping#name must be a String") unless name.is_a?(String)
             assert_not_blank(name, "Mapping#name must not be blank")
             @name = name
           rescue Test::Unit::AssertionFailedError => e
             raise ArgumentError.new(e.message)
           end
 
+          @mappings = mappings
           @composite_mappings = []
           @fields = java.util.LinkedHashSet.new
           @key = java.util.LinkedHashSet.new
@@ -41,6 +42,10 @@ module Wheels
 
         def target
           @target
+        end
+
+        def mappings
+          @mappings
         end
 
         def field(name, type, default_value = nil)
@@ -86,21 +91,32 @@ module Wheels
           composite_mapping
         end
 
-        def proxy(mapped_name)
+        def belongs_to(name, mapped_name, &match_criteria)
           mapping = self
-          criteria = yield Wheels::Orm::Query::Criteria.new(self)
+          associated_mapping = mapping.mappings[mapped_name]
+          
+          target.send(:define_method, name) do
+            criteria1 = Wheels::Orm::Query::Criteria.new(mapping)
+            criteria = match_criteria.call(self, Wheels::Orm::Query::Criteria.new(associated_mapping))
 
-          target.send(:define_method, mapped_name) do
-            c = criteria.condition.dup
-            c.value = c.value.field.get(self)
-            orm.find(c.field.mapping.target, c).first
+            # c = criteria.__conditions__
+            # c.field.get(self)
+
+            # __session__ ? __session__.find(mapping, criteria.__options__, criteria.__conditions__) : nil
+            orm.find(associated_mapping, criteria.__options__, criteria.__conditions__).first
           end
 
-          target.send(:define_method, mapped_name+"=") do |object|
-            c = criteria.condition
+          target.send(:define_method, "#{name}=") do |object|
+            criteria1 = Wheels::Orm::Query::Criteria.new(mapping)
+            criteria = match_criteria.call(criteria1, Wheels::Orm::Query::Criteria.new(mapping.mappings[mapped_name]))
+
+            c = criteria.__conditions__
             c.value.field.set(self, c.field.get(object))
           end
         end
+
+        alias belong_to belongs_to
+
 
         def constrain(context_name, &block)
           @validation_contexts.define(context_name, &block)

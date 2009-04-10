@@ -1,12 +1,13 @@
-require "helper"
+require "pathname"
+require Pathname(__FILE__).dirname.parent + "helper"
 
 class RelationTest < Test::Unit::TestCase
 
   def setup
-    @authors = Wheels::Orm::Mappings::Mapping.new(Class.new, "authors")
+    @authors = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, "authors")
     @authors.key(@authors.field "id", Wheels::Orm::Types::Integer)
 
-    @stories = Wheels::Orm::Mappings::Mapping.new(Class.new, "stories")
+    @stories = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, "stories")
     @stories.key(@stories.field "id", Wheels::Orm::Types::Integer)
     @stories.field "author_id", Wheels::Orm::Types::Integer
   end

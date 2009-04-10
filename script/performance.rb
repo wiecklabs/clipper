@@ -38,7 +38,7 @@ else
   end
 
   class Person
-    orm.map(self, "people") do |people|
+    Wheels::Orm::Mappings["default"].map(self, "people") do |people|
       people.key people.field("id", Wheels::Orm::Types::Serial)
       people.field("name", String)
       people.field("gpa", Wheels::Orm::Types::Float(7, 2))
@@ -84,7 +84,7 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       repository.create(people)
     else
-      orm.save(Wheels::Orm::Collection.new(orm.mappings[Person], people))
+      orm.save(Wheels::Orm::Collection.new(Wheels::Orm::Mappings["default"].mappings[Person], people))
     end
   end
 
@@ -108,7 +108,7 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       1.upto(TIMES) { Person.all(:id.lt => 10).entries }
     else
-      conditions = Wheels::Orm::Query::Condition.lt(orm.mappings[Person]["id"], 10)
+      conditions = Wheels::Orm::Query::Condition.lt(Wheels::Orm::Mappings["default"].mappings[Person]["id"], 10)
       orm { |session| 1.upto(TIMES) { session.all(Person, conditions) } }
     end
   end

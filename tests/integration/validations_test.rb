@@ -8,7 +8,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
     @user = Class.new do
       attr_accessor :password_confirmation
       
-      orm.map(self, "users") do |users|
+      Wheels::Orm::Mappings["default"].map(self, "users") do |users|
         users.key "id", Integer
         users.field "name", Wheels::Orm::Types::String.new(200)
         users.field "email", Wheels::Orm::Types::String.new(200)

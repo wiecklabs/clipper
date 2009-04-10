@@ -1,7 +1,7 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
 
-class BelongsToTest # PENDING < Test::Unit::TestCase
+class BelongsToTest < Test::Unit::TestCase
   class Zoo
   end
 
@@ -13,14 +13,14 @@ class BelongsToTest # PENDING < Test::Unit::TestCase
     Wheels::Orm::Repositories::register("default", @uri.to_s)
 
     @zoo = Zoo
-    orm.map(@zoo, "zoos") do |zoos|
+    Wheels::Orm::Mappings["default"].map(@zoo, "zoos") do |zoos|
       zoos.key(zoos.field("id", Wheels::Orm::Types::Serial))
     end
 
     @exhibit = Exhibit
-    orm.map(@exhibit, "exhibits") do |exhibits|
+    Wheels::Orm::Mappings["default"].map(@exhibit, "exhibits") do |exhibits|
       exhibits.key(exhibits.field("id", Wheels::Orm::Types::Serial))
-      exhibits.field("zoo_id", Integer)
+      exhibits.field("zoo_id", Wheels::Orm::Types::Integer)
 
 
       # Exhibit#inhabitants returns an animal or keeper:
@@ -38,9 +38,9 @@ class BelongsToTest # PENDING < Test::Unit::TestCase
       #   keepers.exhibit_id.eq(exhibits.id)
       # end
 
-      # exhibit.belongs_to('zoo', 'zoos') do |exhibit, zoo|
-      #   exhibit.zoo_id.eq(zoo.id)
-      # end
+      exhibits.belong_to('zoo', Zoo) do |exhibit, zoo|
+        zoo.id.eq(exhibit.zoo_id)
+      end
 
       # animals.belongs_to('exhibit', 'animals') do |exhibit, animals|
       #  exhibit.ecosystem.eq(animals.ecosystem)
@@ -75,7 +75,7 @@ class BelongsToTest # PENDING < Test::Unit::TestCase
     exhibit = @exhibit.new
     assert_respond_to(exhibit, :zoo=)
   end
-
+  
   def test_proxy_sets_association_key
     exhibit = @exhibit.new
     orm.save(zoo = @zoo.new)

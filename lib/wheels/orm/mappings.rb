@@ -12,6 +12,13 @@ module Wheels
 
       include Enumerable
 
+      class << self
+        def [](repository_name)
+          @repository_mappings ||= {}
+          @repository_mappings[repository_name] ||= Mappings.new
+        end
+      end
+
       def initialize
         @mappings = {}
       end
@@ -27,6 +34,13 @@ module Wheels
 
       def each
         @mappings.values.each { |mapping| yield mapping }
+      end
+
+      def map(target, mapped_name)
+        mapping = Wheels::Orm::Mappings::Mapping.new(self, target, mapped_name)
+        yield mapping
+        self << mapping
+        mapping
       end
 
     end
