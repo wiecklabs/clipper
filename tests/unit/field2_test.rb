@@ -58,16 +58,29 @@ class Field2Test < Test::Unit::TestCase
       @type = type
     end
 
+    # This should call the correct field right? But is getting/setting of values field
+    # specific?
+    # In the case of default values, yes it is. :-/
+    # So we need a way to look up this specific field, but only in the context of the
+    # field.
+    # For materialized objects that easy (if a little awkward).
+    # For new objects that's not possible since a class could have multiple mappings,
+    # even in the context of a single connection.
+    # Though again, that only applies to defaults. Which should bind to the class, not
+    # a particular mapping.
+    #
+    # Ok, so defaults don't go into the Field definition. They go into the binding.
+    # Makes sense.
     def self.bind!(field, target)
-      target.class_eval do
-        define_method(field.bound_method_name) do
-          field.get(self)
+      target.class_eval <<-EOS
+        def #{field.bound_method_name}
+          __mapping__[#{field.bound_method_name.inspect}].get(self)
         end
-
-        define_method("#{field.bound_method_name}=") do |value|
-          field.set(self, value)
+        
+        def #{field.bound_method_name}=(value)
+          __mapping__[#{field.bound_method_name.inspect}].set(self, value)
         end
-      end
+      EOS
     end
 
     def get(object)
