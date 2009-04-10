@@ -4,29 +4,25 @@ module Wheels
       class Field
 
         def initialize(mapping, name, type, default = nil)
-          begin
-            raise ArgumentError.new("Field#mapping must be a Mapping") unless mapping.kind_of?(Wheels::Orm::Mappings::Mapping)
-            @mapping = mapping
+          raise ArgumentError.new("Field#mapping must be a Mapping") unless mapping.kind_of?(Wheels::Orm::Mappings::Mapping)
+          @mapping = mapping
 
-            raise ArgumentError.new("Field#name must be a String") unless name.is_a?(String)
-            raise ArgumentError.new("Field#name must not be blank") if name.blank?
-            @name = name
+          raise ArgumentError.new("Field#name must be a String") unless name.is_a?(String)
+          raise ArgumentError.new("Field#name must not be blank") if name.blank?
+          @name = name
 
-            if type.is_a?(Class)
-              if defined_type = Wheels::Orm::Types[type.to_s]
-                type = defined_type.new
-              else
-                raise Wheels::Orm::Mappings::UnsupportedTypeError.new(type)
-              end
+          if type.is_a?(Class)
+            if defined_type = Wheels::Orm::Types[type.to_s]
+              type = defined_type.new
+            else
+              raise Wheels::Orm::Mappings::UnsupportedTypeError.new(type)
             end
-
-            raise ArgumentError.new("Field#type must be a Wheels::Orm::Type") unless type.is_a?(Wheels::Orm::Type)
-            @type = type
-
-            @default = default
-          rescue Test::Unit::AssertionFailedError => e
-            raise ArgumentError.new(e.message)
           end
+
+          raise ArgumentError.new("Field#type must be a Wheels::Orm::Type") unless type.is_a?(Wheels::Orm::Type)
+          @type = type
+
+          @default = default
         end
 
         def self.bind!(field, target)

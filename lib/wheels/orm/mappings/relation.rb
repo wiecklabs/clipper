@@ -3,23 +3,14 @@ module Wheels
     class Mappings
       class Relation
 
-        include Test::Unit::Assertions
-
         def initialize(key, reference)
-          begin
-            # Breaks CPK...
-            assert_kind_of(Field, key, "Relation#key must be a Wheels::Orm::Mappings::Field")
-            @key = key
-          rescue Test::Unit::AssertionFailedError => e
-            raise ArgumentError.new(e.message)
-          end
 
-          begin
-            assert_kind_of(Field, reference, "Relation#reference must be a Wheels::Orm::Mappings::Field")
-            @reference = reference
-          rescue Test::Unit::AssertionFailedError => e
-            raise ArgumentError.new(e.message)
-          end
+          # Breaks CPK...
+          raise ArgumentError.new("Relation#key must be a Wheels::Orm::Mappings::Field") unless key.is_a?(Field)
+          @key = key
+
+          raise ArgumentError.new("Relation#reference must be a Wheels::Orm::Mappings::Field") unless reference.is_a?(Field)
+          @reference = reference
         end
 
         def key

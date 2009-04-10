@@ -12,19 +12,13 @@ module Wheels
         class MultipleKeyError < StandardError
         end
 
-        include Test::Unit::Assertions
-
         def initialize(mappings, target, name)
-          begin
-            raise ArgumentError.new("Mapping#target must be a Class") unless target.kind_of?(Class)
-            @target = target
+          raise ArgumentError.new("Mapping#target must be a Class") unless target.kind_of?(Class)
+          @target = target
 
-            raise ArgumentError.new("Mapping#name must be a String") unless name.is_a?(String)
-            assert_not_blank(name, "Mapping#name must not be blank")
-            @name = name
-          rescue Test::Unit::AssertionFailedError => e
-            raise ArgumentError.new(e.message)
-          end
+          raise ArgumentError.new("Mapping#name must be a String") unless name.is_a?(String)
+          raise ArgumentError.new("Mapping#name must not be blank") if name.blank?
+          @name = name
 
           @mappings = mappings
           @composite_mappings = []

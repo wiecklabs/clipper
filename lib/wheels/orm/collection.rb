@@ -2,8 +2,6 @@ module Wheels
   module Orm
     class Collection
 
-      include Test::Unit::Assertions
-
       include Enumerable
 
       def initialize(mapping, collection)

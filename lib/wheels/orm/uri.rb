@@ -5,15 +5,9 @@ module Wheels
   module Orm
     class Uri
 
-      include Test::Unit::Assertions
-
       def initialize(uri)
-        begin
-          assert_kind_of(String, uri, "URI must be a String")
-          assert_not_blank(uri, "URI must not be blank")
-        rescue Test::Unit::AssertionFailedError => e
-          raise ArgumentError.new(e.message)
-        end
+        raise ArgumentError.new("URI must be a String") unless uri.is_a?(String)
+        raise ArgumentError.new("URI must not be blank") if uri.blank?
 
         @s = uri.dup
 
