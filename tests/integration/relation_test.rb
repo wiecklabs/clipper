@@ -1,4 +1,5 @@
-require "helper"
+require "pathname"
+require Pathname(__FILE__).dirname.parent + "helper"
 
 class RelationTest < Test::Unit::TestCase
 

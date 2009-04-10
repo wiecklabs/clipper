@@ -9,7 +9,7 @@ class TypesTest < Test::Unit::TestCase
   # ===============
   # String
   # ===============
-  
+
   def test_string_initializer
     assert_raise(ArgumentError) { Wheels::Orm::Types::String.new() }
     assert_raise(ArgumentError) { Wheels::Orm::Types::String.new('abc') }
