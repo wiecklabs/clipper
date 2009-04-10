@@ -87,22 +87,19 @@ module Wheels
 
         def belongs_to(name, mapped_name, &match_criteria)
           mapping = self
-          associated_mapping = mapping.mappings[mapped_name]
-          
+
           target.send(:define_method, name) do
-            criteria1 = Wheels::Orm::Query::Criteria.new(mapping)
+            associated_mapping = mapping.mappings[mapped_name]
             criteria = match_criteria.call(self, Wheels::Orm::Query::Criteria.new(associated_mapping))
 
-            # c = criteria.__conditions__
-            # c.field.get(self)
-
-            # __session__ ? __session__.find(mapping, criteria.__options__, criteria.__conditions__) : nil
             orm.find(associated_mapping, criteria.__options__, criteria.__conditions__).first
           end
 
           target.send(:define_method, "#{name}=") do |object|
-            criteria1 = Wheels::Orm::Query::Criteria.new(mapping)
-            criteria = match_criteria.call(criteria1, Wheels::Orm::Query::Criteria.new(mapping.mappings[mapped_name]))
+            associated_mapping = mapping.mappings[mapped_name]
+
+            mapping_criteria = Wheels::Orm::Query::Criteria.new(mapping)
+            criteria = match_criteria.call(mapping_criteria, Wheels::Orm::Query::Criteria.new(associated_mapping))
 
             c = criteria.__conditions__
             c.value.field.set(self, c.field.get(object))
@@ -111,6 +108,17 @@ module Wheels
 
         alias belong_to belongs_to
 
+        def has_many(name, mapped_name, &match_criteria)
+          mapping = self
+
+          target.send(:define_method, name) do
+            associated_mapping = mapping.mappings[mapped_name]
+            criteria = match_criteria.call(self, Wheels::Orm::Query::Criteria.new(associated_mapping))
+
+            orm.find(associated_mapping, criteria.__options__, criteria.__conditions__)
+          end
+        end
+        alias have_many has_many
 
         def constrain(context_name, &block)
           @validation_contexts.define(context_name, &block)

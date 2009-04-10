@@ -31,7 +31,7 @@ module Wheels
       def first
         @collection.first
       end
-      
+
       def [](index)
         entries[index]
       end

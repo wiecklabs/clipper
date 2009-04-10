@@ -75,7 +75,7 @@ class BelongsToTest < Test::Unit::TestCase
     exhibit = @exhibit.new
     assert_respond_to(exhibit, :zoo=)
   end
-  
+
   def test_proxy_sets_association_key
     exhibit = @exhibit.new
     orm.save(zoo = @zoo.new)
