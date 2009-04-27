@@ -78,36 +78,4 @@ class Integration::MappingTest < Test::Unit::TestCase
     end
   end
 
-  def test_related_keys_are_already_defined_when_composing
-    person = Class.new
-    people = Wheels::Orm::Mappings["default"].map(person, "people") {}
-    assert_raise(ArgumentError) { people.compose("localities", "city", "state") }
-  end
-
-  def test_describing_mapping_a_complete_class
-    person = Class.new
-    people = Wheels::Orm::Mappings["default"].map(person, "people") do |people|
-      people.key people.field("id", Integer)
-      people.field "name", Wheels::Orm::Types::String.new(200)
-      people.field "organization_id", Integer
-      people.field "address_id", Integer
-    end
-
-    addresses = people.compose("addresses", "address_id") do |address|
-      address.key address.field("id", Integer)
-      address.field "city", Wheels::Orm::Types::String.new(200)
-      address.field "state", Wheels::Orm::Types::String.new(200)
-    end
-
-    assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, addresses)
-
-    localities = people.compose("localities", "city", "state") do |locality|
-      locality.key locality.field("city", Wheels::Orm::Types::String.new(200)), locality.field("state", Wheels::Orm::Types::String.new(200))
-      locality.field "zip", Wheels::Orm::Types::String.new(200)
-    end
-
-    assert_kind_of(Wheels::Orm::Mappings::CompositeMapping, localities)
-    assert_equal(2, people.composite_mappings.size)
-  end
-
 end

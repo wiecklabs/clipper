@@ -21,7 +21,6 @@ module Wheels
           @name = name
 
           @mappings = mappings
-          @composite_mappings = []
           @fields = java.util.LinkedHashSet.new
           @key = java.util.LinkedHashSet.new
           @validation_contexts = Wheels::Orm::Validations::Contexts.new(self)
@@ -67,22 +66,7 @@ module Wheels
         end
 
         def [](name)
-          @fields.detect { |field| field.name == name } || composite_fields.detect { |field| field.name == name }
-        end
-
-        def compose(mapped_name, *related_keys)
-          missing_keys = related_keys.reject { |related_key| self[related_key] }
-
-          unless missing_keys.empty?
-            raise ArgumentError.new("The keys #{missing_keys.inspect} for composing #{mapped_name} are not defined.")
-          end
-
-          related_keys.map! { |key| self[key] }
-
-          composite_mapping = Wheels::Orm::Mappings::CompositeMapping.new(self, mapped_name, related_keys)
-          yield(composite_mapping)
-          @composite_mappings << composite_mapping
-          composite_mapping
+          @fields.detect { |field| field.name == name }
         end
 
         def belongs_to(name, mapped_name, &match_criteria)
@@ -144,24 +128,11 @@ module Wheels
           @fields
         end
 
-        def composite_fields
-          composite_fields = java.util.LinkedHashSet.new
-          @composite_mappings.each do |mapping|
-            mapping.fields.each do |field|
-              composite_fields.add(field) unless mapping.keys.include?(field)
-            end
-          end
-          composite_fields
-        end
-
         # TODO: Mapping#keys? This doesn't really make sense, maybe key_fields?
         def keys
           @key
         end
 
-        def composite_mappings
-          @composite_mappings
-        end
       end
     end
   end

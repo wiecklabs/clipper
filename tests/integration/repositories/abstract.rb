@@ -11,21 +11,6 @@ module Integration::AbstractRepositoryTest
         zoos.field "city", Wheels::Orm::Types::String.new(200)
         zoos.field "state", Wheels::Orm::Types::String.new(200)
         zoos.field "notes", Wheels::Orm::Types::Text
-
-        cities = zoos.compose("cities", "city", "state") do |cities|
-          cities.field("name", Wheels::Orm::Types::String.new(200))
-          cities.field("state", Wheels::Orm::Types::String.new(200))
-          cities.field("region", Wheels::Orm::Types::String.new(200))
-
-          cities.key(cities["name"], cities["state"])
-        end
-
-        zoos.compose("climates", "region") do |climates|
-          climates.field("region", Wheels::Orm::Types::String.new(200))
-          climates.field("climate", Wheels::Orm::Types::String.new(200))
-
-          climates.key(climates["region"])
-        end
       end
     end
 
@@ -259,64 +244,6 @@ module Integration::AbstractRepositoryTest
 
   ensure
     schema.destroy(@person)
-  end
-
-  def test_get_with_composite_mapping
-    schema = Wheels::Orm::Schema.new("default")
-    schema.create(@zoo)
-    schema.create(@city)
-    schema.create(@climate)
-
-    city = @city.new
-    city.name = "Dallas"
-    city.state = "Texas"
-    city.region = "South"
-    orm.save(city)
-
-    zoo = @zoo.new
-    zoo.name = "Dallas Zoo"
-    zoo.city = "Dallas"
-    zoo.state = "Texas"
-    orm.save(zoo)
-
-    assert_equal("South", orm.get(@zoo, zoo.id).region)
-
-  ensure
-    schema.destroy(@zoo)
-    schema.destroy(@city)
-    schema.destroy(@climate)
-  end
-
-  def test_get_with_multiple_composite_mappings
-    schema = Wheels::Orm::Schema.new("default")
-    schema.create(@zoo)
-    schema.create(@city)
-    schema.create(@climate)
-
-    city = @city.new
-    city.name = "Dallas"
-    city.state = "Texas"
-    city.region = "South"
-    orm.save(city)
-
-    climate = @climate.new
-    climate.region = "South"
-    climate.climate = "Hot"
-    orm.save(climate)
-
-    zoo = @zoo.new
-    zoo.name = "Dallas Zoo"
-    zoo.city = "Dallas"
-    zoo.state = "Texas"
-    orm.save(zoo)
-
-    assert_equal("South", orm.get(@zoo, zoo.id).region)
-    assert_equal("Hot", orm.get(@zoo, zoo.id).climate)
-
-  ensure
-    schema.destroy(@zoo)
-    schema.destroy(@city)
-    schema.destroy(@climate)
   end
 
   def test_all_with_single_condition
