@@ -25,6 +25,7 @@ module Wheels
           when Serializable > @type then
             case value
             when @type then value
+            when nil then @type.load(Serializable::EmptyReader.new)
             when Hash then @type.load(Serializable::HashReader.new(value))
             else
               raise SerializationError.new("Don't know how to load value #{value.inspect}")

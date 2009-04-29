@@ -37,5 +37,11 @@ class SerializableTest < Test::Unit::TestCase
     assert_equal("Dallas", me.home.name)
     assert_equal("TX", me.home.state_abbreviation)
   end
+
+  def test_serializable_class_determines_default_value
+    me = Person.new
+    assert_kind_of(City, me.home)
+  end
+
 end
 
