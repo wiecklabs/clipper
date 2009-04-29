@@ -14,6 +14,10 @@ require Pathname(__FILE__).dirname.parent + "wieck" + "string"
 
 require Pathname(__FILE__).dirname + "orm" + "uri"
 
+require Pathname(__FILE__).dirname + "orm" + "model"
+
+require Pathname(__FILE__).dirname + "orm" + "accessors"
+
 require Pathname(__FILE__).dirname + "orm" + "type"
 require Pathname(__FILE__).dirname + "orm" + "types"
 require Pathname(__FILE__).dirname + "orm" + "mappings" + "mapping"

@@ -1,10 +1,10 @@
 require "pathname"
-require Pathname(__FILE__).dirname.parent + "helper"
+require Pathname(__FILE__).dirname.parent.parent + "helper"
 
-class TypedAccessorTest < Test::Unit::TestCase
+class SerializableTest < Test::Unit::TestCase
 
   class City
-    include Wheels::Orm::Serializable
+    include Wheels::Orm::Accessors::Serializable
 
     attr_accessor :name, :state_abbreviation
 
@@ -22,15 +22,7 @@ class TypedAccessorTest < Test::Unit::TestCase
   end
 
   class Person
-    include Wheels::Orm::Model
-
-    accessor :name => String
-    accessor :age => Integer
-  end
-
-  def test_accessing_types
-    assert_equal(String, Person.accessors[:name].type)
-    assert_equal(Integer, Person.accessors[:age].type)
+    include Wheels::Orm::Accessors
   end
 
   def test_can_use_a_custom_serializable_type
@@ -39,6 +31,11 @@ class TypedAccessorTest < Test::Unit::TestCase
     end
 
     assert_equal(City, Person.accessors[:home].type)
+
+    me = Person.new
+    me.home = { :name => "Dallas", :state_abbreviation => "TX"}
+    assert_equal("Dallas", me.home.name)
+    assert_equal("TX", me.home.state_abbreviation)
   end
 end
 
