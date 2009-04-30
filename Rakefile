@@ -15,8 +15,8 @@ end
 # Gem
 require "rake/gempackagetask"
 
-NAME = "worm"
-SUMMARY = "Wheels O/RM"
+NAME = "beacon"
+SUMMARY = "Beacon O/RM"
 GEM_VERSION = "0.1.1"
 
 spec = Gem::Specification.new do |s|
@@ -34,16 +34,16 @@ Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
-desc "Install Wheels O/RM as a gem"
+desc "Install the Beacon O/RM as a gem"
 task :install => [:repackage] do
   sh %{gem install pkg/#{NAME}-#{GEM_VERSION}}
 end
 
-desc "Publish Wheels O/RM gem"
+desc "Publish the Beacon O/RM gem"
 task :publish do
   STDOUT.print "Publishing gem... "
   STDOUT.flush
-  `ssh gems@able.wieck.com "cd #{NAME} && git pull &> /dev/null && rake repackage &> /dev/null && cp pkg/* ../site/gems && cd ../site && gem generate_index"`
+  `ssh gems@gems.wieck.com "cd #{NAME} && git pull &> /dev/null && rake repackage &> /dev/null && cp pkg/* ../site/gems && cd ../site && gem generate_index"`
   STDOUT.puts "done"
 end
 
@@ -83,9 +83,9 @@ desc "Compile the native Java code."
 task :java_compile do
   puts "Compiling native Java code"
   pkg_classes = File.join(*%w(pkg classes))
-  jar_name = File.join(*%w(lib worm_internal.jar))
+  jar_name = File.join(*%w(lib beacon_internal.jar))
   mkdir_p pkg_classes
   sh "javac -target 1.5 -source 1.5 -Xlint:unchecked -d pkg/classes #{java_classpath_arg} #{FileList['src/java/**/*.java'].join(' ')}"
   sh "jar cf #{jar_name} -C #{pkg_classes} ."
 end
-file "lib/worm_internal.jar" => :java_compile
+file "lib/beacon_internal.jar" => :java_compile

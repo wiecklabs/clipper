@@ -8,7 +8,7 @@ require Pathname(__FILE__).dirname.parent + "vendor" + "log4j-1.2.15.jar"
 require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
 require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
 
-# require Pathname(__FILE__).dirname.parent + "worm_internal.jar"
+# require Pathname(__FILE__).dirname.parent + "beacon_internal.jar"
 
 require Pathname(__FILE__).dirname.parent + "wieck" + "string"
 
