@@ -4,7 +4,7 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class Integration::ModelTest < Test::Unit::TestCase
 
   class Zoo
-
+    include Beacon::Model
   end
 
   def setup
@@ -22,8 +22,8 @@ class Integration::ModelTest < Test::Unit::TestCase
     Beacon.close("default")
   end
 
-  def test_true
-    assert true
+  def test_new_record
+    assert(!(orm.stored? Zoo.new))
   end
 
 end

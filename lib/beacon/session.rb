@@ -39,7 +39,7 @@ module Beacon
 
       query = Query.new(mapping, nil, conditions)
 
-      @repository.select(query).first
+      @repository.select(query, self).first
     end
 
     def all(target)
@@ -48,13 +48,13 @@ module Beacon
 
       yield(criteria) if block_given?
 
-      @repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__))
+      @repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__), self)
     end
 
     def find(target, options, conditions)
       mapping = target.is_a?(Beacon::Mappings::Mapping) ? target : @repository.mappings[target]
 
-      @repository.select(Query.new(mapping, options, conditions))
+      @repository.select(Query.new(mapping, options, conditions), self)
     end
 
     def save(collection)
@@ -74,6 +74,12 @@ module Beacon
     end
 
     def load(object, field)
+    end
+
+    def stored?(instance)
+      instance.__session__ &&
+        instance.__session__.repository == @repository &&
+        instance.__session__.identity_map.include?(instance)
     end
 
   end # class Session
