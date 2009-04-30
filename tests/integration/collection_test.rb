@@ -5,7 +5,7 @@ class Integration::CollectionTest < Test::Unit::TestCase
   
   def setup
     @uri = Beacon::Uri.new("abstract://localhost/example")
-    Beacon::Repositories::register("example", @uri.to_s)
+    Beacon::open("example", @uri.to_s)
     
     @person = Class.new do
       Beacon::Mappings["example"].map(self, "people") do |people|
@@ -19,7 +19,7 @@ class Integration::CollectionTest < Test::Unit::TestCase
   end
   
   def teardown
-    Beacon::Repositories::registrations.delete("example")
+    Beacon::registrations.delete("example")
   end
   
   def test_should_have_an_indexer

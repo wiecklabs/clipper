@@ -35,6 +35,9 @@ module Beacon
       def update(collection)
       end
 
+      def close
+      end
+
     end # class Abstract
   end # module Repositories
 end

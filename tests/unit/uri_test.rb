@@ -38,6 +38,12 @@ class UriTest < Test::Unit::TestCase
     end
   end
 
+  def test_missing_driver_error
+    assert_raises(Beacon::Uri::MissingDriverError) do
+      Beacon::Uri.new("not:a:driver:///#{Dir.pwd}/example.db")
+    end
+  end
+
   def test_returns_original_string
     assert_equal("abstract://user:password@name?charset=utf8", @uri.to_s)
   end

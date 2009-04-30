@@ -7,7 +7,7 @@ require Pathname(__FILE__).dirname.parent + "lib" + "beacon"
 
 sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
 @uri = Beacon::Uri.new("jdbc:sqlite://#{sqlite_path}")
-Beacon::Repositories::register("default", @uri.to_s)
+Beacon::open("default", @uri.to_s)
 
 class Person
   Beacon::Mappings["default"].map(self, "people") do |people|

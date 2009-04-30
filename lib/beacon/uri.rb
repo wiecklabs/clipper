@@ -4,6 +4,12 @@ require "cgi"
 module Beacon
   class Uri
 
+    class MissingDriverError < StandardError
+      def initialize(name)
+        super("Missing Driver for #{name.inspect}")
+      end
+    end
+
     def initialize(uri)
       raise ArgumentError.new("URI must be a String") unless uri.is_a?(String)
       raise ArgumentError.new("URI must not be blank") if uri.blank?
@@ -27,7 +33,11 @@ module Beacon
       end
 
       @driver = uri.scheme.split(/[\:\+]/).compact.inject(Beacon::Repositories) do |c, name|
-        c.const_get(name.capitalize)
+        begin
+          c.const_get(name.capitalize)
+        rescue NameError
+          raise MissingDriverError.new(uri.scheme)
+        end
       end
     end
 

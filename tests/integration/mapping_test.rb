@@ -4,11 +4,11 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class Integration::MappingTest < Test::Unit::TestCase
 
   def setup
-    Beacon::Repositories::register("default", "abstract://localhost/example")
+    Beacon::open("default", "abstract://localhost/example")
   end
 
   def teardown
-    Beacon::Repositories::registrations.delete("default")
+    Beacon::registrations.delete("default")
   end
 
   # This test describes the internal mappings use by the Wheels O/RM.

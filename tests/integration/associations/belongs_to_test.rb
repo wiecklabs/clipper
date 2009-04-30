@@ -10,7 +10,7 @@ class BelongsToTest < Test::Unit::TestCase
 
   def setup
     @uri = Beacon::Uri.new("jdbc:hsqldb:mem:test")
-    Beacon::Repositories::register("default", @uri.to_s)
+    Beacon::open("default", @uri.to_s)
 
     @zoo = Zoo
     Beacon::Mappings["default"].map(@zoo, "zoos") do |zoos|
@@ -87,6 +87,6 @@ class BelongsToTest < Test::Unit::TestCase
   def teardown
     @schema.destroy(@zoo)
     @schema.destroy(@exhibit)
-    Beacon::Repositories::registrations.delete("default")
+    Beacon::registrations.delete("default")
   end
 end

@@ -10,13 +10,13 @@ class Integration::SqliteTest < Test::Unit::TestCase
     @sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
     @uri = Beacon::Uri.new("jdbc:sqlite://#{@sqlite_path}")
 
-    Beacon::Repositories::register("default", @uri.to_s)
+    Beacon::open("default", @uri.to_s)
 
     setup_abstract
   end
 
   def teardown
-    Beacon::Repositories::registrations.delete("default")
+    Beacon::registrations.delete("default")
     File.unlink(@sqlite_path) rescue nil
   end
 
@@ -31,7 +31,7 @@ class Integration::SqliteTest < Test::Unit::TestCase
   end
 
   def test_has_a_syntax
-    assert_kind_of(Beacon::Syntax::Sql, Beacon::Repositories.registrations["default"].syntax)
+    assert_kind_of(Beacon::Syntax::Sql, Beacon::registrations["default"].syntax)
   end
 
   def test_schema_raises_for_unmapped_classes

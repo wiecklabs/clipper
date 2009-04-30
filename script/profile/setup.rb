@@ -1,4 +1,4 @@
-Beacon::Repositories.register("default", "jdbc:hsqldb:mem:test")
+Beacon::open("default", "jdbc:hsqldb:mem:test")
 
 TIMES = (ENV["x"] || 1000).to_i
 

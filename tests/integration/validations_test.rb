@@ -4,7 +4,7 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class Integration::ValidationsTest < Test::Unit::TestCase
 
   def setup
-    Beacon::Repositories::register("default", "abstract://localhost/example")
+    Beacon::open("default", "abstract://localhost/example")
     @user = Class.new do
       attr_accessor :password_confirmation
       
@@ -23,7 +23,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   end
   
   def teardown
-    Beacon::Repositories::registrations.delete("default")
+    Beacon::registrations.delete("default")
   end
     
   def test_constraint_declarations

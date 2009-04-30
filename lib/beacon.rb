@@ -58,3 +58,24 @@ def orm(name = "default")
   yield session if block_given?
   session
 end
+
+module Beacon
+
+  @registrations = {}
+  def self.registrations
+    @registrations
+  end
+
+  def self.open(connection_name, uri)
+    uri = Beacon::Uri.new(uri)
+    @registrations[connection_name] = uri.driver.new(connection_name, uri)
+  end
+
+  def self.close(connection_name)
+    if driver = @registrations[connection_name]
+      driver.close
+    else
+      raise ArgumentError.new("#{connection_name.inspect} is not a registered connection.")
+    end
+  end
+end

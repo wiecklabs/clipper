@@ -1,10 +1,15 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent + "helper"
 
-class Integration::SessionTest < Test::Unit::TestCase
+class Integration::ModelTest < Test::Unit::TestCase
+
+  class Zoo
+
+  end
 
   def setup
-    Beacon::open("default", "abstract://localhost/example")
+    Beacon.open("default", "jdbc:sqlite://#{Pathname(__FILE__).dirname.expand_path + "sqlite.db"}")
+
     @zoo = Class.new do
       Beacon::Mappings["default"].map(self, "zoos") do |zoos|
         zoos.key "id", Integer
@@ -14,12 +19,11 @@ class Integration::SessionTest < Test::Unit::TestCase
   end
 
   def teardown
-    Beacon::registrations.delete("default")
+    Beacon.close("default")
   end
 
-  def test_session_save_should_return_true
-    zoo = @zoo.new
-    zoo.name = "Dallas"
-    assert(orm.save(zoo))
+  def test_true
+    assert true
   end
+
 end

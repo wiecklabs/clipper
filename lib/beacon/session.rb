@@ -11,7 +11,7 @@ module Beacon
       raise ArgumentError.new("Session repository_name must be a String") unless repository_name.is_a?(String)
       raise ArgumentError.new("Session repository_name must not be blank") if repository_name.blank?
 
-      @repository = Beacon::Repositories::registrations[repository_name]
+      @repository = Beacon::registrations[repository_name]
       raise RepositoryMissingError.new(reponsitory_name) if @repository.nil?
 
       @identity_map = IdentityMap.new

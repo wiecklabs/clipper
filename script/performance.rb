@@ -33,8 +33,8 @@ if ORM == "dm"
   Person.auto_migrate!
 else
   case ADAPTER
-  when "sqlite" then Beacon::Repositories.register("default", "jdbc:hsqldb:mem:test")
-  when "mysql" then Beacon::Repositories.register("default", "jdbc:mysql://localhost:3306/dm_worm_performance?user=root")
+  when "sqlite" then Beacon::open("default", "jdbc:hsqldb:mem:test")
+  when "mysql" then Beacon::open("default", "jdbc:mysql://localhost:3306/dm_worm_performance?user=root")
   end
 
   class Person

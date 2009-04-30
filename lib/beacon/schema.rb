@@ -1,7 +1,7 @@
 module Beacon
   class Schema
     def initialize(repository)
-      @repository = Beacon::Repositories.registrations[repository]
+      @repository = Beacon::registrations[repository]
     end
 
     def create(mapped_class)

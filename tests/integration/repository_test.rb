@@ -8,7 +8,7 @@ class RepositoryTest < Test::Unit::TestCase
   end
 
   def teardown
-    Beacon::Repositories::registrations.delete("example")
+    Beacon::registrations.delete("example")
   end
 
   def test_requires_two_arguments
@@ -22,13 +22,13 @@ class RepositoryTest < Test::Unit::TestCase
   end
 
   def test_registering_a_repository
-    repository = Beacon::Repositories::register("example", @uri.to_s)
+    repository = Beacon::open("example", @uri.to_s)
     assert_kind_of(Beacon::Repositories::Abstract, repository)
-    assert_equal(1, Beacon::Repositories::registrations.size)
+    assert_equal(1, Beacon::registrations.size)
   end
 
   def test_retrieving_a_mapping_for_an_instance
-    repository = Beacon::Repositories::register("example", @uri.to_s)
+    repository = Beacon::open("example", @uri.to_s)
 
     person = Class.new do
       attr_accessor :name, :age
@@ -42,7 +42,7 @@ class RepositoryTest < Test::Unit::TestCase
   end
 
   def test_mappings_is_a_mappings_collection
-    repository = Beacon::Repositories::register("example", @uri.to_s)
+    repository = Beacon::open("example", @uri.to_s)
 
     assert_kind_of(Beacon::Mappings, repository.mappings)
   end
