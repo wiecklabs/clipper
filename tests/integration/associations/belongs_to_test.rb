@@ -9,18 +9,18 @@ class BelongsToTest < Test::Unit::TestCase
   end
 
   def setup
-    @uri = Wheels::Orm::Uri.new("jdbc:hsqldb:mem:test")
-    Wheels::Orm::Repositories::register("default", @uri.to_s)
+    @uri = Beacon::Uri.new("jdbc:hsqldb:mem:test")
+    Beacon::Repositories::register("default", @uri.to_s)
 
     @zoo = Zoo
-    Wheels::Orm::Mappings["default"].map(@zoo, "zoos") do |zoos|
-      zoos.key(zoos.field("id", Wheels::Orm::Types::Serial))
+    Beacon::Mappings["default"].map(@zoo, "zoos") do |zoos|
+      zoos.key(zoos.field("id", Beacon::Types::Serial))
     end
 
     @exhibit = Exhibit
-    Wheels::Orm::Mappings["default"].map(@exhibit, "exhibits") do |exhibits|
-      exhibits.key(exhibits.field("id", Wheels::Orm::Types::Serial))
-      exhibits.field("zoo_id", Wheels::Orm::Types::Integer)
+    Beacon::Mappings["default"].map(@exhibit, "exhibits") do |exhibits|
+      exhibits.key(exhibits.field("id", Beacon::Types::Serial))
+      exhibits.field("zoo_id", Beacon::Types::Integer)
 
 
       # Exhibit#inhabitants returns an animal or keeper:
@@ -48,7 +48,7 @@ class BelongsToTest < Test::Unit::TestCase
 
     end
 
-    @schema = Wheels::Orm::Schema.new("default")
+    @schema = Beacon::Schema.new("default")
     @schema.create(@zoo)
     @schema.create(@exhibit)
 
@@ -87,6 +87,6 @@ class BelongsToTest < Test::Unit::TestCase
   def teardown
     @schema.destroy(@zoo)
     @schema.destroy(@exhibit)
-    Wheels::Orm::Repositories::registrations.delete("default")
+    Beacon::Repositories::registrations.delete("default")
   end
 end

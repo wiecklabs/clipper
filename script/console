@@ -3,21 +3,21 @@
 # This just creates a "people" table in Sqlite3 and adds a few records for you to play with.
 
 require "pathname"
-require Pathname(__FILE__).dirname.parent + "lib" + "wheels" + "orm"
+require Pathname(__FILE__).dirname.parent + "lib" + "beacon"
 
 sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
-@uri = Wheels::Orm::Uri.new("jdbc:sqlite://#{sqlite_path}")
-Wheels::Orm::Repositories::register("default", @uri.to_s)
+@uri = Beacon::Uri.new("jdbc:sqlite://#{sqlite_path}")
+Beacon::Repositories::register("default", @uri.to_s)
 
 class Person
-  Wheels::Orm::Mappings["default"].map(self, "people") do |people|
-    people.key people.field("id", Wheels::Orm::Types::Serial)
+  Beacon::Mappings["default"].map(self, "people") do |people|
+    people.key people.field("id", Beacon::Types::Serial)
     people.field "name", String
-    people.field "gpa", Wheels::Orm::Types::Float(7, 2)
+    people.field "gpa", Beacon::Types::Float(7, 2)
   end
 end
 
-$schema = Wheels::Orm::Schema.new("default")
+$schema = Beacon::Schema.new("default")
 $schema.create(Person)
 
 mike = Person.new

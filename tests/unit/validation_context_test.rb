@@ -14,7 +14,7 @@ class ValidationContextTest < Test::Unit::TestCase
     @executed = false
     validation_block = lambda { |check| @executed = true }
 
-    context = Wheels::Orm::Validations::Context.new('mapping', "registration", &validation_block)
+    context = Beacon::Validations::Context.new('mapping', "registration", &validation_block)
     context.validate(Class.new.new)
 
     assert(@executed)
@@ -23,10 +23,10 @@ class ValidationContextTest < Test::Unit::TestCase
   def test_validation_returns_validation_result
     validation_block = lambda { |check| @executed = true }
 
-    context = Wheels::Orm::Validations::Context.new('mapping', "registration", &validation_block)
+    context = Beacon::Validations::Context.new('mapping', "registration", &validation_block)
     result = context.validate(Class.new.new)
 
-    assert_kind_of(Wheels::Orm::Validations::ValidationResult, result)
+    assert_kind_of(Beacon::Validations::ValidationResult, result)
   end
 
 end

@@ -4,47 +4,47 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class RepositoryTest < Test::Unit::TestCase
 
   def setup
-    @uri = Wheels::Orm::Uri.new("abstract://localhost/example")
+    @uri = Beacon::Uri.new("abstract://localhost/example")
   end
 
   def teardown
-    Wheels::Orm::Repositories::registrations.delete("example")
+    Beacon::Repositories::registrations.delete("example")
   end
 
   def test_requires_two_arguments
-    assert_equal(2, Wheels::Orm::Repositories::Abstract.instance_method("initialize").arity)
+    assert_equal(2, Beacon::Repositories::Abstract.instance_method("initialize").arity)
   end
 
   def test_has_a_name_and_uri
-    repository = Wheels::Orm::Repositories::Abstract.new("example", @uri)
+    repository = Beacon::Repositories::Abstract.new("example", @uri)
     assert_equal("example", repository.name)
     assert_equal(@uri, repository.uri)
   end
 
   def test_registering_a_repository
-    repository = Wheels::Orm::Repositories::register("example", @uri.to_s)
-    assert_kind_of(Wheels::Orm::Repositories::Abstract, repository)
-    assert_equal(1, Wheels::Orm::Repositories::registrations.size)
+    repository = Beacon::Repositories::register("example", @uri.to_s)
+    assert_kind_of(Beacon::Repositories::Abstract, repository)
+    assert_equal(1, Beacon::Repositories::registrations.size)
   end
 
   def test_retrieving_a_mapping_for_an_instance
-    repository = Wheels::Orm::Repositories::register("example", @uri.to_s)
+    repository = Beacon::Repositories::register("example", @uri.to_s)
 
     person = Class.new do
       attr_accessor :name, :age
-      Wheels::Orm::Mappings["example"].map(self, "people") do |people|
-        people.field "name", Wheels::Orm::Types::String.new(200)
-        people.field "age", Wheels::Orm::Types::Integer
+      Beacon::Mappings["example"].map(self, "people") do |people|
+        people.field "name", Beacon::Types::String.new(200)
+        people.field "age", Beacon::Types::Integer
       end
     end
 
-    assert_kind_of(Wheels::Orm::Mappings::Mapping, repository.mappings[person])
+    assert_kind_of(Beacon::Mappings::Mapping, repository.mappings[person])
   end
 
   def test_mappings_is_a_mappings_collection
-    repository = Wheels::Orm::Repositories::register("example", @uri.to_s)
+    repository = Beacon::Repositories::register("example", @uri.to_s)
 
-    assert_kind_of(Wheels::Orm::Mappings, repository.mappings)
+    assert_kind_of(Beacon::Mappings, repository.mappings)
   end
 
 end

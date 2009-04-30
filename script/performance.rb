@@ -11,7 +11,7 @@ if ORM == "dm"
 else
   require 'java'
   $CLASSPATH << File.dirname(__FILE__)
-  require Pathname(__FILE__).dirname.parent + "lib" + "wheels" + "orm"
+  require Pathname(__FILE__).dirname.parent + "lib" + "beacon"
 end
 
 gem 'faker', '~>0.3.1'
@@ -23,7 +23,7 @@ if ORM == "dm"
 
     property :id, Serial
     property :name, String
-    property :gpa, Wheels::Orm::Types::Float(7, 2)
+    property :gpa, Beacon::Types::Float(7, 2)
   end
 
   case ADAPTER
@@ -33,19 +33,19 @@ if ORM == "dm"
   Person.auto_migrate!
 else
   case ADAPTER
-  when "sqlite" then Wheels::Orm::Repositories.register("default", "jdbc:hsqldb:mem:test")
-  when "mysql" then Wheels::Orm::Repositories.register("default", "jdbc:mysql://localhost:3306/dm_worm_performance?user=root")
+  when "sqlite" then Beacon::Repositories.register("default", "jdbc:hsqldb:mem:test")
+  when "mysql" then Beacon::Repositories.register("default", "jdbc:mysql://localhost:3306/dm_worm_performance?user=root")
   end
 
   class Person
-    Wheels::Orm::Mappings["default"].map(self, "people") do |people|
-      people.key people.field("id", Wheels::Orm::Types::Serial)
+    Beacon::Mappings["default"].map(self, "people") do |people|
+      people.key people.field("id", Beacon::Types::Serial)
       people.field("name", String)
-      people.field("gpa", Wheels::Orm::Types::Float(7, 2))
+      people.field("gpa", Beacon::Types::Float(7, 2))
     end
   end
 
-  schema = Wheels::Orm::Schema.new("default")
+  schema = Beacon::Schema.new("default")
   schema.destroy(Person) rescue nil
   schema.create(Person)
 end
@@ -84,7 +84,7 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       repository.create(people)
     else
-      orm.save(Wheels::Orm::Collection.new(Wheels::Orm::Mappings["default"].mappings[Person], people))
+      orm.save(Beacon::Collection.new(Beacon::Mappings["default"].mappings[Person], people))
     end
   end
 
@@ -108,7 +108,7 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       1.upto(TIMES) { Person.all(:id.lt => 10).entries }
     else
-      conditions = Wheels::Orm::Query::Condition.lt(Wheels::Orm::Mappings["default"].mappings[Person]["id"], 10)
+      conditions = Beacon::Query::Condition.lt(Beacon::Mappings["default"].mappings[Person]["id"], 10)
       orm { |session| 1.upto(TIMES) { session.all(Person, conditions) } }
     end
   end

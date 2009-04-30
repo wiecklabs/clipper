@@ -4,7 +4,7 @@ require Pathname(__FILE__).dirname.parent.parent + "helper"
 class TypedAccessorTest < Test::Unit::TestCase
 
   class Person
-    include Wheels::Orm::Accessors
+    include Beacon::Accessors
 
     accessor :name => String
     accessor :age => Integer

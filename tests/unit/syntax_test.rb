@@ -4,17 +4,17 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class SyntaxTest < Test::Unit::TestCase
 
   def setup
-    @uri = Wheels::Orm::Uri.new("jdbc:sqlite:///tmp/syntax.db")
+    @uri = Beacon::Uri.new("jdbc:sqlite:///tmp/syntax.db")
     @repository = @uri.driver.new("default", @uri)
 
-    @syntax = Wheels::Orm::Syntax::Sql.new(@repository)
+    @syntax = Beacon::Syntax::Sql.new(@repository)
 
-    @zoos = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, "zoos")
-    @zoos.key @zoos.field("id", Wheels::Orm::Types::Serial)
+    @zoos = Beacon::Mappings::Mapping.new(Beacon::Mappings.new, Class.new, "zoos")
+    @zoos.key @zoos.field("id", Beacon::Types::Serial)
     @zoos.field "city_id", Integer
 
-    @cities = Wheels::Orm::Mappings::Mapping.new(Wheels::Orm::Mappings.new, Class.new, "cities")
-    @cities.key @cities.field("id", Wheels::Orm::Types::Serial)
+    @cities = Beacon::Mappings::Mapping.new(Beacon::Mappings.new, Class.new, "cities")
+    @cities.key @cities.field("id", Beacon::Types::Serial)
   end
 
   def test_basic_serializations

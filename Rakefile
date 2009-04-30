@@ -50,26 +50,26 @@ end
 desc "Run performance benchmarks"
 task :perf do
   if RUBY_PLATFORM =~ /java/
-    sh("jruby -r'lib/wheels/orm' script/performance.rb")
+    sh("jruby -r'lib/beacon' script/performance.rb")
   else
-    sh("ruby -r'lib/wheels/orm' script/performance.rb dm")
+    sh("ruby -r'lib/beacon' script/performance.rb dm")
   end
 end
 
 desc "Run profiling"
 task :profile do
-  sh("jruby -r'lib/wheels/orm' -rprofile script/profile.rb")
+  sh("jruby -r'lib/beacon' -rprofile script/profile.rb")
 end
 
 namespace :profile do
   desc "Run profiling for get"
   task :get do
-    sh("TARGET=get jruby -r'lib/wheels/orm' script/profile/get.rb")
+    sh("TARGET=get jruby -r'lib/beacon' script/profile/get.rb")
   end
 
   desc "Run profiling for create"
   task :create do
-    sh("TARGET=create jruby -r'lib/wheels/orm' script/profile/create.rb")
+    sh("TARGET=create jruby -r'lib/beacon' script/profile/create.rb")
   end
 end
 

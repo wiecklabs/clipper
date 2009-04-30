@@ -5,45 +5,45 @@ module Integration::AbstractRepositoryTest
 
   def setup_abstract
     @zoo = Class.new do
-      Wheels::Orm::Mappings["default"].map(self, "zoos") do |zoos|
-        zoos.key zoos.field("id", Wheels::Orm::Types::Serial)
-        zoos.field "name", Wheels::Orm::Types::String.new(200)
-        zoos.field "city", Wheels::Orm::Types::String.new(200)
-        zoos.field "state", Wheels::Orm::Types::String.new(200)
-        zoos.field "notes", Wheels::Orm::Types::Text
+      Beacon::Mappings["default"].map(self, "zoos") do |zoos|
+        zoos.key zoos.field("id", Beacon::Types::Serial)
+        zoos.field "name", Beacon::Types::String.new(200)
+        zoos.field "city", Beacon::Types::String.new(200)
+        zoos.field "state", Beacon::Types::String.new(200)
+        zoos.field "notes", Beacon::Types::Text
       end
     end
 
     @climate = Class.new do
-      Wheels::Orm::Mappings["default"].map(self, "climates") do |climates|
-        climates.field("region", Wheels::Orm::Types::String.new(200))
-        climates.field("climate", Wheels::Orm::Types::String.new(200))
+      Beacon::Mappings["default"].map(self, "climates") do |climates|
+        climates.field("region", Beacon::Types::String.new(200))
+        climates.field("climate", Beacon::Types::String.new(200))
 
         climates.key(climates["region"])
       end
     end
 
     @city = Class.new do
-      Wheels::Orm::Mappings["default"].map(self, "cities") do |cities|
-        cities.field("name", Wheels::Orm::Types::String.new(200))
-        cities.field("state", Wheels::Orm::Types::String.new(200))
-        cities.field("region", Wheels::Orm::Types::String.new(200))
+      Beacon::Mappings["default"].map(self, "cities") do |cities|
+        cities.field("name", Beacon::Types::String.new(200))
+        cities.field("state", Beacon::Types::String.new(200))
+        cities.field("region", Beacon::Types::String.new(200))
 
         cities.key(cities["name"], cities["state"])
       end
     end
 
     @person = Class.new do
-      Wheels::Orm::Mappings["default"].map(self, "people") do |people|
-        people.key people.field("id", Wheels::Orm::Types::Serial)
-        people.field "name", Wheels::Orm::Types::String.new(200)
-        people.field "gpa", Wheels::Orm::Types::Float(7, 2)
+      Beacon::Mappings["default"].map(self, "people") do |people|
+        people.key people.field("id", Beacon::Types::Serial)
+        people.field "name", Beacon::Types::String.new(200)
+        people.field "gpa", Beacon::Types::Float(7, 2)
       end
     end
 
     @article = Class.new do
-      Wheels::Orm::Mappings["default"].map(self, "articles") do |articles|
-        articles.field("id", Wheels::Orm::Types::Serial)
+      Beacon::Mappings["default"].map(self, "articles") do |articles|
+        articles.field("id", Beacon::Types::Serial)
         articles.field("time", Time)
         articles.field("date", Date)
         articles.field("datetime", DateTime)
@@ -53,7 +53,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_schema_create
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     assert(!schema.exists?(@zoo))
     assert_nothing_raised do
       schema.create(@zoo)
@@ -64,12 +64,12 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_schema_exists
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     assert(!schema.exists?(@city))
   end
 
   def test_schema_destroy
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@zoo)
     assert_nothing_raised do
       schema.destroy(@zoo)
@@ -77,7 +77,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_field_exists
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@city)
     orm.repository.with_connection do |connection|
       columns = connection.getMetaData.getColumns(nil, nil, "cities", "state")
@@ -88,7 +88,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_save_object
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@zoo)
     zoo = @zoo.new
     zoo.name = "Dallas"
@@ -101,7 +101,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_support_for_floats
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     assert_nothing_raised { schema.create(@person) }
     person = @person.new
     person.gpa = 3.5
@@ -116,7 +116,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_support_for_date_and_time_fields
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     assert_nothing_raised { schema.create(@article) }
     assert(schema.exists?(@article))
 
@@ -141,7 +141,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_insert_multiple_records
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@person)
 
     person1 = @person.new
@@ -150,7 +150,7 @@ module Integration::AbstractRepositoryTest
     person2 = @person.new
     person2.name = "Jane"
 
-    people = Wheels::Orm::Collection.new(Wheels::Orm::Mappings["default"][@person], [person1, person2])
+    people = Beacon::Collection.new(Beacon::Mappings["default"][@person], [person1, person2])
 
     orm.save(people)
 
@@ -161,7 +161,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_get_object
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@person)
 
     person = @person.new
@@ -180,7 +180,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_get_object_with_compound_key
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@city)
 
     city = @city.new
@@ -200,7 +200,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_find
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@person)
 
     person = @person.new
@@ -223,7 +223,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_find_with_conditions
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@person)
 
     person = @person.new
@@ -237,7 +237,7 @@ module Integration::AbstractRepositoryTest
     orm.save(person)
 
     assert_nothing_raised do
-      low_gpa = Wheels::Orm::Query::Condition.lt(Wheels::Orm::Mappings["default"][@person]["gpa"], 3)
+      low_gpa = Beacon::Query::Condition.lt(Beacon::Mappings["default"][@person]["gpa"], 3)
       people = orm.find(@person, nil, low_gpa)
       assert_equal(1, people.size)
     end
@@ -247,7 +247,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_all_with_single_condition
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@person)
 
     bob = @person.new
@@ -264,7 +264,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_all_with_multiple_conditions
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@person)
 
     jimmy = @person.new
@@ -284,7 +284,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_all_with_limit_and_order
-    schema = Wheels::Orm::Schema.new("default")
+    schema = Beacon::Schema.new("default")
     schema.create(@person)
 
     mike = @person.new

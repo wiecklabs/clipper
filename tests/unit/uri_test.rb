@@ -4,37 +4,37 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class UriTest < Test::Unit::TestCase
 
   def setup
-    @uri = Wheels::Orm::Uri.new("abstract://user:password@name?charset=utf8")
+    @uri = Beacon::Uri.new("abstract://user:password@name?charset=utf8")
 
     dorb = Class.new do
-      self.const_set("Sqlite3", Class.new(Wheels::Orm::Repositories::Abstract))
+      self.const_set("Sqlite3", Class.new(Beacon::Repositories::Abstract))
     end
-    Wheels::Orm::Repositories.const_set("Dorb", dorb)
+    Beacon::Repositories.const_set("Dorb", dorb)
   end
 
   def teardown
-    Wheels::Orm::Repositories.send(:remove_const, "Dorb")
+    Beacon::Repositories.send(:remove_const, "Dorb")
   end
 
   def test_requires_one_argument
-    assert_equal(Wheels::Orm::Uri.instance_method("initialize").arity, 1)
+    assert_equal(Beacon::Uri.instance_method("initialize").arity, 1)
   end
 
   def test_initializes_with_string
     assert_nothing_raised do
-      Wheels::Orm::Uri.new("dorb:sqlite3:///#{Dir.pwd}/example.db")
+      Beacon::Uri.new("dorb:sqlite3:///#{Dir.pwd}/example.db")
     end
 
     assert_raises(ArgumentError) do
-      Wheels::Orm::Uri.new(URI::parse("dorb:sqlite3:///#{Dir.pwd}/example.db"))
+      Beacon::Uri.new(URI::parse("dorb:sqlite3:///#{Dir.pwd}/example.db"))
     end
 
     assert_raises(ArgumentError) do
-      Wheels::Orm::Uri.new(nil)
+      Beacon::Uri.new(nil)
     end
 
     assert_raises(ArgumentError) do
-      Wheels::Orm::Uri.new("")
+      Beacon::Uri.new("")
     end
   end
 
@@ -43,7 +43,7 @@ class UriTest < Test::Unit::TestCase
   end
 
   def test_has_a_driver
-    assert_equal(Wheels::Orm::Repositories::Abstract, @uri.driver)
+    assert_equal(Beacon::Repositories::Abstract, @uri.driver)
   end
 
   def test_has_a_name

@@ -8,20 +8,20 @@ class Integration::SqliteTest < Test::Unit::TestCase
 
   def setup
     @sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
-    @uri = Wheels::Orm::Uri.new("jdbc:sqlite://#{@sqlite_path}")
+    @uri = Beacon::Uri.new("jdbc:sqlite://#{@sqlite_path}")
 
-    Wheels::Orm::Repositories::register("default", @uri.to_s)
+    Beacon::Repositories::register("default", @uri.to_s)
 
     setup_abstract
   end
 
   def teardown
-    Wheels::Orm::Repositories::registrations.delete("default")
+    Beacon::Repositories::registrations.delete("default")
     File.unlink(@sqlite_path) rescue nil
   end
 
   def test_get_driver_from_uri
-    assert_equal(Wheels::Orm::Repositories::Jdbc::Sqlite, @uri.driver)
+    assert_equal(Beacon::Repositories::Jdbc::Sqlite, @uri.driver)
   end
 
   def test_connecting_should_create_database
@@ -31,12 +31,12 @@ class Integration::SqliteTest < Test::Unit::TestCase
   end
 
   def test_has_a_syntax
-    assert_kind_of(Wheels::Orm::Syntax::Sql, Wheels::Orm::Repositories.registrations["default"].syntax)
+    assert_kind_of(Beacon::Syntax::Sql, Beacon::Repositories.registrations["default"].syntax)
   end
 
   def test_schema_raises_for_unmapped_classes
-    schema = Wheels::Orm::Schema.new("default")
-    assert_raise(Wheels::Orm::Mappings::UnmappedClassError) { schema.create(Class.new) }
+    schema = Beacon::Schema.new("default")
+    assert_raise(Beacon::Mappings::UnmappedClassError) { schema.create(Class.new) }
   end
 
 end

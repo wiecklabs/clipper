@@ -25,11 +25,11 @@ class ValidationTest < Test::Unit::TestCase
   end
   
   def setup
-    @errors = Wheels::Orm::Validations::ValidationResult.new
+    @errors = Beacon::Validations::ValidationResult.new
   end
   
   def test_absent_validator
-    minimum = Wheels::Orm::Validations::AbsenceValidator.new("name")  
+    minimum = Beacon::Validations::AbsenceValidator.new("name")  
     
     minimum.call(Person.new(nil), @errors)
     assert_empty(@errors)
@@ -39,7 +39,7 @@ class ValidationTest < Test::Unit::TestCase
   end
 
   def test_absent_validator
-    v = Wheels::Orm::Validations::RequiredValidator.new("name")
+    v = Beacon::Validations::RequiredValidator.new("name")
 
     v.call(Person.new("Me"), @errors)
     assert_empty(@errors)
@@ -49,7 +49,7 @@ class ValidationTest < Test::Unit::TestCase
   end
 
   def test_acceptance_validator
-    minimum = Wheels::Orm::Validations::AcceptanceValidator.new("name")  
+    minimum = Beacon::Validations::AcceptanceValidator.new("name")  
     
     minimum.call(Person.new("Jackson"), @errors)
     assert_empty(@errors)
@@ -59,7 +59,7 @@ class ValidationTest < Test::Unit::TestCase
   end
   
   def test_minimum_length_validator
-    minimum = Wheels::Orm::Validations::MinimumLengthValidator.new("name", 3)  
+    minimum = Beacon::Validations::MinimumLengthValidator.new("name", 3)  
     
     minimum.call(Person.new("Jackson"), @errors)
     assert_empty(@errors)
@@ -72,7 +72,7 @@ class ValidationTest < Test::Unit::TestCase
   end
 
   def test_maximum_length_validator
-    minimum = Wheels::Orm::Validations::MaximumLengthValidator.new("name", 7)
+    minimum = Beacon::Validations::MaximumLengthValidator.new("name", 7)
     
     minimum.call(Person.new("Jackson"), @errors)
     assert_empty(@errors)
@@ -85,7 +85,7 @@ class ValidationTest < Test::Unit::TestCase
   end
 
   def test_format_validator
-    v = Wheels::Orm::Validations::FormatValidator.new("email", /\w+@\w+\.com/)
+    v = Beacon::Validations::FormatValidator.new("email", /\w+@\w+\.com/)
 
     v.call(OpenStruct.new(:email => "test@example.com"), @errors)
     assert_empty(@errors)
@@ -95,7 +95,7 @@ class ValidationTest < Test::Unit::TestCase
   end
 
   def test_within_validator_with_range
-    v = Wheels::Orm::Validations::WithinValidator.new("age", 21..35)
+    v = Beacon::Validations::WithinValidator.new("age", 21..35)
 
     v.call(OpenStruct.new(:age => 21), @errors)
     assert_empty(@errors)
@@ -111,7 +111,7 @@ class ValidationTest < Test::Unit::TestCase
   end
 
   def test_within_validator_with_array
-    v = Wheels::Orm::Validations::WithinValidator.new("gender", %w{M F})
+    v = Beacon::Validations::WithinValidator.new("gender", %w{M F})
 
     v.call(OpenStruct.new(:gender => 'M'), @errors)
     assert_empty(@errors)
@@ -124,7 +124,7 @@ class ValidationTest < Test::Unit::TestCase
   end
 
   def test_size_validator
-    v = Wheels::Orm::Validations::SizeValidator.new("code", 5..8)
+    v = Beacon::Validations::SizeValidator.new("code", 5..8)
 
     v.call(OpenStruct.new(:code => '12345'), @errors)
     assert_empty(@errors)

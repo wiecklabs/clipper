@@ -4,18 +4,18 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class Integration::ValidationsTest < Test::Unit::TestCase
 
   def setup
-    Wheels::Orm::Repositories::register("default", "abstract://localhost/example")
+    Beacon::Repositories::register("default", "abstract://localhost/example")
     @user = Class.new do
       attr_accessor :password_confirmation
       
-      Wheels::Orm::Mappings["default"].map(self, "users") do |users|
+      Beacon::Mappings["default"].map(self, "users") do |users|
         users.key "id", Integer
-        users.field "name", Wheels::Orm::Types::String.new(200)
-        users.field "email", Wheels::Orm::Types::String.new(200)
-        users.field "password", Wheels::Orm::Types::String.new(200)
-        users.field "age", Wheels::Orm::Types::Integer
-        users.field "gender", Wheels::Orm::Types::String.new(200)
-        users.field "title", Wheels::Orm::Types::String.new(200)
+        users.field "name", Beacon::Types::String.new(200)
+        users.field "email", Beacon::Types::String.new(200)
+        users.field "password", Beacon::Types::String.new(200)
+        users.field "age", Beacon::Types::Integer
+        users.field "gender", Beacon::Types::String.new(200)
+        users.field "title", Beacon::Types::String.new(200)
       end
     end
     
@@ -23,7 +23,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   end
   
   def teardown
-    Wheels::Orm::Repositories::registrations.delete("default")
+    Beacon::Repositories::registrations.delete("default")
   end
     
   def test_constraint_declarations
