@@ -57,7 +57,9 @@ require Pathname(__FILE__).dirname + "beacon" + "schema"
 
 def orm(name = "default")
   session = Beacon::Session.new(name)
-  yield session if block_given?
+  if block_given?
+    yield session
+  end
   session
 end
 
@@ -74,7 +76,7 @@ module Beacon
   end
 
   def self.close(connection_name)
-    if driver = @registrations[connection_name]
+    if driver = @registrations.delete(connection_name)
       driver.close
     else
       raise ArgumentError.new("#{connection_name.inspect} is not a registered connection.")
