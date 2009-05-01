@@ -67,10 +67,7 @@ module Beacon
     end
 
     def validate(object, context_name = 'default')
-      mapping = @repository.mappings[object.class]
-      mapping.validate(object, context_name)
-      # context = mapping.validation_contexts(context_name)
-      # context.validate(target)
+      Beacon::validate(object, context_name)
     end
 
     def load(object, field)

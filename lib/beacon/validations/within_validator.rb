@@ -1,7 +1,7 @@
 module Beacon
   module Validations
 
-    class WithinValidator
+    class WithinValidator < Validator
       def initialize(field, set)
         @field = field
         @set = set

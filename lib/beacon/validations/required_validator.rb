@@ -1,7 +1,7 @@
 module Beacon
   module Validations
     
-    class RequiredValidator
+    class RequiredValidator < Validator
       def initialize(field)
         @field = field
       end

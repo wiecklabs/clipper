@@ -1,7 +1,7 @@
 module Beacon
   module Validations
     
-    class FormatValidator
+    class FormatValidator < Validator
       def initialize(field, format, message = "%1$s is not formatted properly.")
         @field = field
         @format = format

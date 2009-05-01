@@ -1,7 +1,7 @@
 module Beacon
   module Validations
 
-    class AbsenceValidator
+    class AbsenceValidator < Validator
       def initialize(field)
         @field = field
       end

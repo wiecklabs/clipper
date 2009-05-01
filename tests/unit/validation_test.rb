@@ -27,7 +27,22 @@ class ValidationTest < Test::Unit::TestCase
   def setup
     @errors = Beacon::Validations::ValidationResult.new
   end
-  
+
+  def test_validator_precondition
+    validator = Beacon::Validations::Validator.new
+    validator.precondition_block = nil
+
+    assert_equal(true, validator.should_run?(Class.new.new))
+
+    precondition_called = false
+    validator.precondition_block = lambda { |instance| precondition_called = true }
+    assert_equal(true, validator.should_run?(Class.new.new))
+    assert_equal(true, precondition_called)
+
+    validator.precondition_block = lambda { |instance| false }
+    assert_equal(false, validator.should_run?(Class.new.new))
+  end
+
   def test_absent_validator
     minimum = Beacon::Validations::AbsenceValidator.new("name")  
     

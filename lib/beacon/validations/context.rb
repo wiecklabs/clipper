@@ -1,73 +1,91 @@
 module Beacon
   module Validations
 
+    class ValidationFactory
+
+      def self.create(validation_class, *args, &precondition_block)
+        validation = validation_class.new(*args)
+        validation.precondition_block = precondition_block
+        validation
+      end
+
+    end
+
     class ConstraintEvaluator
 
-      attr_reader :validation_result
-
-      def initialize(instance)
-        @instance = instance
-        @validation_result = Beacon::Validations::ValidationResult.new
+      def initialize
+        @validations = []
       end
 
-      def absent(field)
-        return if block_given? && !yield(@instance)
-        AbsenceValidator.new(field).call(@instance, @validation_result)
+      def run(instance)
+        validation_result = Beacon::Validations::ValidationResult.new
+
+        @validations.each do |validation|
+          validation.call(instance, validation_result) if validation.should_run?(instance)
+        end
+
+        validation_result
       end
 
-      def within(field, set)
-        return if block_given? && !yield(@instance)
-        WithinValidator.new(field, set).call(@instance, @validation_result)
+      def absent(field, &block)
+        append_validation(ValidationFactory.create(AbsenceValidator, field, &block))
       end
 
-      def acceptance(field)
-        return if block_given? && !yield(@instance)
-        AcceptanceValidator.new(field).call(@instance, @validation_result)
+      def within(field, set, &block)
+        append_validation(ValidationFactory.create(WithinValidator, field, set, &block))
       end
 
-      def format(field, format)
-        return if block_given? && !yield(@instance)
-        FormatValidator.new(field, format).call(@instance, @validation_result)
+      def acceptance(field, &block)
+        append_validation(ValidationFactory.create(AcceptanceValidator, field, &block))
       end
 
-      def maximum(field, length)
-        return if block_given? && !yield(@instance)
-        MaximumLengthValidator.new(field, foramt).call(@instance, @validation_result)
+      def format(field, format, &block)
+        append_validation(ValidationFactory.create(FormatValidator, field, format, &block))
       end
 
-      def minimum(field, length)
-        return if block_given? && !yield(@instance)
-        MinimumLengthValidator.new(field, foramt).call(@instance, @validation_result)
+      def maximum(field, length, &block)
+        append_validation(ValidationFactory.create(MaximumLengthValidator, field, length, &block))
       end
 
-      def required(field)
-        return if block_given? && !yield(@instance)
-        RequiredValidator.new(field).call(@instance, @validation_result)
+      def minimum(field, length, &block)
+        append_validation(ValidationFactory.create(MinimumLengthValidator, field, length, &block))
       end
 
-      def size(field, size)
-        return if block_given? && !yield(@instance)
-        SizeValidator.new(field).call(@instance, @validation_result)
+      def required(field, &block)
+        append_validation(ValidationFactory.create(RequiredValidator, field, &block))
       end
 
-      def within(field, set)
-        return if block_given? && !yield(@instance)
-        WithinValidator.new(field, set).call(@instance, @validation_result)
+      def size(field, size, &block)
+        append_validation(ValidationFactory.create(SizeValidator, field, size, &block))
+      end
+
+      def within(field, set, &block)
+        append_validation(ValidationFactory.create(WithinValidator, field, set, &block))
+      end
+
+      def equal(field1, field2, &block)
+        append_validation(ValidationFactory.create(EqualityValidator, field1, field2, &block))
+      end
+
+      private
+
+      def append_validation(validator)
+        @validations << validator
       end
     end
 
     class Context
 
-      # TODO: Re-do the way validations are executed.  The block should be executed
-      # upon creation of the context
-      def initialize(mapping, name, &block)
-        @mapping = mapping
+      def initialize(target, name)
+        @target = target
         @name = name
-        @validation_block = block
+
+        @evaluator = ConstraintEvaluator.new
+        yield(@evaluator) if block_given?
       end
 
-      def mapping
-        @mapping
+      def target
+        @target
       end
 
       def name
@@ -75,17 +93,15 @@ module Beacon
       end
 
       def eql?(other)
-        other.is_a?(Context) && @mapping == other.mapping && @name == other.name
+        other.is_a?(Context) && @target == other.target && @name == other.name
       end
 
       def hash
-        @hash ||= [@mapping, @name].hash
+        @hash ||= [@target, @name].hash
       end
 
       def validate(instance)
-        evaluator = ConstraintEvaluator.new(instance)
-        @validation_block.call(evaluator)
-        evaluator.validation_result
+        @evaluator.run(instance)
       end
 
     end

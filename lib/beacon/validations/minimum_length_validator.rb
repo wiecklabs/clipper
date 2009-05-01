@@ -1,7 +1,7 @@
 module Beacon
   module Validations
     
-    class MinimumLengthValidator
+    class MinimumLengthValidator < Validator
       def initialize(field, length)
         @field = field
         @length = length

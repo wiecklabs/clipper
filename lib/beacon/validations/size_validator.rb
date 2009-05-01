@@ -1,7 +1,7 @@
 module Beacon
   module Validations
     
-    class SizeValidator
+    class SizeValidator < Validator
       def initialize(field, size)
         @field = field
         @size = size

@@ -23,7 +23,8 @@ require Pathname(__FILE__).dirname + "beacon" + "types"
 require Pathname(__FILE__).dirname + "beacon" + "mappings" + "mapping"
 require Pathname(__FILE__).dirname + "beacon" + "mappings" + "relation"
 
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "contexts"
+require Pathname(__FILE__).dirname + "beacon" + "validations"
+require Pathname(__FILE__).dirname + "beacon" + "validations" + "validator"
 require Pathname(__FILE__).dirname + "beacon" + "validations" + "context"
 require Pathname(__FILE__).dirname + "beacon" + "validations" + "validation_result"
 require Pathname(__FILE__).dirname + "beacon" + "validations" + "validation_error"
@@ -35,6 +36,7 @@ require Pathname(__FILE__).dirname + "beacon" + "validations" + "within_validato
 require Pathname(__FILE__).dirname + "beacon" + "validations" + "size_validator"
 require Pathname(__FILE__).dirname + "beacon" + "validations" + "required_validator"
 require Pathname(__FILE__).dirname + "beacon" + "validations" + "format_validator"
+require Pathname(__FILE__).dirname + "beacon" + "validations" + "equality_validator"
 
 require Pathname(__FILE__).dirname + "beacon" + "repositories"
 require Pathname(__FILE__).dirname + "beacon" + "repositories" + "schema"
