@@ -7,6 +7,7 @@ require Pathname(__FILE__).dirname.parent + "vendor" + "log4j-1.2.15.jar"
 
 require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
 require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
+require Pathname(__FILE__).dirname.parent + "wieck" + "using"
 
 # require Pathname(__FILE__).dirname.parent + "beacon_internal.jar"
 
@@ -54,14 +55,7 @@ require Pathname(__FILE__).dirname + "beacon" + "collection"
 require Pathname(__FILE__).dirname + "beacon" + "identity_map"
 require Pathname(__FILE__).dirname + "beacon" + "mappings"
 require Pathname(__FILE__).dirname + "beacon" + "schema"
-
-def orm(name = "default")
-  session = Beacon::Session.new(name)
-  if block_given?
-    yield session
-  end
-  session
-end
+require Pathname(__FILE__).dirname + "beacon" + "session" + "helper"
 
 module Beacon
 

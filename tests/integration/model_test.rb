@@ -3,19 +3,19 @@ require Pathname(__FILE__).dirname.parent + "helper"
 
 class Integration::ModelTest < Test::Unit::TestCase
 
+  include Beacon::Session::Helper
+
   class Zoo
     include Beacon::Model
+
+    orm.map(self, "zoos") do |zoos|
+      zoos.key "id", Integer
+      zoos.field "name", Beacon::Types::String.new(200)
+    end
   end
 
   def setup
-    Beacon.open("default", "jdbc:sqlite://#{Pathname(__FILE__).dirname.expand_path + "sqlite.db"}")
-
-    @zoo = Class.new do
-      Beacon::Mappings["default"].map(self, "zoos") do |zoos|
-        zoos.key "id", Integer
-        zoos.field "name", Beacon::Types::String.new(200)
-      end
-    end
+    Beacon.open("default", "jdbc:hsqldb://#{Pathname(__FILE__).dirname.expand_path + "sqlite.db"}")
   end
 
   def teardown

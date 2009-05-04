@@ -74,7 +74,7 @@ module Beacon
           associated_mapping = mapping.mappings[mapped_name]
           criteria = match_criteria.call(self, Beacon::Query::Criteria.new(associated_mapping))
 
-          orm.find(associated_mapping, criteria.__options__, criteria.__conditions__).first
+          __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__).first
         end
 
         target.send(:define_method, "#{name}=") do |object|

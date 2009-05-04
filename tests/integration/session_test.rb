@@ -3,14 +3,18 @@ require Pathname(__FILE__).dirname.parent + "helper"
 
 class Integration::SessionTest < Test::Unit::TestCase
 
+  include Beacon::Session::Helper
+
+  class Zoo
+    include Beacon::Model
+    orm.map(self, "zoos") do |zoos|
+      zoos.key "id", Integer
+      zoos.field "name", Beacon::Types::String.new(200)
+    end
+  end
+
   def setup
     Beacon::open("default", "abstract://localhost/example")
-    @zoo = Class.new do
-      Beacon::Mappings["default"].map(self, "zoos") do |zoos|
-        zoos.key "id", Integer
-        zoos.field "name", Beacon::Types::String.new(200)
-      end
-    end
   end
 
   def teardown
@@ -18,7 +22,7 @@ class Integration::SessionTest < Test::Unit::TestCase
   end
 
   def test_session_save_should_return_true
-    zoo = @zoo.new
+    zoo = Zoo.new
     zoo.name = "Dallas"
     assert(orm.save(zoo))
   end

@@ -3,6 +3,8 @@ require Pathname(__FILE__).dirname.parent + "helper"
 
 class SessionTest < Test::Unit::TestCase
 
+  include Beacon::Session::Helper
+
   def setup
     Beacon::open("default", "abstract://localhost/example")
   end

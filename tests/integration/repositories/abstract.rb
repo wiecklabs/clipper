@@ -3,6 +3,8 @@ module Integration::AbstractRepositoryTest
   # class Zoo
   # end
 
+  include Beacon::Session::Helper
+
   def setup_abstract
     @zoo = Class.new do
       Beacon::Mappings["default"].map(self, "zoos") do |zoos|

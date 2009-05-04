@@ -2,8 +2,8 @@ module Beacon
   class Session
 
     class RepositoryMissingError < StandardError
-      def initialize(name)
-        super("Repository #{name.inspect} not a registered repository, can't initiate a Session")
+      def initialize(repository_name)
+        super("Repository #{repository_name.inspect} not a registered repository, can't initiate a Session")
       end
     end
 
@@ -11,50 +11,51 @@ module Beacon
       raise ArgumentError.new("Session repository_name must be a String") unless repository_name.is_a?(String)
       raise ArgumentError.new("Session repository_name must not be blank") if repository_name.blank?
 
-      @repository = Beacon::registrations[repository_name]
-      raise RepositoryMissingError.new(reponsitory_name) if @repository.nil?
-
+      @repository_name = repository_name
       @identity_map = IdentityMap.new
     end
 
     def repository
-      @repository
+      @repository ||= begin
+        if repository = Beacon::registrations[@repository_name]
+          repository
+        else
+          raise RepositoryMissingError.new(@repository_name)
+        end
+      end
     end
 
     def mappings
-      @repository.mappings
+      repository.mappings
     end
 
-    # def map(target, mapped_name)
-    #   mapping = Beacon::Mappings::Mapping.new(target, mapped_name)
-    #   yield mapping
-    #   @repository.mappings << mapping
-    #   mapping
-    # end
+    def map(target, mapped_name, &b)
+      Beacon::Mappings[@repository_name].map(target, mapped_name, &b)
+    end
 
     def get(target, *keys)
-      mapping = @repository.mappings[target]
+      mapping = repository.mappings[target]
 
       conditions = Query::AndExpression.new(*mapping.keys.zip(keys).map { |condition| Query::Condition.eq(*condition) })
 
       query = Query.new(mapping, nil, conditions)
 
-      @repository.select(query, self).first
+      repository.select(query, self).first
     end
 
     def all(target)
-      mapping = @repository.mappings[target]
+      mapping = repository.mappings[target]
       criteria = Beacon::Query::Criteria.new(mapping)
 
       yield(criteria) if block_given?
 
-      @repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__), self)
+      repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__), self)
     end
 
     def find(target, options, conditions)
-      mapping = target.is_a?(Beacon::Mappings::Mapping) ? target : @repository.mappings[target]
+      mapping = target.is_a?(Beacon::Mappings::Mapping) ? target : repository.mappings[target]
 
-      @repository.select(Query.new(mapping, options, conditions), self)
+      repository.select(Query.new(mapping, options, conditions), self)
     end
 
     def save(collection)
@@ -63,7 +64,7 @@ module Beacon
     end
 
     def create(collection)
-      @repository.create(collection)
+      repository.create(collection)
     end
 
     def validate(object, context_name = 'default')
@@ -75,7 +76,7 @@ module Beacon
 
     def stored?(instance)
       instance.__session__ &&
-        instance.__session__.repository == @repository &&
+        instance.__session__.repository == repository &&
         instance.__session__.identity_map.include?(instance)
     end
 

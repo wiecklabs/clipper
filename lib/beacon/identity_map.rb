@@ -5,7 +5,7 @@ module Beacon
     end
 
     def include?(instance)
-      
+
     end
   end
 end # module Beacon
