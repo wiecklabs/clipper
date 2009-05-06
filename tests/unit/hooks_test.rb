@@ -112,11 +112,15 @@ class HooksTest < Test::Unit::TestCase
     assert_equal(0, hooked_instance.hooked_method_with_block_calls)
     assert_equal(0, hooked_instance.after_hook_with_block_calls)
 
+    @block_called = 0
+
     assert_nothing_raised do
       hooked_instance.hooked_method_with_block("blue", 10) do
-        # stuff
+        @block_called += 1
       end
     end
+
+    assert_equal(1, @block_called)
 
     assert_equal(1, hooked_instance.before_hook_with_block_calls)
     assert_equal(1, hooked_instance.hooked_method_with_block_calls)

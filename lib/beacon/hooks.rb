@@ -3,6 +3,14 @@ module Beacon
 
     def self.included(target)
       target.extend(ClassMethods)
+
+      target.class_eval do
+        @__beacon_hooked_method_added = method(:method_added) if respond_to?(:method_added)
+        def self.method_added(method)
+          @__beacon_hooked_method_added.call(method) if @__beacon_hooked_method_added
+        end
+      end
+
     end
 
     class Map
