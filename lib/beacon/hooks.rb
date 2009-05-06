@@ -1,0 +1,79 @@
+module Beacon
+  module Hooks
+
+    def self.included(target)
+      target.extend(ClassMethods)
+    end
+
+    class Map
+      def initialize(target)
+        @map = {}
+        @target = target
+      end
+      
+      def [](method_name)
+        @map[method_name] ||= Chain.new(@target, method_name)
+      end
+    end
+    
+    class Chain
+      def initialize(target, method_name)
+        @target = target
+        @method_name = method_name
+        @before = java.util.LinkedHashSet.new
+        @after = java.util.LinkedHashSet.new
+
+        Chain.bind!(target, method_name)
+      end
+
+      def before(block)
+        @before << block
+      end
+
+      def after(block)
+        @after << block
+      end
+
+      def call(instance)
+        @before.each do |block|
+          block.call instance
+        end
+
+        result = instance.send("__hooked_#{@method_name}")
+
+        @after.each do |block|
+          block.call instance
+        end
+
+        result
+      end
+
+      def self.bind!(target, method_name)
+        target.send(:alias_method, "__hooked_#{method_name}", method_name)
+
+        target.send(:class_eval, <<-EOS)
+          def #{method_name}
+            self.class.hooks[#{method_name.inspect}].call(self)
+          end
+        EOS
+
+        # or add_a_method_added_hook_for_this_method_if_it_doesnt_already_exist
+      end
+    end
+
+    module ClassMethods
+
+      def hooks
+        @hooks ||= Map.new(self)
+      end
+      
+      def before(method_name, &block)
+        hooks[method_name].before(block)
+      end
+      
+      def after(method_name, &block)
+        hooks[method_name].after(block)
+      end
+    end
+  end
+end

@@ -19,6 +19,8 @@ require Pathname(__FILE__).dirname + "beacon" + "model"
 
 require Pathname(__FILE__).dirname + "beacon" + "accessors"
 
+require Pathname(__FILE__).dirname + "beacon" + "hooks"
+
 require Pathname(__FILE__).dirname + "beacon" + "type"
 require Pathname(__FILE__).dirname + "beacon" + "types"
 require Pathname(__FILE__).dirname + "beacon" + "mappings" + "mapping"
