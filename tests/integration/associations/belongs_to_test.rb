@@ -3,22 +3,22 @@ require Pathname(__FILE__).dirname.parent.parent + "helper"
 
 class BelongsToTest < Test::Unit::TestCase
 
-  include Beacon::Session::Helper
+  include Clipper::Session::Helper
 
   class Zoo
-    include Beacon::Model
+    include Clipper::Model
 
     orm.map(self, "zoos") do |zoos|
-      zoos.key(zoos.field("id", Beacon::Types::Serial))
+      zoos.key(zoos.field("id", Clipper::Types::Serial))
     end
   end
 
   class Exhibit
-    include Beacon::Model
+    include Clipper::Model
 
     orm.map(self, "exhibits") do |exhibits|
-      exhibits.key(exhibits.field("id", Beacon::Types::Serial))
-      exhibits.field("zoo_id", Beacon::Types::Integer)
+      exhibits.key(exhibits.field("id", Clipper::Types::Serial))
+      exhibits.field("zoo_id", Clipper::Types::Integer)
 
       exhibits.belong_to('zoo', Zoo) do |exhibit, zoo|
         zoo.id.eq(exhibit.zoo_id)
@@ -27,9 +27,9 @@ class BelongsToTest < Test::Unit::TestCase
   end
 
   def setup
-    Beacon::open("default", "jdbc:hsqldb:mem:test")
+    Clipper::open("default", "jdbc:hsqldb:mem:test")
 
-    @schema = Beacon::Schema.new("default")
+    @schema = Clipper::Schema.new("default")
     @schema.create(Zoo)
     @schema.create(Exhibit)
 
@@ -44,7 +44,7 @@ class BelongsToTest < Test::Unit::TestCase
   def teardown
     @schema.destroy(Zoo)
     @schema.destroy(Exhibit)
-    Beacon::close("default")
+    Clipper::close("default")
   end
 
   def test_proxy_defines_getter_on_object

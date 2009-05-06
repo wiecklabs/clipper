@@ -1,6 +1,6 @@
 require 'date'
 
-module Beacon
+module Clipper
   module Types
 
     @types = {}

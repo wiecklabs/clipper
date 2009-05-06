@@ -1,11 +1,11 @@
-module Beacon
+module Clipper
   class Mappings
     class UnmappedClassError < StandardError
     end
 
     class UnsupportedTypeError < StandardError
       def initialize(type)
-        super("#{type.inspect} is not a registered Beacon::Type (#{Beacon::Types.inspect})")
+        super("#{type.inspect} is not a registered Clipper::Type (#{Clipper::Types.inspect})")
       end
     end
 
@@ -27,7 +27,7 @@ module Beacon
     end
 
     def <<(mapping)
-      raise ArgumentError.new("Mappings#<< must be passed a Mapping") unless mapping.is_a?(Beacon::Mappings::Mapping)
+      raise ArgumentError.new("Mappings#<< must be passed a Mapping") unless mapping.is_a?(Clipper::Mappings::Mapping)
       @mappings[mapping.target] = mapping
     end
 
@@ -36,7 +36,7 @@ module Beacon
     end
 
     def map(target, mapped_name)
-      mapping = Beacon::Mappings::Mapping.new(self, target, mapped_name)
+      mapping = Clipper::Mappings::Mapping.new(self, target, mapped_name)
       yield mapping
       self << mapping
       mapping

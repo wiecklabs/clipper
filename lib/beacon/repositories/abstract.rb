@@ -1,6 +1,6 @@
 require Pathname(__FILE__).dirname + "type"
 
-module Beacon
+module Clipper
   module Repositories
     class Abstract
 
@@ -9,7 +9,7 @@ module Beacon
         raise ArgumentError.new("Repository name must not be blank") if name.blank?
         @name = name
 
-        raise ArgumentError.new("Repository uri must be a Beacon::Uri") unless uri.is_a?(Beacon::Uri)
+        raise ArgumentError.new("Repository uri must be a Clipper::Uri") unless uri.is_a?(Clipper::Uri)
         @uri = uri
       end
 
@@ -22,7 +22,7 @@ module Beacon
       end
 
       def mappings
-        Beacon::Mappings[name]
+        Clipper::Mappings[name]
       end
 
       def save(collection)

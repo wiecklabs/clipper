@@ -1,7 +1,7 @@
 require "uri"
 require "cgi"
 
-module Beacon
+module Clipper
   class Uri
 
     class MissingDriverError < StandardError
@@ -32,7 +32,7 @@ module Beacon
         @options[key] = value.first if key[-2..-1] != "[]" && value.kind_of?(Array) && value.size == 1
       end
 
-      @driver = uri.scheme.split(/[\:\+]/).compact.inject(Beacon::Repositories) do |c, name|
+      @driver = uri.scheme.split(/[\:\+]/).compact.inject(Clipper::Repositories) do |c, name|
         begin
           c.const_get(name.capitalize)
         rescue NameError

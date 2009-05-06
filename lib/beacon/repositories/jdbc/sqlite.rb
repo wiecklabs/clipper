@@ -1,7 +1,7 @@
 require "jdbc/sqlite3"
 import "org.sqlite.JDBC"
 
-module Beacon
+module Clipper
   module Repositories
     class Jdbc
       class Sqlite < Jdbc
@@ -21,7 +21,7 @@ module Beacon
 
         def key_definition(mapping)
           # If we've already declared a serial column, don't worry about the key definition
-          return nil if mapping.keys.any? { |field| field.type.is_a?(Beacon::Types::Serial) }
+          return nil if mapping.keys.any? { |field| field.type.is_a?(Clipper::Types::Serial) }
 
           "PRIMARY KEY (#{mapping.keys.map { |field| quote_identifier(field.name) }.join(', ')})"
         end
@@ -46,4 +46,4 @@ module Beacon
       end # class Sqlite
     end # class Jdbc
   end # module Repositories
-end # module Beacon
+end # module Clipper

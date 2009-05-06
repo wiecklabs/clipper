@@ -4,17 +4,17 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class SyntaxTest < Test::Unit::TestCase
 
   def setup
-    @uri = Beacon::Uri.new("jdbc:sqlite:///tmp/syntax.db")
+    @uri = Clipper::Uri.new("jdbc:sqlite:///tmp/syntax.db")
     @repository = @uri.driver.new("default", @uri)
 
-    @syntax = Beacon::Syntax::Sql.new(@repository)
+    @syntax = Clipper::Syntax::Sql.new(@repository)
 
-    @zoos = Beacon::Mappings::Mapping.new(Beacon::Mappings.new, Class.new, "zoos")
-    @zoos.key @zoos.field("id", Beacon::Types::Serial)
+    @zoos = Clipper::Mappings::Mapping.new(Clipper::Mappings.new, Class.new, "zoos")
+    @zoos.key @zoos.field("id", Clipper::Types::Serial)
     @zoos.field "city_id", Integer
 
-    @cities = Beacon::Mappings::Mapping.new(Beacon::Mappings.new, Class.new, "cities")
-    @cities.key @cities.field("id", Beacon::Types::Serial)
+    @cities = Clipper::Mappings::Mapping.new(Clipper::Mappings.new, Class.new, "cities")
+    @cities.key @cities.field("id", Clipper::Types::Serial)
   end
 
   def test_basic_serializations

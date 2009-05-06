@@ -1,14 +1,14 @@
-module Beacon
+module Clipper
   class Mappings
     class Relation
 
       def initialize(key, reference)
 
         # Breaks CPK...
-        raise ArgumentError.new("Relation#key must be a Beacon::Mappings::Field") unless key.is_a?(Field)
+        raise ArgumentError.new("Relation#key must be a Clipper::Mappings::Field") unless key.is_a?(Field)
         @key = key
 
-        raise ArgumentError.new("Relation#reference must be a Beacon::Mappings::Field") unless reference.is_a?(Field)
+        raise ArgumentError.new("Relation#reference must be a Clipper::Mappings::Field") unless reference.is_a?(Field)
         @reference = reference
       end
 

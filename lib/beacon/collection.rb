@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   class Collection
 
     include Enumerable

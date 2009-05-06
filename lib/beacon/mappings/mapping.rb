@@ -1,6 +1,6 @@
 require Pathname(__FILE__).dirname + "field"
 
-module Beacon
+module Clipper
   class Mappings
 
     class Mapping
@@ -72,7 +72,7 @@ module Beacon
 
         target.send(:define_method, name) do
           associated_mapping = mapping.mappings[mapped_name]
-          criteria = match_criteria.call(self, Beacon::Query::Criteria.new(associated_mapping))
+          criteria = match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
 
           __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__).first
         end
@@ -80,8 +80,8 @@ module Beacon
         target.send(:define_method, "#{name}=") do |object|
           associated_mapping = mapping.mappings[mapped_name]
 
-          mapping_criteria = Beacon::Query::Criteria.new(mapping)
-          criteria = match_criteria.call(mapping_criteria, Beacon::Query::Criteria.new(associated_mapping))
+          mapping_criteria = Clipper::Query::Criteria.new(mapping)
+          criteria = match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(associated_mapping))
 
           c = criteria.__conditions__
           c.value.field.set(self, c.field.get(object))
@@ -95,7 +95,7 @@ module Beacon
 
         target.send(:define_method, name) do
           associated_mapping = mapping.mappings[mapped_name]
-          criteria = match_criteria.call(self, Beacon::Query::Criteria.new(associated_mapping))
+          criteria = match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
 
           orm.find(associated_mapping, criteria.__options__, criteria.__conditions__)
         end

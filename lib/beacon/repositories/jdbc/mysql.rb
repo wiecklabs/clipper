@@ -1,7 +1,7 @@
 require "jdbc/mysql"
 import "com.mysql.jdbc.Driver"
 
-module Beacon
+module Clipper
   module Repositories
     class Jdbc
       class Mysql < Jdbc
@@ -16,4 +16,4 @@ module Beacon
       end # class Sqlite
     end # class Jdbc
   end # module Repositories
-end # module Beacon
+end # module Clipper

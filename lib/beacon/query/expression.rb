@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   class Query
     class Expression
       def initialize(*values)

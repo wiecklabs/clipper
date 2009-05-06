@@ -9,55 +9,55 @@ require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
 require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
 require Pathname(__FILE__).dirname.parent + "wieck" + "using"
 
-# require Pathname(__FILE__).dirname.parent + "beacon_internal.jar"
+# require Pathname(__FILE__).dirname.parent + "clipper_internal.jar"
 
 require Pathname(__FILE__).dirname.parent + "wieck" + "string"
 
-require Pathname(__FILE__).dirname + "beacon" + "uri"
+require Pathname(__FILE__).dirname + "clipper" + "uri"
 
-require Pathname(__FILE__).dirname + "beacon" + "model"
+require Pathname(__FILE__).dirname + "clipper" + "model"
 
-require Pathname(__FILE__).dirname + "beacon" + "accessors"
+require Pathname(__FILE__).dirname + "clipper" + "accessors"
 
-require Pathname(__FILE__).dirname + "beacon" + "type"
-require Pathname(__FILE__).dirname + "beacon" + "types"
-require Pathname(__FILE__).dirname + "beacon" + "mappings" + "mapping"
-require Pathname(__FILE__).dirname + "beacon" + "mappings" + "relation"
+require Pathname(__FILE__).dirname + "clipper" + "type"
+require Pathname(__FILE__).dirname + "clipper" + "types"
+require Pathname(__FILE__).dirname + "clipper" + "mappings" + "mapping"
+require Pathname(__FILE__).dirname + "clipper" + "mappings" + "relation"
 
-require Pathname(__FILE__).dirname + "beacon" + "validations"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "context"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "validation_result"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "validation_error"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "absence_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "acceptance_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "minimum_length_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "maximum_length_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "within_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "size_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "required_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "format_validator"
-require Pathname(__FILE__).dirname + "beacon" + "validations" + "equality_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "context"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "validation_result"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "validation_error"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "absence_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "acceptance_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "minimum_length_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "maximum_length_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "within_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "size_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "required_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "format_validator"
+require Pathname(__FILE__).dirname + "clipper" + "validations" + "equality_validator"
 
-require Pathname(__FILE__).dirname + "beacon" + "repositories"
-require Pathname(__FILE__).dirname + "beacon" + "repositories" + "schema"
-require Pathname(__FILE__).dirname + "beacon" + "repositories" + "abstract"
+require Pathname(__FILE__).dirname + "clipper" + "repositories"
+require Pathname(__FILE__).dirname + "clipper" + "repositories" + "schema"
+require Pathname(__FILE__).dirname + "clipper" + "repositories" + "abstract"
 
-require Pathname(__FILE__).dirname + "beacon" + "query" + "query"
-require Pathname(__FILE__).dirname + "beacon" + "query" + "expression"
-require Pathname(__FILE__).dirname + "beacon" + "query" + "condition"
-require Pathname(__FILE__).dirname + "beacon" + "query" + "criteria"
+require Pathname(__FILE__).dirname + "clipper" + "query" + "query"
+require Pathname(__FILE__).dirname + "clipper" + "query" + "expression"
+require Pathname(__FILE__).dirname + "clipper" + "query" + "condition"
+require Pathname(__FILE__).dirname + "clipper" + "query" + "criteria"
 
-require Pathname(__FILE__).dirname + "beacon" + "syntax" + "sql"
+require Pathname(__FILE__).dirname + "clipper" + "syntax" + "sql"
 
-require Pathname(__FILE__).dirname + "beacon" + "session"
-require Pathname(__FILE__).dirname + "beacon" + "collection"
-require Pathname(__FILE__).dirname + "beacon" + "identity_map"
-require Pathname(__FILE__).dirname + "beacon" + "mappings"
-require Pathname(__FILE__).dirname + "beacon" + "schema"
-require Pathname(__FILE__).dirname + "beacon" + "session" + "helper"
+require Pathname(__FILE__).dirname + "clipper" + "session"
+require Pathname(__FILE__).dirname + "clipper" + "collection"
+require Pathname(__FILE__).dirname + "clipper" + "identity_map"
+require Pathname(__FILE__).dirname + "clipper" + "mappings"
+require Pathname(__FILE__).dirname + "clipper" + "schema"
+require Pathname(__FILE__).dirname + "clipper" + "session" + "helper"
 
-module Beacon
+module Clipper
 
   @registrations = {}
   def self.registrations
@@ -65,7 +65,7 @@ module Beacon
   end
 
   def self.open(connection_name, uri)
-    uri = Beacon::Uri.new(uri)
+    uri = Clipper::Uri.new(uri)
     @registrations[connection_name] = uri.driver.new(connection_name, uri)
   end
 

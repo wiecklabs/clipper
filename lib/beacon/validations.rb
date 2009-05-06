@@ -1,10 +1,10 @@
-module Beacon
+module Clipper
 
   @validation_context_map = {}
 
   def self.constrain(target, context_name, &block)
     @validation_context_map[context_name] ||= {}
-    @validation_context_map[context_name][target] = Beacon::Validations::Context.new(target, context_name, &block)
+    @validation_context_map[context_name][target] = Clipper::Validations::Context.new(target, context_name, &block)
   end
 
   def self.validate(instance, context_name = 'default')
@@ -19,4 +19,4 @@ module Beacon
     end
   end
 
-end # module Beacon
+end # module Clipper

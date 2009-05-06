@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Validations
 
     class ValidationResult
@@ -31,4 +31,4 @@ module Beacon
     end # class ValidationResult
 
   end # module Validations
-end # module Beacon
+end # module Clipper

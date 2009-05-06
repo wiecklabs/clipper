@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Syntax
     class Sql
 
@@ -43,7 +43,7 @@ module Beacon
       end
 
       def normalize_value(value)
-        if value.is_a?(Beacon::Mappings::Field)
+        if value.is_a?(Clipper::Mappings::Field)
           @repository.quote_identifier("#{value.mapping.name}.#{value.name}")
         else
           "?"

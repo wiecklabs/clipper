@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Validations
 
     class ValidationFactory
@@ -18,7 +18,7 @@ module Beacon
       end
 
       def run(instance)
-        validation_result = Beacon::Validations::ValidationResult.new
+        validation_result = Clipper::Validations::ValidationResult.new
 
         @validations.each do |validation|
           validation.call(instance, validation_result) if validation.should_run?(instance)
@@ -106,4 +106,4 @@ module Beacon
 
     end
   end
-end # module Beacon
+end # module Clipper

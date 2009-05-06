@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Accessors
     module Serializable
 

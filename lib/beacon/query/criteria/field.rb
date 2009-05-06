@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   class Query
     class Criteria
       class Field
@@ -14,15 +14,15 @@ module Beacon
         end
 
         def eq(value)
-          @criteria.merge(Beacon::Query::Condition::eq(@field, value))
+          @criteria.merge(Clipper::Query::Condition::eq(@field, value))
         end
 
         def lt(value)
-          @criteria.merge(Beacon::Query::Condition::lt(@field, value))
+          @criteria.merge(Clipper::Query::Condition::lt(@field, value))
         end
 
         def gt(value)
-          @criteria.merge(Beacon::Query::Condition::gt(@field, value))
+          @criteria.merge(Clipper::Query::Condition::gt(@field, value))
         end
 
         def desc
@@ -42,4 +42,4 @@ module Beacon
       end # class Field
     end # class Criteria
   end # class Query
-end # module Beacon
+end # module Clipper

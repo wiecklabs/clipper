@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   class Query
     class Criteria
 
@@ -6,8 +6,8 @@ module Beacon
         alias __new__ new
 
         def new(mapping)
-          unless mapping.is_a?(Beacon::Mappings::Mapping)
-            raise ArgumentError.new("Beacon::Query::Criteria#initialize requires a Beacon::Mappings::Mapping")
+          unless mapping.is_a?(Clipper::Mappings::Mapping)
+            raise ArgumentError.new("Clipper::Query::Criteria#initialize requires a Clipper::Mappings::Mapping")
           end
 
           (@mappings ||= {})[mapping] ||= begin
@@ -15,7 +15,7 @@ module Beacon
             field_methods = mapping.fields.map do |field|
               <<-EOS
               def #{field.name}
-                Beacon::Query::Criteria::Field.new(self, self.class.mapping[#{field.name.inspect}])
+                Clipper::Query::Criteria::Field.new(self, self.class.mapping[#{field.name.inspect}])
               end
               EOS
             end.join
@@ -50,21 +50,21 @@ module Beacon
 
       def limit(size)
         if !size.is_a?(Integer) || size <= 0
-          raise ArgumentError.new("Beacon::Query::Criteria#limit expects a non-zero Integer for the size")
+          raise ArgumentError.new("Clipper::Query::Criteria#limit expects a non-zero Integer for the size")
         end
         @limit = size
       end
 
       def offset(position)
         if !position.is_a?(Integer) || position < 0
-          raise ArgumentError.new("Beacon::Query::Criteria#offset expects a non-negative Integer for the position")
+          raise ArgumentError.new("Clipper::Query::Criteria#offset expects a non-negative Integer for the position")
         end
         @offset = position
       end
 
       def order(*fields)
         unless fields.all? { |field| field.is_a?(Criteria::Field)  }
-          raise ArgumentError.new("Beacon::Query::Criteria#order expects a list of Criteria::Field objects")
+          raise ArgumentError.new("Clipper::Query::Criteria#order expects a list of Criteria::Field objects")
         end
         @order = fields.map do |proxy|
           [ proxy.field, proxy.direction ]

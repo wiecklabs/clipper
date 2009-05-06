@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
 
   class UnsupportedTypeError < StandardError
     def initialize(type)
@@ -9,7 +9,7 @@ module Beacon
   class Type
 
     def self.inherited(target)
-      Beacon::Types[target.name] = Beacon::Types[target.name.split("::").last] = target
+      Clipper::Types[target.name] = Clipper::Types[target.name.split("::").last] = target
     end
 
   end

@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Repositories
     class Schema
       def initialize(repository)

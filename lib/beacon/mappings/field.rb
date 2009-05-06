@@ -1,9 +1,9 @@
-module Beacon
+module Clipper
   class Mappings
     class Field
 
       def initialize(mapping, name, type, default = nil)
-        raise ArgumentError.new("Field#mapping must be a Mapping") unless mapping.kind_of?(Beacon::Mappings::Mapping)
+        raise ArgumentError.new("Field#mapping must be a Mapping") unless mapping.kind_of?(Clipper::Mappings::Mapping)
         @mapping = mapping
 
         raise ArgumentError.new("Field#name must be a String") unless name.is_a?(String)
@@ -11,14 +11,14 @@ module Beacon
         @name = name
 
         if type.is_a?(Class)
-          if defined_type = Beacon::Types[type.to_s]
+          if defined_type = Clipper::Types[type.to_s]
             type = defined_type.new
           else
-            raise Beacon::Mappings::UnsupportedTypeError.new(type)
+            raise Clipper::Mappings::UnsupportedTypeError.new(type)
           end
         end
 
-        raise ArgumentError.new("Field#type must be a Beacon::Type") unless type.is_a?(Beacon::Type)
+        raise ArgumentError.new("Field#type must be a Clipper::Type") unless type.is_a?(Clipper::Type)
         @type = type
 
         @default = default

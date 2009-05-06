@@ -1,6 +1,6 @@
 require Pathname(__FILE__).dirname.parent.parent.parent + "vendor" + "c3p0-0.9.1.2.jar"
 
-module Beacon
+module Clipper
   module Repositories
     class Jdbc < Abstract
 
@@ -29,7 +29,7 @@ module Beacon
       end
 
       def syntax
-        @syntax ||= Beacon::Syntax::Sql.new(self)
+        @syntax ||= Clipper::Syntax::Sql.new(self)
       end
 
       def select(query, session)
@@ -50,7 +50,7 @@ module Beacon
         statement << " LIMIT #{query.limit}" if query.limit
         statement << " OFFSET #{query.offset}" if query.offset
 
-        collection = Beacon::Collection.new(query.mapping, [])
+        collection = Clipper::Collection.new(query.mapping, [])
 
         with_connection do |connection|
           if query.paramaters.empty?
@@ -93,13 +93,13 @@ module Beacon
 
       def get_value_from_result_set(results, index, type)
         case type
-        when Beacon::Types::Time
+        when Clipper::Types::Time
           t = results.getTime(index)
           Time.local(t.seconds, t.minutes, t.hours, *Time.now.to_a[3..-1])
-        when Beacon::Types::Date
+        when Clipper::Types::Date
           d = results.getDate(index)
           Date.new(d.year + 1900, d.month + 1, d.date)
-        when Beacon::Types::DateTime
+        when Clipper::Types::DateTime
           t = results.getTimestamp(index)
           Time.at(*t.getTime.divmod(1000)).send(:to_datetime)
         else
@@ -115,7 +115,7 @@ module Beacon
           mapping = collection.mapping
 
           fields = mapping.fields
-          serial_key = mapping.keys.detect { |field| field.type.is_a?(Beacon::Types::Serial) }
+          serial_key = mapping.keys.detect { |field| field.type.is_a?(Clipper::Types::Serial) }
 
           statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
           statement << fields.map { |field| quote_identifier(field.name) } * ", "
@@ -216,7 +216,7 @@ module Beacon
       end
 
       def schema
-        @schema ||= Beacon::Repositories::Schema.new(self)
+        @schema ||= Clipper::Repositories::Schema.new(self)
       end
 
       ##
@@ -251,24 +251,24 @@ module Beacon
       def column_definition(field)
         column_name = quote_identifier(field.name)
         case field.type
-        when Beacon::Types::Integer
+        when Clipper::Types::Integer
           "#{column_name} INTEGER"
-        when Beacon::Types::Serial
+        when Clipper::Types::Serial
           "#{column_name} #{column_definition_serial(field)}"
-        when Beacon::Types::Float
+        when Clipper::Types::Float
           "#{column_name} #{column_definition_float(field)}"
-        when Beacon::Types::String
+        when Clipper::Types::String
           "#{column_name} #{column_definition_string(field)}"
-        when Beacon::Types::Text
+        when Clipper::Types::Text
           "#{column_name} #{column_definition_text(field)}"
-        when Beacon::Types::DateTime
+        when Clipper::Types::DateTime
           "#{column_name} TIMESTAMP"
-        when Beacon::Types::Date
+        when Clipper::Types::Date
           "#{column_name} DATE"
-        when Beacon::Types::Time
+        when Clipper::Types::Time
           "#{column_name} TIME"
         else
-          raise Beacon::UnsupportedTypeError.new(field.type)
+          raise Clipper::UnsupportedTypeError.new(field.type)
         end
       end
 
@@ -293,21 +293,21 @@ module Beacon
           statement.setNull(index, 4)
         else
           case field.type
-          when Beacon::Types::Integer
+          when Clipper::Types::Integer
             statement.setInt(index, value)
-          when Beacon::Types::Serial
+          when Clipper::Types::Serial
             statement.setInt(index, value)
-          when Beacon::Types::String
+          when Clipper::Types::String
             statement.setString(index, value)
-          when Beacon::Types::Text
+          when Clipper::Types::Text
             statement.setString(index, value)
-          when Beacon::Types::Float
+          when Clipper::Types::Float
             statement.setString(index, value.to_s)
-          when Beacon::Types::Time
+          when Clipper::Types::Time
             statement.setTime(index, java.sql.Time.new(value.to_f * 1000))
-          when Beacon::Types::Date
+          when Clipper::Types::Date
             statement.setDate(index, java.sql.Date.new(Time.local(value.year, value.month, value.day).to_f * 1000))
-          when Beacon::Types::DateTime
+          when Clipper::Types::DateTime
             case value
             when Time
               time = value.utc
@@ -318,7 +318,7 @@ module Beacon
 
             statement.setTimestamp(index, java.sql.Timestamp.new(time.to_f * 1000))
           else
-            raise Beacon::UnsupportedTypeError.new(field.type)
+            raise Clipper::UnsupportedTypeError.new(field.type)
           end
         end
       end

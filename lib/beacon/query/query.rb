@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   class Query
     def initialize(mapping, options, conditions)
       @mapping = mapping

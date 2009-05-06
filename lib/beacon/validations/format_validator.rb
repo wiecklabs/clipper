@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Validations
     
     class FormatValidator < Validator
@@ -16,4 +16,4 @@ module Beacon
     end
     
   end # module Validations
-end # module Beacon
+end # module Clipper

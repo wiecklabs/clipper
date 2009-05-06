@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Validations
 
     class WithinValidator < Validator
@@ -23,4 +23,4 @@ module Beacon
     end
 
   end # module Validations
-end # module Beacon
+end # module Clipper

@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Validations
 
     class Validator

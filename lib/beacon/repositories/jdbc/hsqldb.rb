@@ -1,7 +1,7 @@
 require "jdbc/hsqldb"
 import "org.hsqldb.jdbcDriver"
 
-module Beacon
+module Clipper
   module Repositories
     class Jdbc
       class Hsqldb < Jdbc
@@ -45,4 +45,4 @@ module Beacon
       end # class Sqlite
     end # class Jdbc
   end # module Repositories
-end # module Beacon
+end # module Clipper

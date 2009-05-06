@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Validations
     
     class ValidationError
@@ -12,4 +12,4 @@ module Beacon
     end # class ValidationError
     
   end # module Validations
-end # module Beacon
+end # module Clipper

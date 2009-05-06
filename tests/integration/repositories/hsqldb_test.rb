@@ -7,19 +7,19 @@ class Integration::HsqldbTest < Test::Unit::TestCase
   include Integration::AbstractRepositoryTest
 
   def setup
-    @uri = Beacon::Uri.new("jdbc:hsqldb:mem:test")
+    @uri = Clipper::Uri.new("jdbc:hsqldb:mem:test")
 
-    Beacon::open("default", @uri.to_s)
+    Clipper::open("default", @uri.to_s)
 
     setup_abstract
   end
 
   def teardown
-    Beacon::registrations.delete("default")
+    Clipper::registrations.delete("default")
   end
 
   def test_connection_works
-    Beacon::registrations["default"].with_connection do |connection|
+    Clipper::registrations["default"].with_connection do |connection|
       assert_equal(false, connection.getMetaData.supportsGetGeneratedKeys)
     end
   end

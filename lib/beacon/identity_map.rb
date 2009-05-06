@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   class IdentityMap
     def initialize
       @map = java.util.LinkedHashSet.new
@@ -8,4 +8,4 @@ module Beacon
 
     end
   end
-end # module Beacon
+end # module Clipper

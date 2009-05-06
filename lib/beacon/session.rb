@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   class Session
 
     class RepositoryMissingError < StandardError
@@ -17,7 +17,7 @@ module Beacon
 
     def repository
       @repository ||= begin
-        if repository = Beacon::registrations[@repository_name]
+        if repository = Clipper::registrations[@repository_name]
           repository
         else
           raise RepositoryMissingError.new(@repository_name)
@@ -30,7 +30,7 @@ module Beacon
     end
 
     def map(target, mapped_name, &b)
-      Beacon::Mappings[@repository_name].map(target, mapped_name, &b)
+      Clipper::Mappings[@repository_name].map(target, mapped_name, &b)
     end
 
     def get(target, *keys)
@@ -45,7 +45,7 @@ module Beacon
 
     def all(target)
       mapping = repository.mappings[target]
-      criteria = Beacon::Query::Criteria.new(mapping)
+      criteria = Clipper::Query::Criteria.new(mapping)
 
       yield(criteria) if block_given?
 
@@ -53,7 +53,7 @@ module Beacon
     end
 
     def find(target, options, conditions)
-      mapping = target.is_a?(Beacon::Mappings::Mapping) ? target : repository.mappings[target]
+      mapping = target.is_a?(Clipper::Mappings::Mapping) ? target : repository.mappings[target]
 
       repository.select(Query.new(mapping, options, conditions), self)
     end
@@ -68,7 +68,7 @@ module Beacon
     end
 
     def validate(object, context_name = 'default')
-      Beacon::validate(object, context_name)
+      Clipper::validate(object, context_name)
     end
 
     def load(object, field)
@@ -81,4 +81,4 @@ module Beacon
     end
 
   end # class Session
-end # module Beacon
+end # module Clipper

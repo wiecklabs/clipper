@@ -4,11 +4,11 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class Integration::MappingTest < Test::Unit::TestCase
 
   def setup
-    Beacon::open("default", "abstract://localhost/example")
+    Clipper::open("default", "abstract://localhost/example")
   end
 
   def teardown
-    Beacon::registrations.delete("default")
+    Clipper::registrations.delete("default")
   end
 
   # This test describes the internal mappings use by the Wheels O/RM.
@@ -23,7 +23,7 @@ class Integration::MappingTest < Test::Unit::TestCase
       # mail server, web-service or other such storage provider.
 
       # The "people" Mapping here would map to the "people" table in our database.
-      people = Beacon::Mappings::Mapping.new(Beacon::Mappings.new, Class.new, "people")
+      people = Clipper::Mappings::Mapping.new(Clipper::Mappings.new, Class.new, "people")
 
       # The fields in our mappings are added to an ordered-set. This means their order
       # is deterministic, and should reflect the same order as the underlying schema
@@ -38,8 +38,8 @@ class Integration::MappingTest < Test::Unit::TestCase
       # isn't necessarily directly related to the type returned by a loaded object's
       # mapped accessor, this information is simply used to optimize how values are stored
       # and provide some flexibility in mapping them uniformally to objects.
-      age = people.field "age", Beacon::Types::Integer
-      marital_status = people.field "marital_status", Beacon::Types::Integer
+      age = people.field "age", Clipper::Types::Integer
+      marital_status = people.field "marital_status", Clipper::Types::Integer
 
       # Typically we would want our keys to appear first in our mappings, but we needed
       # to talk about fields first.
@@ -54,12 +54,12 @@ class Integration::MappingTest < Test::Unit::TestCase
       # Field object, we can define our mappings and set the keys in the same step as the
       # code below, or we could define them separately like so:
       #
-      #   first_name = people.field("first_name", Beacon::Repositories::Types::String)
-      #   last_name = people.field("last_name", Beacon::Repositories::Types::String)
+      #   first_name = people.field("first_name", Clipper::Repositories::Types::String)
+      #   last_name = people.field("last_name", Clipper::Repositories::Types::String)
       #   people.key(first_name, last_name)
       people.key(
-        people.field("first_name", Beacon::Types::String.new(200)),
-        people.field("last_name", Beacon::Types::String.new(200))
+        people.field("first_name", Clipper::Types::String.new(200)),
+        people.field("last_name", Clipper::Types::String.new(200))
       )
 
       # Alternatively, if you want just one field, you can use the Mapping#[] method to
@@ -67,12 +67,12 @@ class Integration::MappingTest < Test::Unit::TestCase
       assert_equal(people["age"], age)
 
       # Adding an already defined field will result in a DuplicateFieldError.
-      assert_raise(Beacon::Mappings::Mapping::DuplicateFieldError) do
-        people.field("age", Beacon::Types::Integer)
+      assert_raise(Clipper::Mappings::Mapping::DuplicateFieldError) do
+        people.field("age", Clipper::Types::Integer)
       end
 
       # A Mapping should have one (and only one) key defined.
-      assert_raise(Beacon::Mappings::Mapping::MultipleKeyError) do
+      assert_raise(Clipper::Mappings::Mapping::MultipleKeyError) do
         people.key(people["age"])
       end
     end

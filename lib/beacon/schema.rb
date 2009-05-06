@@ -1,7 +1,7 @@
-module Beacon
+module Clipper
   class Schema
     def initialize(repository)
-      @repository = Beacon::registrations[repository]
+      @repository = Clipper::registrations[repository]
     end
 
     def create(mapped_class)

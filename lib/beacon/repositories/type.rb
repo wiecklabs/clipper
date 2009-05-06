@@ -1,4 +1,4 @@
-module Beacon
+module Clipper
   module Repositories
     class Type
       def initialize(field)

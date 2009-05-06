@@ -12,7 +12,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
 
   def test_constraint_declarations
     assert_nothing_raised do
-      Beacon::constrain(@user, "test_constraint_declarations") do |check|
+      Clipper::constrain(@user, "test_constraint_declarations") do |check|
         check.size("name", 50) { |instance| instance.active? }
         check.required("name")
   
@@ -31,34 +31,34 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   end
 
   def test_default_validation_returns_invalid_result
-    Beacon::constrain(@user, 'default') do |check|
+    Clipper::constrain(@user, 'default') do |check|
       check.required('name')
     end
 
     user = @user.new
-    result = Beacon::validate(user)
+    result = Clipper::validate(user)
     assert_equal(false, result.valid?)
     assert_equal(1, result.errors.size)
   end
 
   def test_default_validation_returns_valid_result
-    Beacon::constrain(@user, 'default') do |check|
+    Clipper::constrain(@user, 'default') do |check|
       check.required('name')
     end
   
     user = @user.new
     user.name = 'Sample User'
-    result = Beacon::validate(user)
+    result = Clipper::validate(user)
     assert_equal(true, result.valid?)
     assert_equal(0, result.errors.size)
   end
   
   def test_multiple_context_validation
-    Beacon::constrain(@user, 'default') do |check|
+    Clipper::constrain(@user, 'default') do |check|
       check.required('name')
     end
   
-    Beacon::constrain(@user, 'email_marketing') do |check|
+    Clipper::constrain(@user, 'email_marketing') do |check|
       check.required('name')
       check.required('email')
     end
@@ -66,13 +66,13 @@ class Integration::ValidationsTest < Test::Unit::TestCase
     # Validate in the default context
     user = @user.new
     user.name = 'Sample User'
-    result = Beacon::validate(user)
+    result = Clipper::validate(user)
     assert_equal(true, result.valid?)
     assert_equal(0, result.errors.size)
   
     # Validate in the email_marketing context
     user = @user.new
-    result = Beacon::validate(user, 'email_marketing')
+    result = Clipper::validate(user, 'email_marketing')
     assert_equal(false, result.valid?)
     assert_equal(2, result.errors.size)
   end

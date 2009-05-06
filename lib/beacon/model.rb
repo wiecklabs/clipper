@@ -1,8 +1,8 @@
-module Beacon
+module Clipper
   module Model
 
     def self.included(target)
-      target.send(:extend, Beacon::Session::Helper)
+      target.send(:extend, Clipper::Session::Helper)
     end
 
     def __session__
