@@ -4,43 +4,43 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class UriTest < Test::Unit::TestCase
 
   def setup
-    @uri = Beacon::Uri.new("abstract://user:password@name?charset=utf8")
+    @uri = Clipper::Uri.new("abstract://user:password@name?charset=utf8")
 
     dorb = Class.new do
-      self.const_set("Sqlite3", Class.new(Beacon::Repositories::Abstract))
+      self.const_set("Sqlite3", Class.new(Clipper::Repositories::Abstract))
     end
-    Beacon::Repositories.const_set("Dorb", dorb)
+    Clipper::Repositories.const_set("Dorb", dorb)
   end
 
   def teardown
-    Beacon::Repositories.send(:remove_const, "Dorb")
+    Clipper::Repositories.send(:remove_const, "Dorb")
   end
 
   def test_requires_one_argument
-    assert_equal(Beacon::Uri.instance_method("initialize").arity, 1)
+    assert_equal(Clipper::Uri.instance_method("initialize").arity, 1)
   end
 
   def test_initializes_with_string
     assert_nothing_raised do
-      Beacon::Uri.new("dorb:sqlite3:///#{Dir.pwd}/example.db")
+      Clipper::Uri.new("dorb:sqlite3:///#{Dir.pwd}/example.db")
     end
 
     assert_raises(ArgumentError) do
-      Beacon::Uri.new(URI::parse("dorb:sqlite3:///#{Dir.pwd}/example.db"))
+      Clipper::Uri.new(URI::parse("dorb:sqlite3:///#{Dir.pwd}/example.db"))
     end
 
     assert_raises(ArgumentError) do
-      Beacon::Uri.new(nil)
+      Clipper::Uri.new(nil)
     end
 
     assert_raises(ArgumentError) do
-      Beacon::Uri.new("")
+      Clipper::Uri.new("")
     end
   end
 
   def test_missing_driver_error
-    assert_raises(Beacon::Uri::MissingDriverError) do
-      Beacon::Uri.new("not:a:driver:///#{Dir.pwd}/example.db")
+    assert_raises(Clipper::Uri::MissingDriverError) do
+      Clipper::Uri.new("not:a:driver:///#{Dir.pwd}/example.db")
     end
   end
 
@@ -49,7 +49,7 @@ class UriTest < Test::Unit::TestCase
   end
 
   def test_has_a_driver
-    assert_equal(Beacon::Repositories::Abstract, @uri.driver)
+    assert_equal(Clipper::Repositories::Abstract, @uri.driver)
   end
 
   def test_has_a_name

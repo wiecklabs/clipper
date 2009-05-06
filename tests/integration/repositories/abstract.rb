@@ -3,49 +3,49 @@ module Integration::AbstractRepositoryTest
   # class Zoo
   # end
 
-  include Beacon::Session::Helper
+  include Clipper::Session::Helper
 
   def setup_abstract
     @zoo = Class.new do
-      Beacon::Mappings["default"].map(self, "zoos") do |zoos|
-        zoos.key zoos.field("id", Beacon::Types::Serial)
-        zoos.field "name", Beacon::Types::String.new(200)
-        zoos.field "city", Beacon::Types::String.new(200)
-        zoos.field "state", Beacon::Types::String.new(200)
-        zoos.field "notes", Beacon::Types::Text
+      Clipper::Mappings["default"].map(self, "zoos") do |zoos|
+        zoos.key zoos.field("id", Clipper::Types::Serial)
+        zoos.field "name", Clipper::Types::String.new(200)
+        zoos.field "city", Clipper::Types::String.new(200)
+        zoos.field "state", Clipper::Types::String.new(200)
+        zoos.field "notes", Clipper::Types::Text
       end
     end
 
     @climate = Class.new do
-      Beacon::Mappings["default"].map(self, "climates") do |climates|
-        climates.field("region", Beacon::Types::String.new(200))
-        climates.field("climate", Beacon::Types::String.new(200))
+      Clipper::Mappings["default"].map(self, "climates") do |climates|
+        climates.field("region", Clipper::Types::String.new(200))
+        climates.field("climate", Clipper::Types::String.new(200))
 
         climates.key(climates["region"])
       end
     end
 
     @city = Class.new do
-      Beacon::Mappings["default"].map(self, "cities") do |cities|
-        cities.field("name", Beacon::Types::String.new(200))
-        cities.field("state", Beacon::Types::String.new(200))
-        cities.field("region", Beacon::Types::String.new(200))
+      Clipper::Mappings["default"].map(self, "cities") do |cities|
+        cities.field("name", Clipper::Types::String.new(200))
+        cities.field("state", Clipper::Types::String.new(200))
+        cities.field("region", Clipper::Types::String.new(200))
 
         cities.key(cities["name"], cities["state"])
       end
     end
 
     @person = Class.new do
-      Beacon::Mappings["default"].map(self, "people") do |people|
-        people.key people.field("id", Beacon::Types::Serial)
-        people.field "name", Beacon::Types::String.new(200)
-        people.field "gpa", Beacon::Types::Float(7, 2)
+      Clipper::Mappings["default"].map(self, "people") do |people|
+        people.key people.field("id", Clipper::Types::Serial)
+        people.field "name", Clipper::Types::String.new(200)
+        people.field "gpa", Clipper::Types::Float(7, 2)
       end
     end
 
     @article = Class.new do
-      Beacon::Mappings["default"].map(self, "articles") do |articles|
-        articles.field("id", Beacon::Types::Serial)
+      Clipper::Mappings["default"].map(self, "articles") do |articles|
+        articles.field("id", Clipper::Types::Serial)
         articles.field("time", Time)
         articles.field("date", Date)
         articles.field("datetime", DateTime)
@@ -55,7 +55,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_schema_create
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     assert(!schema.exists?(@zoo))
     assert_nothing_raised do
       schema.create(@zoo)
@@ -66,12 +66,12 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_schema_exists
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     assert(!schema.exists?(@city))
   end
 
   def test_schema_destroy
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@zoo)
     assert_nothing_raised do
       schema.destroy(@zoo)
@@ -79,7 +79,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_field_exists
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@city)
     orm.repository.with_connection do |connection|
       columns = connection.getMetaData.getColumns(nil, nil, "cities", "state")
@@ -90,7 +90,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_save_object
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@zoo)
     zoo = @zoo.new
     zoo.name = "Dallas"
@@ -103,7 +103,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_support_for_floats
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     assert_nothing_raised { schema.create(@person) }
     person = @person.new
     person.gpa = 3.5
@@ -118,7 +118,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_support_for_date_and_time_fields
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     assert_nothing_raised { schema.create(@article) }
     assert(schema.exists?(@article))
 
@@ -143,7 +143,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_insert_multiple_records
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@person)
 
     person1 = @person.new
@@ -152,7 +152,7 @@ module Integration::AbstractRepositoryTest
     person2 = @person.new
     person2.name = "Jane"
 
-    people = Beacon::Collection.new(Beacon::Mappings["default"][@person], [person1, person2])
+    people = Clipper::Collection.new(Clipper::Mappings["default"][@person], [person1, person2])
 
     orm.save(people)
 
@@ -163,7 +163,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_get_object
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@person)
 
     person = @person.new
@@ -182,7 +182,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_get_object_with_compound_key
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@city)
 
     city = @city.new
@@ -202,7 +202,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_find
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@person)
 
     person = @person.new
@@ -225,7 +225,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_find_with_conditions
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@person)
 
     person = @person.new
@@ -239,7 +239,7 @@ module Integration::AbstractRepositoryTest
     orm.save(person)
 
     assert_nothing_raised do
-      low_gpa = Beacon::Query::Condition.lt(Beacon::Mappings["default"][@person]["gpa"], 3)
+      low_gpa = Clipper::Query::Condition.lt(Clipper::Mappings["default"][@person]["gpa"], 3)
       people = orm.find(@person, nil, low_gpa)
       assert_equal(1, people.size)
     end
@@ -249,7 +249,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_all_with_single_condition
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@person)
 
     bob = @person.new
@@ -266,7 +266,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_all_with_multiple_conditions
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@person)
 
     jimmy = @person.new
@@ -286,7 +286,7 @@ module Integration::AbstractRepositoryTest
   end
 
   def test_all_with_limit_and_order
-    schema = Beacon::Schema.new("default")
+    schema = Clipper::Schema.new("default")
     schema.create(@person)
 
     mike = @person.new

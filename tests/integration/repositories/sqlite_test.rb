@@ -8,20 +8,20 @@ class Integration::SqliteTest < Test::Unit::TestCase
 
   def setup
     @sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
-    @uri = Beacon::Uri.new("jdbc:sqlite://#{@sqlite_path}")
+    @uri = Clipper::Uri.new("jdbc:sqlite://#{@sqlite_path}")
 
-    Beacon::open("default", @uri.to_s)
+    Clipper::open("default", @uri.to_s)
 
     setup_abstract
   end
 
   def teardown
-    Beacon::registrations.delete("default")
+    Clipper::registrations.delete("default")
     File.unlink(@sqlite_path) rescue nil
   end
 
   def test_get_driver_from_uri
-    assert_equal(Beacon::Repositories::Jdbc::Sqlite, @uri.driver)
+    assert_equal(Clipper::Repositories::Jdbc::Sqlite, @uri.driver)
   end
 
   def test_connecting_should_create_database
@@ -31,12 +31,12 @@ class Integration::SqliteTest < Test::Unit::TestCase
   end
 
   def test_has_a_syntax
-    assert_kind_of(Beacon::Syntax::Sql, Beacon::registrations["default"].syntax)
+    assert_kind_of(Clipper::Syntax::Sql, Clipper::registrations["default"].syntax)
   end
 
   def test_schema_raises_for_unmapped_classes
-    schema = Beacon::Schema.new("default")
-    assert_raise(Beacon::Mappings::UnmappedClassError) { schema.create(Class.new) }
+    schema = Clipper::Schema.new("default")
+    assert_raise(Clipper::Mappings::UnmappedClassError) { schema.create(Class.new) }
   end
 
 end

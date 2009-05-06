@@ -11,7 +11,7 @@ if ORM == "dm"
 else
   require 'java'
   $CLASSPATH << File.dirname(__FILE__)
-  require Pathname(__FILE__).dirname.parent + "lib" + "beacon"
+  require Pathname(__FILE__).dirname.parent + "lib" + "clipper"
 end
 
 gem 'faker', '~>0.3.1'
@@ -23,7 +23,7 @@ if ORM == "dm"
 
     property :id, Serial
     property :name, String
-    property :gpa, Beacon::Types::Float(7, 2)
+    property :gpa, Clipper::Types::Float(7, 2)
   end
 
   case ADAPTER
@@ -33,19 +33,19 @@ if ORM == "dm"
   Person.auto_migrate!
 else
   case ADAPTER
-  when "sqlite" then Beacon::open("default", "jdbc:hsqldb:mem:test")
-  when "mysql" then Beacon::open("default", "jdbc:mysql://localhost:3306/dm_worm_performance?user=root")
+  when "sqlite" then Clipper::open("default", "jdbc:hsqldb:mem:test")
+  when "mysql" then Clipper::open("default", "jdbc:mysql://localhost:3306/dm_worm_performance?user=root")
   end
 
   class Person
-    Beacon::Mappings["default"].map(self, "people") do |people|
-      people.key people.field("id", Beacon::Types::Serial)
+    Clipper::Mappings["default"].map(self, "people") do |people|
+      people.key people.field("id", Clipper::Types::Serial)
       people.field("name", String)
-      people.field("gpa", Beacon::Types::Float(7, 2))
+      people.field("gpa", Clipper::Types::Float(7, 2))
     end
   end
 
-  schema = Beacon::Schema.new("default")
+  schema = Clipper::Schema.new("default")
   schema.destroy(Person) rescue nil
   schema.create(Person)
 end
@@ -84,7 +84,7 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       repository.create(people)
     else
-      orm.save(Beacon::Collection.new(Beacon::Mappings["default"].mappings[Person], people))
+      orm.save(Clipper::Collection.new(Clipper::Mappings["default"].mappings[Person], people))
     end
   end
 
@@ -108,7 +108,7 @@ Benchmark.bmbm do |x|
     if ORM == "dm"
       1.upto(TIMES) { Person.all(:id.lt => 10).entries }
     else
-      conditions = Beacon::Query::Condition.lt(Beacon::Mappings["default"].mappings[Person]["id"], 10)
+      conditions = Clipper::Query::Condition.lt(Clipper::Mappings["default"].mappings[Person]["id"], 10)
       orm { |session| 1.upto(TIMES) { session.all(Person, conditions) } }
     end
   end

@@ -3,21 +3,21 @@
 # This just creates a "people" table in Sqlite3 and adds a few records for you to play with.
 
 require "pathname"
-require Pathname(__FILE__).dirname.parent + "lib" + "beacon"
+require Pathname(__FILE__).dirname.parent + "lib" + "clipper"
 
 sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
-@uri = Beacon::Uri.new("jdbc:sqlite://#{sqlite_path}")
-Beacon::open("default", @uri.to_s)
+@uri = Clipper::Uri.new("jdbc:sqlite://#{sqlite_path}")
+Clipper::open("default", @uri.to_s)
 
 class Person
-  Beacon::Mappings["default"].map(self, "people") do |people|
-    people.key people.field("id", Beacon::Types::Serial)
+  Clipper::Mappings["default"].map(self, "people") do |people|
+    people.key people.field("id", Clipper::Types::Serial)
     people.field "name", String
-    people.field "gpa", Beacon::Types::Float(7, 2)
+    people.field "gpa", Clipper::Types::Float(7, 2)
   end
 end
 
-$schema = Beacon::Schema.new("default")
+$schema = Clipper::Schema.new("default")
 $schema.create(Person)
 
 mike = Person.new

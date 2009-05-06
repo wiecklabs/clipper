@@ -3,19 +3,19 @@ require Pathname(__FILE__).dirname.parent + "helper"
 
 class SessionTest < Test::Unit::TestCase
 
-  include Beacon::Session::Helper
+  include Clipper::Session::Helper
 
   def setup
-    Beacon::open("default", "abstract://localhost/example")
+    Clipper::open("default", "abstract://localhost/example")
   end
 
   def teardown
-    Beacon::registrations.delete("default")
+    Clipper::registrations.delete("default")
   end
 
   def test_can_initialize_a_session
     assert_nothing_raised do
-      Beacon::Session.new("default")
+      Clipper::Session.new("default")
     end
     assert_nothing_raised do
       session = orm("default")
@@ -23,14 +23,14 @@ class SessionTest < Test::Unit::TestCase
   end
 
   def test_has_a_repository
-    session = Beacon::Session.new("default")
+    session = Clipper::Session.new("default")
     assert_respond_to(session, :repository)
-    assert_equal(Beacon::registrations["default"], session.repository)
+    assert_equal(Clipper::registrations["default"], session.repository)
   end
 
   def test_has_a_mappings_shortcut
-    session = Beacon::Session.new("default")
+    session = Clipper::Session.new("default")
     assert_respond_to(session, :mappings)
-    assert_kind_of(Beacon::Mappings, session.mappings)
+    assert_kind_of(Clipper::Mappings, session.mappings)
   end
 end

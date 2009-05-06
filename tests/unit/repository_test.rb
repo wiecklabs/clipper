@@ -3,7 +3,7 @@ require Pathname(__FILE__).dirname.parent + "helper"
 
 class RepositoryTest < Test::Unit::TestCase
   def setup
-    @uri = Beacon::Uri.new("abstract://localhost/example")
+    @uri = Clipper::Uri.new("abstract://localhost/example")
   end
 
 

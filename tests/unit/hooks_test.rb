@@ -4,7 +4,7 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class HooksTest < Test::Unit::TestCase
 
   class Hooked
-    include Beacon::Hooks
+    include Clipper::Hooks
 
     attr_accessor :before_hook_calls, :after_hook_calls, :hooked_method_calls
     attr_accessor :before_hook_with_args_calls, :after_hook_with_args_calls, :hooked_method_with_args_calls

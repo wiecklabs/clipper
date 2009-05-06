@@ -4,7 +4,7 @@ require Pathname(__FILE__).dirname.parent.parent + "helper"
 class SerializableTest < Test::Unit::TestCase
 
   class City
-    include Beacon::Accessors::Serializable
+    include Clipper::Accessors::Serializable
 
     attr_accessor :name, :state_abbreviation
 
@@ -22,7 +22,7 @@ class SerializableTest < Test::Unit::TestCase
   end
 
   class Person
-    include Beacon::Accessors
+    include Clipper::Accessors
   end
 
   def test_can_use_a_custom_serializable_type

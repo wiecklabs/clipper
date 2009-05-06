@@ -3,23 +3,23 @@ require Pathname(__FILE__).dirname.parent + "helper"
 
 class Integration::ModelTest < Test::Unit::TestCase
 
-  include Beacon::Session::Helper
+  include Clipper::Session::Helper
 
   class Zoo
-    include Beacon::Model
+    include Clipper::Model
 
     orm.map(self, "zoos") do |zoos|
       zoos.key "id", Integer
-      zoos.field "name", Beacon::Types::String.new(200)
+      zoos.field "name", Clipper::Types::String.new(200)
     end
   end
 
   def setup
-    Beacon.open("default", "jdbc:hsqldb://#{Pathname(__FILE__).dirname.expand_path + "sqlite.db"}")
+    Clipper.open("default", "jdbc:hsqldb://#{Pathname(__FILE__).dirname.expand_path + "sqlite.db"}")
   end
 
   def teardown
-    Beacon.close("default")
+    Clipper.close("default")
   end
 
   def test_new_record
