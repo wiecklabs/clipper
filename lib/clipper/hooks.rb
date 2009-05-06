@@ -8,6 +8,12 @@ module Clipper
         @__clipper_hooked_method_added = method(:method_added) if respond_to?(:method_added)
         def self.method_added(method)
           @__clipper_hooked_method_added.call(method) if @__clipper_hooked_method_added
+
+          if !@__clipper_binding_method && hooks.has_key?(method)
+            chain = hooks[method]
+            chain.bind!
+          end
+
         end
       end
 
@@ -17,6 +23,10 @@ module Clipper
       def initialize(target)
         @map = {}
         @target = target
+      end
+
+      def has_key?(method_name)
+        @map.has_key?(method_name)
       end
 
       def [](method_name)
@@ -31,7 +41,7 @@ module Clipper
         @before = java.util.LinkedHashSet.new
         @after = java.util.LinkedHashSet.new
 
-        Chain.bind!(target, method_name)
+        bind! if target.instance_methods.include?(method_name.to_s)
       end
 
       def before(block)
@@ -60,12 +70,16 @@ module Clipper
         target.send(:alias_method, "__hooked_#{method_name}", method_name)
 
         target.send(:class_eval, <<-EOS)
+          instance_variable_set(:@__clipper_binding_method, true)
           def #{method_name}(*args, &block)
             self.class.hooks[#{method_name.inspect}].call(self, args, block)
           end
+          remove_instance_variable(:@__clipper_binding_method)
         EOS
+      end
 
-        # or add_a_method_added_hook_for_this_method_if_it_doesnt_already_exist
+      def bind!
+        self.class.bind!(@target, @method_name)
       end
     end
 
