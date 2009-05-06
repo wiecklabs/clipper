@@ -3,15 +3,15 @@ require "set"
 require "test/unit"
 require "rubygems"
 
-require Pathname(__FILE__).dirname.parent + "vendor" + "log4j-1.2.15.jar"
+require Pathname(__FILE__).dirname + "vendor" + "log4j-1.2.15.jar"
 
-require Pathname(__FILE__).dirname.parent + "wieck" + "assertions"
-require Pathname(__FILE__).dirname.parent + "wieck" + "blank"
-require Pathname(__FILE__).dirname.parent + "wieck" + "using"
+require Pathname(__FILE__).dirname + "wieck" + "assertions"
+require Pathname(__FILE__).dirname + "wieck" + "blank"
+require Pathname(__FILE__).dirname + "wieck" + "using"
+require Pathname(__FILE__).dirname + "wieck" + "string"
 
 # require Pathname(__FILE__).dirname.parent + "clipper_internal.jar"
 
-require Pathname(__FILE__).dirname.parent + "wieck" + "string"
 
 require Pathname(__FILE__).dirname + "clipper" + "uri"
 
