@@ -1,4 +1,4 @@
-require Pathname(__FILE__).dirname.parent.parent.parent + "vendor" + "c3p0-0.9.1.2.jar"
+require Pathname(__FILE__).dirname.parent.parent + "vendor" + "c3p0-0.9.1.2.jar"
 
 module Beacon
   module Repositories

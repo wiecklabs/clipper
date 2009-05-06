@@ -7,7 +7,8 @@ class HooksTest < Test::Unit::TestCase
     include Beacon::Hooks
 
     attr_accessor :before_hook_calls, :after_hook_calls, :hooked_method_calls
-    attr_accessor :before_hook_with_args_calls, :after_with_args_hook_calls, :hooked_method_with_args_calls
+    attr_accessor :before_hook_with_args_calls, :after_hook_with_args_calls, :hooked_method_with_args_calls
+    attr_accessor :before_hook_with_block_calls, :after_hook_with_block_calls, :hooked_method_with_block_calls
 
     def initialize
       @before_hook_calls = 0
@@ -17,6 +18,10 @@ class HooksTest < Test::Unit::TestCase
       @before_hook_with_args_calls = 0
       @after_hook_with_args_calls = 0
       @hooked_method_with_args_calls = 0
+
+      @before_hook_with_block_calls = 0
+      @after_hook_with_block_calls = 0
+      @hooked_method_with_block_calls = 0
     end
 
     def hooked_method
@@ -42,6 +47,20 @@ class HooksTest < Test::Unit::TestCase
     after :hooked_method_with_args do |reciever|
       reciever.after_hook_with_args_calls += 1
     end
+
+    def hooked_method_with_block(color, size, &block)
+      yield
+      @hooked_method_with_block_calls += 1
+    end
+
+    before :hooked_method_with_block do |reciever|
+      reciever.before_hook_with_block_calls += 1
+    end
+
+    after :hooked_method_with_block do |reciever|
+      reciever.after_hook_with_block_calls += 1
+    end
+
   end
 
   def setup
@@ -73,6 +92,35 @@ class HooksTest < Test::Unit::TestCase
   end
 
   def test_hooked_methods_should_preserve_arguments
+    hooked_instance = Hooked.new
+
+    assert_equal(0, hooked_instance.before_hook_with_args_calls)
+    assert_equal(0, hooked_instance.hooked_method_with_args_calls)
+    assert_equal(0, hooked_instance.after_hook_with_args_calls)
+
+    hooked_instance.hooked_method_with_args("blue", 10)
+
+    assert_equal(1, hooked_instance.before_hook_with_args_calls)
+    assert_equal(1, hooked_instance.hooked_method_with_args_calls)
+    assert_equal(1, hooked_instance.after_hook_with_args_calls)
+  end
+
+  def test_hooked_methods_should_preserve_block_arguments
+    hooked_instance = Hooked.new
+
+    assert_equal(0, hooked_instance.before_hook_with_block_calls)
+    assert_equal(0, hooked_instance.hooked_method_with_block_calls)
+    assert_equal(0, hooked_instance.after_hook_with_block_calls)
+
+    assert_nothing_raised do
+      hooked_instance.hooked_method_with_block("blue", 10) do
+        # stuff
+      end
+    end
+
+    assert_equal(1, hooked_instance.before_hook_with_block_calls)
+    assert_equal(1, hooked_instance.hooked_method_with_block_calls)
+    assert_equal(1, hooked_instance.after_hook_with_block_calls)
   end
 
 end

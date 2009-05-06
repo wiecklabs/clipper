@@ -10,12 +10,12 @@ module Beacon
         @map = {}
         @target = target
       end
-      
+
       def [](method_name)
         @map[method_name] ||= Chain.new(@target, method_name)
       end
     end
-    
+
     class Chain
       def initialize(target, method_name)
         @target = target
@@ -34,12 +34,12 @@ module Beacon
         @after << block
       end
 
-      def call(instance)
+      def call(instance, args, blk = nil)
         @before.each do |block|
           block.call instance
         end
 
-        result = instance.send("__hooked_#{@method_name}")
+        result = instance.send("__hooked_#{@method_name}", *args, &blk)
 
         @after.each do |block|
           block.call instance
@@ -52,8 +52,8 @@ module Beacon
         target.send(:alias_method, "__hooked_#{method_name}", method_name)
 
         target.send(:class_eval, <<-EOS)
-          def #{method_name}
-            self.class.hooks[#{method_name.inspect}].call(self)
+          def #{method_name}(*args, &block)
+            self.class.hooks[#{method_name.inspect}].call(self, args, block)
           end
         EOS
 
@@ -66,14 +66,15 @@ module Beacon
       def hooks
         @hooks ||= Map.new(self)
       end
-      
+
       def before(method_name, &block)
         hooks[method_name].before(block)
       end
-      
+
       def after(method_name, &block)
         hooks[method_name].after(block)
       end
+
     end
   end
 end
