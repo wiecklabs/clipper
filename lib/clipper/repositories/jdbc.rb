@@ -51,6 +51,7 @@ module Clipper
         statement << " OFFSET #{query.offset}" if query.offset
 
         collection = Clipper::Collection.new(query.mapping, [])
+        collection.session = session
 
         with_connection do |connection|
           if query.paramaters.empty?
@@ -107,7 +108,14 @@ module Clipper
         end
       end
 
-      def create(collection)
+      def save(collection, session)
+        update(collection.stored_entries, session)
+        create(collection.new_entries, session)
+
+        collection
+      end
+
+      def create(collection, session)
         with_connection do |connection|
           metadata = connection.getMetaData
           supports_generated_keys = metadata.supportsGetGeneratedKeys
@@ -153,6 +161,9 @@ module Clipper
               serial_key.set(object, result) if serial_key && result
             end
 
+            # HACK: Find a better way to do this
+            object.instance_variable_set("@__session__", session)
+            session.identity_map.add(object)
           end
 
           if supports_generated_keys
@@ -164,6 +175,41 @@ module Clipper
               collection.zip(keys) { |object, value| serial_key.set(object, value) }
             end
 
+            stmt.close
+          end
+        end
+      end
+
+      def update(collection, session)
+        with_connection do |connection|
+          metadata = connection.getMetaData
+          supports_generated_keys = metadata.supportsGetGeneratedKeys
+
+          mapping = collection.mapping
+
+          fields = mapping.fields
+          key_fields = mapping.keys
+
+          statement = "UPDATE #{quote_identifier(collection.mapping.name)} SET "
+          statement << fields.map { |field| quote_identifier(field.name) + " = ?"}.join(', ')
+          statement << " WHERE ("
+          statement << key_fields.map { |field| quote_identifier(field.name) + " = ?"}.join(' AND ') 
+          statement << ")"
+
+          stmt = connection.prepareStatement(statement)
+
+          collection.each do |object|
+            result = nil
+
+            attributes = fields.map { |field| [field, field.get(object)] } + key_fields.map { |key_field| [key_field, key_field.get(object)] }
+
+            logger.debug(statement + " -> #{attributes.transpose[1].inspect}")
+
+            attributes.each_with_index do |attribute, index|
+              bind_value_to_statement(stmt, index + 1, *attribute)
+            end
+
+            stmt.execute
             stmt.close
           end
         end

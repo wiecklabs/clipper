@@ -33,4 +33,5 @@ class SessionTest < Test::Unit::TestCase
     assert_respond_to(session, :mappings)
     assert_kind_of(Clipper::Mappings, session.mappings)
   end
+
 end

@@ -25,6 +25,10 @@ module Clipper
       end
     end
 
+    def identity_map
+      @identity_map
+    end
+
     def mappings
       repository.mappings
     end
@@ -40,7 +44,12 @@ module Clipper
 
       query = Query.new(mapping, nil, conditions)
 
-      repository.select(query, self).first
+      if (result = repository.select(query, self).first)
+        result.instance_variable_set("@__session__", self)
+        self.identity_map.add(result)
+      end
+
+      result
     end
 
     def all(target)
@@ -58,13 +67,38 @@ module Clipper
       repository.select(Query.new(mapping, options, conditions), self)
     end
 
-    def save(collection)
-      collection = Collection.new(mappings[collection.class], [collection]) unless collection.is_a?(Collection)
-      create(collection)
+    def key(instance)
+      mapping = repository.mappings[instance.class]
+      mapping.keys.map do |field|
+        field.get(instance)
+      end
     end
 
-    def create(collection)
-      repository.create(collection)
+    # Session#get
+    #   z = orm.get(0) ---> yields z, with a brand new session instance
+    # Session#save(z), when z is a new instance
+    #   z = Zoo.new ---> z has no session assigned
+    #   z.name = "Slap"
+    #   orm.save(z)
+    #     repository.save(z, session)
+    #       z has no session, insert, read keys, set keys on z, add z to session.identity_map
+    #   orm.stored?(z)
+    #   => true
+    #
+    #  z.name = "Tester"
+    #  orm.save(z)
+    #     repository.save(z, session)
+    #       z has session, update
+    #
+    # z = orm.get(Zoo, 0)
+    # z has a new session, z exists in identity map
+
+
+    def save(collection)
+      collection = Collection.new(mappings[collection.class], [collection].flatten) unless collection.is_a?(Collection)
+
+      result = repository.save(collection, self)
+      result
     end
 
     def validate(object, context_name = 'default')

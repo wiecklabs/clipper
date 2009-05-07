@@ -69,5 +69,10 @@ class BelongsToTest < Test::Unit::TestCase
     assert_not_blank(zoo.id, "Zoo#id must not be blank")
     exhibit.zoo = zoo
     assert_equal(zoo.id, exhibit.zoo_id)
+    orm.save(exhibit)
+
+    exhibit = orm.get(Exhibit, exhibit.id)
+    assert_not_nil(exhibit.zoo)
+    assert_equal(exhibit.zoo, zoo)
   end
 end

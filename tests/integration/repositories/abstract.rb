@@ -7,6 +7,8 @@ module Integration::AbstractRepositoryTest
 
   def setup_abstract
     @zoo = Class.new do
+      include Clipper::Model
+
       Clipper::Mappings["default"].map(self, "zoos") do |zoos|
         zoos.key zoos.field("id", Clipper::Types::Serial)
         zoos.field "name", Clipper::Types::String.new(200)
@@ -17,6 +19,8 @@ module Integration::AbstractRepositoryTest
     end
 
     @climate = Class.new do
+      include Clipper::Model
+
       Clipper::Mappings["default"].map(self, "climates") do |climates|
         climates.field("region", Clipper::Types::String.new(200))
         climates.field("climate", Clipper::Types::String.new(200))
@@ -26,6 +30,8 @@ module Integration::AbstractRepositoryTest
     end
 
     @city = Class.new do
+      include Clipper::Model
+
       Clipper::Mappings["default"].map(self, "cities") do |cities|
         cities.field("name", Clipper::Types::String.new(200))
         cities.field("state", Clipper::Types::String.new(200))
@@ -36,6 +42,8 @@ module Integration::AbstractRepositoryTest
     end
 
     @person = Class.new do
+      include Clipper::Model
+
       Clipper::Mappings["default"].map(self, "people") do |people|
         people.key people.field("id", Clipper::Types::Serial)
         people.field "name", Clipper::Types::String.new(200)
@@ -44,6 +52,8 @@ module Integration::AbstractRepositoryTest
     end
 
     @article = Class.new do
+      include Clipper::Model
+
       Clipper::Mappings["default"].map(self, "articles") do |articles|
         articles.field("id", Clipper::Types::Serial)
         articles.field("time", Time)
