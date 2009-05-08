@@ -44,12 +44,7 @@ module Clipper
 
       query = Query.new(mapping, nil, conditions)
 
-      if (result = repository.select(query, self).first)
-        result.instance_variable_set("@__session__", self)
-        self.identity_map.add(result)
-      end
-
-      result
+      map_results([repository.select(query, self).first]).first
     end
 
     def all(target)
@@ -58,13 +53,13 @@ module Clipper
 
       yield(criteria) if block_given?
 
-      repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__), self)
+      map_results(repository.select(Query.new(mapping, criteria.__options__, criteria.__conditions__), self))
     end
 
     def find(target, options, conditions)
       mapping = target.is_a?(Clipper::Mappings::Mapping) ? target : repository.mappings[target]
 
-      repository.select(Query.new(mapping, options, conditions), self)
+      map_results(repository.select(Query.new(mapping, options, conditions), self))
     end
 
     def key(instance)
@@ -73,26 +68,6 @@ module Clipper
         field.get(instance)
       end
     end
-
-    # Session#get
-    #   z = orm.get(0) ---> yields z, with a brand new session instance
-    # Session#save(z), when z is a new instance
-    #   z = Zoo.new ---> z has no session assigned
-    #   z.name = "Slap"
-    #   orm.save(z)
-    #     repository.save(z, session)
-    #       z has no session, insert, read keys, set keys on z, add z to session.identity_map
-    #   orm.stored?(z)
-    #   => true
-    #
-    #  z.name = "Tester"
-    #  orm.save(z)
-    #     repository.save(z, session)
-    #       z has session, update
-    #
-    # z = orm.get(Zoo, 0)
-    # z has a new session, z exists in identity map
-
 
     def save(collection)
       collection = Collection.new(mappings[collection.class], [collection].flatten) unless collection.is_a?(Collection)
@@ -112,6 +87,17 @@ module Clipper
       instance.__session__ &&
         instance.__session__.repository == repository &&
         instance.__session__.identity_map.include?(instance)
+    end
+
+    private
+
+    def map_results(results)
+      results.each do |result|
+        result.instance_variable_set("@__session__", self)
+        self.identity_map.add(result)
+      end
+
+      results
     end
 
   end # class Session
