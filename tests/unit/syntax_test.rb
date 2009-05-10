@@ -4,7 +4,8 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class SyntaxTest < Test::Unit::TestCase
 
   def setup
-    @uri = Clipper::Uri.new("jdbc:sqlite:///tmp/syntax.db")
+    @sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
+    @uri = Clipper::Uri.new('jdbc:sqlite:///' + @sqlite_path + 'syntax.db')
     @repository = @uri.driver.new("default", @uri)
 
     @syntax = Clipper::Syntax::Sql.new(@repository)

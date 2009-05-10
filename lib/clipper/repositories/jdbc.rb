@@ -214,6 +214,41 @@ module Clipper
           end
         end
       end
+      
+      def delete(collection, session)
+        with_connection do |connection|
+          metadata = connection.getMetaData
+          supports_generated_keys = metadata.supportsGetGeneratedKeys
+
+          mapping = collection.mapping
+
+          fields = mapping.fields
+          key_fields = mapping.keys
+
+          statement = "DELETE FROM #{quote_identifier(collection.mapping.name)} "
+          statement << " WHERE ("
+          statement << key_fields.map { |field| quote_identifier(field.name) + " = ?"}.join(' AND ') 
+          statement << ")"
+
+          stmt = connection.prepareStatement(statement)
+
+          collection.each do |object|
+            result = nil
+
+            attributes = key_fields.map { |key_field| [key_field, key_field.get(object)] }
+
+            # TODO: Is this correct for deleting?
+#            logger.debug(statement + " -> #{attributes.transpose[1].inspect}")
+
+            attributes.each_with_index do |attribute, index|
+              bind_value_to_statement(stmt, index + 1, *attribute)
+            end
+
+            stmt.execute
+            stmt.close
+          end
+        end
+      end
 
       def create_table(mapping)
 
