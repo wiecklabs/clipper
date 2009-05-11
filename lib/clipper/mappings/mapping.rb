@@ -74,7 +74,12 @@ module Clipper
           associated_mapping = mapping.mappings[mapped_name]
           criteria = match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
 
-          __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__).first
+          # TODO: Side effect: Multiple calls w/ a nil association will run the fider each time.
+          if data = instance_variable_get("@__#{name}_instance__")
+            data
+          else
+            instance_variable_set("@__#{name}_instance__", __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__).first)
+          end
         end
 
         target.send(:define_method, "#{name}=") do |object|
@@ -97,7 +102,11 @@ module Clipper
           associated_mapping = mapping.mappings[mapped_name]
           criteria = match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
 
-          orm.find(associated_mapping, criteria.__options__, criteria.__conditions__)
+          if data = instance_variable_get("@__#{name}_collection__")
+            data
+          else
+            instance_variable_set("@__#{name}_collection__", __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__))
+          end
         end
       end
       alias have_many has_many

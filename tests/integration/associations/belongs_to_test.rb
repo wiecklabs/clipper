@@ -47,23 +47,28 @@ class BelongsToTest < Test::Unit::TestCase
     Clipper::close("default")
   end
 
-  def test_proxy_defines_getter_on_object
+  def test_belongs_to_defines_getter_on_object
     exhibit = Exhibit.new
     assert_respond_to(exhibit, :zoo)
   end
 
-  def test_proxy_method_returns_associated_object
+  def test_belongs_to_method_returns_associated_object
     exhibit = orm.get(Exhibit, 0)
     assert_kind_of(Zoo, exhibit.zoo)
     assert_equal(0, exhibit.zoo.id)
   end
 
-  def test_proxy_defines_setter_on_object
+  def test_has_many_getter_returns_same_instance
+    exhibit = orm.get(Exhibit, 0)
+    assert_equal(exhibit.zoo.object_id, exhibit.zoo.object_id)
+  end
+
+  def test_belongs_to_defines_setter_on_object
     exhibit = Exhibit.new
     assert_respond_to(exhibit, :zoo=)
   end
 
-  def test_proxy_sets_association_key
+  def test_belongs_to_sets_association_key
     exhibit = Exhibit.new
     orm.save(zoo = Zoo.new)
     assert_not_blank(zoo.id, "Zoo#id must not be blank")
