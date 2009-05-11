@@ -75,6 +75,13 @@ module Clipper
       result = repository.save(collection, self)
       result
     end
+    
+    def delete(collection)
+      collection = Collection.new(mappings[collection.class], [collection].flatten) unless collection.is_a?(Collection)
+      
+      result = repository.delete(collection, self)
+      result
+    end
 
     def validate(object, context_name = 'default')
       Clipper::validate(object, context_name)

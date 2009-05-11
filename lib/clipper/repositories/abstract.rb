@@ -34,6 +34,9 @@ module Clipper
 
       def update(collection)
       end
+    
+      def delete(collection)
+      end
 
       def close
       end
