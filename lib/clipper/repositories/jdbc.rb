@@ -74,7 +74,7 @@ module Clipper
           results_metadata = results.getMetaData
 
           while results.next
-            resource = query.mapping.target.new
+            resource = query.mapping.target.allocate
             resource.instance_variable_set("@__session__", session)
             values = (1..results_metadata.getColumnCount).zip(mapping_fields).map do |i, field|
               get_value_from_result_set(results, i, field.type)

@@ -53,9 +53,9 @@ module Clipper
 
     def session=(session)
       @session = session
-      each do |item|
-        item.instance_variable_set("@__session__", @session)
-      end
+      # each do |item|
+      #   item.instance_variable_set("@__session__", @session)
+      # end
     end
 
     def [](index)

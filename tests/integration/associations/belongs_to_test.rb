@@ -1,30 +1,12 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
 
+require Pathname(__FILE__).dirname + "sample_models"
+
 class BelongsToTest < Test::Unit::TestCase
 
   include Clipper::Session::Helper
-
-  class Zoo
-    include Clipper::Model
-
-    orm.map(self, "zoos") do |zoos|
-      zoos.key(zoos.field("id", Clipper::Types::Serial))
-    end
-  end
-
-  class Exhibit
-    include Clipper::Model
-
-    orm.map(self, "exhibits") do |exhibits|
-      exhibits.key(exhibits.field("id", Clipper::Types::Serial))
-      exhibits.field("zoo_id", Clipper::Types::Integer)
-
-      exhibits.belong_to('zoo', Zoo) do |exhibit, zoo|
-        zoo.id.eq(exhibit.zoo_id)
-      end
-    end
-  end
+  include Integration::SampleModels
 
   def setup
     Clipper::open("default", "jdbc:hsqldb:mem:test")
@@ -48,7 +30,7 @@ class BelongsToTest < Test::Unit::TestCase
   end
 
   def test_belongs_to_defines_getter_on_object
-    exhibit = Exhibit.new
+    exhibit = Exhibit.new('Emu')
     assert_respond_to(exhibit, :zoo)
   end
 
@@ -64,12 +46,12 @@ class BelongsToTest < Test::Unit::TestCase
   end
 
   def test_belongs_to_defines_setter_on_object
-    exhibit = Exhibit.new
+    exhibit = Exhibit.new('Giraffe')
     assert_respond_to(exhibit, :zoo=)
   end
 
   def test_belongs_to_sets_association_key
-    exhibit = Exhibit.new
+    exhibit = Exhibit.new('Buzzard')
     orm.save(zoo = Zoo.new)
     assert_not_blank(zoo.id, "Zoo#id must not be blank")
     exhibit.zoo = zoo
