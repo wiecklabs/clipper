@@ -111,11 +111,11 @@ module Integration::AbstractRepositoryTest
   ensure
     schema.destroy(@zoo)
   end
-  
+
   def test_delete_object
     schema = Clipper::Schema.new("default")
     schema.create(@zoo)
-    
+
     zoo = @zoo.new
     zoo.name = "Dallas"
     orm.save(zoo)
@@ -123,9 +123,11 @@ module Integration::AbstractRepositoryTest
     zoo = @zoo.new
     zoo.name = "Dallas2"
     orm.save(zoo)
-    
+
     assert_equal(2, orm.all(@zoo).size)
     orm.delete(zoo)
+
+    assert_equal(false, orm.stored?(zoo))
     assert_equal(1, orm.all(@zoo).size)
   ensure
     schema.destroy(@zoo)

@@ -237,15 +237,16 @@ module Clipper
 
             attributes = key_fields.map { |key_field| [key_field, key_field.get(object)] }
 
-            # TODO: Is this correct for deleting?
-#            logger.debug(statement + " -> #{attributes.transpose[1].inspect}")
-
             attributes.each_with_index do |attribute, index|
               bind_value_to_statement(stmt, index + 1, *attribute)
             end
 
             stmt.execute
             stmt.close
+
+            # TODO: This smells, but works for now
+            session.identity_map.remove(object)
+            object.__session__.identity_map.remove(object)
           end
         end
       end
