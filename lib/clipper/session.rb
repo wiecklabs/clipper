@@ -69,16 +69,60 @@ module Clipper
       end
     end
 
-    def save(collection)
-      collection = Collection.new(mappings[collection.class], [collection].flatten) unless collection.is_a?(Collection)
+    def save(instance)
+      collection = instance.is_a?(Collection) ? instance : Collection.new(mappings[instance.class], [instance].flatten)
 
-      result = repository.save(collection, self)
-      result
+      save_cascade(collection)
     end
-    
+
+    def save_cascade(collection, visited = [])
+      return if visited.include?(collection)
+
+      collection = collection.is_a?(Collection) ? collection : Collection.new(mappings[collection.class], [collection].flatten)
+
+      repository.save(collection, self)
+
+      visited << collection
+      collection.each do |item|
+        visited << self.key(item)
+      end
+
+      collection.mapping.associations.each do |association|
+        case association
+        when Mappings::BelongsTo then
+          collection.each do |item|
+            data = association.get(item)
+            return if data.nil?
+            return if visited.include?(self.key(data))
+
+            if data
+              save_cascade(data, visited)
+              association.set_key(item, data)
+              
+              # This should really only be called if the item was new to begin with
+              save(item)
+            end
+          end
+        when Mappings::HasMany then
+          collection.each do |item|
+            data = association.get(item)
+            next if visited.include?(data)
+
+            data.each do |associated_item|
+              association.set_key(item, associated_item)
+            end
+
+            save_cascade(data, visited)
+          end
+        end
+      end
+
+      collection
+    end
+
     def delete(collection)
       collection = Collection.new(mappings[collection.class], [collection].flatten) unless collection.is_a?(Collection)
-      
+
       result = repository.delete(collection, self)
       result
     end

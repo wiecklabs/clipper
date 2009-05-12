@@ -11,6 +11,9 @@ module Clipper
       class MultipleKeyError < StandardError
       end
 
+      class DuplicateAssociationError < StandardError
+      end
+
       def initialize(mappings, target, name)
         raise ArgumentError.new("Mapping#target must be a Class") unless target.kind_of?(Class)
         @target = target
@@ -22,6 +25,7 @@ module Clipper
         @mappings = mappings
         @fields = java.util.LinkedHashSet.new
         @key = java.util.LinkedHashSet.new
+        @associations = java.util.LinkedHashSet.new
       end
 
       # The name of this mapping. In database terms this would map to a
@@ -37,6 +41,10 @@ module Clipper
 
       def mappings
         @mappings
+      end
+      
+      def associations
+        @associations
       end
 
       def field(name, type, default_value = nil)
@@ -68,46 +76,12 @@ module Clipper
       end
 
       def belongs_to(name, mapped_name, &match_criteria)
-        mapping = self
-
-        target.send(:define_method, name) do
-          associated_mapping = mapping.mappings[mapped_name]
-          criteria = match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
-
-          # TODO: Side effect: Multiple calls w/ a nil association will run the fider each time.
-          if data = instance_variable_get("@__#{name}_instance__")
-            data
-          else
-            instance_variable_set("@__#{name}_instance__", __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__).first)
-          end
-        end
-
-        target.send(:define_method, "#{name}=") do |object|
-          associated_mapping = mapping.mappings[mapped_name]
-
-          mapping_criteria = Clipper::Query::Criteria.new(mapping)
-          criteria = match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(associated_mapping))
-
-          c = criteria.__conditions__
-          c.value.field.set(self, c.field.get(object))
-        end
+        add_association BelongsTo.new(self, name, mapped_name, &match_criteria)
       end
-
       alias belong_to belongs_to
 
       def has_many(name, mapped_name, &match_criteria)
-        mapping = self
-
-        target.send(:define_method, name) do
-          associated_mapping = mapping.mappings[mapped_name]
-          criteria = match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
-
-          if data = instance_variable_get("@__#{name}_collection__")
-            data
-          else
-            instance_variable_set("@__#{name}_collection__", __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__))
-          end
-        end
+        add_association HasMany.new(self, name, mapped_name, &match_criteria)
       end
       alias have_many has_many
 
@@ -131,6 +105,19 @@ module Clipper
       def keys
         @key
       end
+
+      private
+
+      def add_association(association)
+        if @associations.include?(association)
+          raise DuplicateAssociationError.new("Association #{association} is already a member of Mapping #{name.inspect}")
+        else
+          @associations << association
+          association.class.bind!(association, target)
+          association
+        end
+      end
+      
 
     end
   end

@@ -51,7 +51,6 @@ module Clipper
         statement << " OFFSET #{query.offset}" if query.offset
 
         collection = Clipper::Collection.new(query.mapping, [])
-        collection.session = session
 
         with_connection do |connection|
           if query.paramaters.empty?

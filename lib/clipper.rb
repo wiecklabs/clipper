@@ -14,17 +14,19 @@ require Pathname(__FILE__).dirname + "wieck" + "string"
 
 
 require Pathname(__FILE__).dirname + "clipper" + "uri"
-
 require Pathname(__FILE__).dirname + "clipper" + "model"
-
 require Pathname(__FILE__).dirname + "clipper" + "accessors"
-
 require Pathname(__FILE__).dirname + "clipper" + "hooks"
+require Pathname(__FILE__).dirname + "clipper" + "collection"
 
 require Pathname(__FILE__).dirname + "clipper" + "type"
 require Pathname(__FILE__).dirname + "clipper" + "types"
 require Pathname(__FILE__).dirname + "clipper" + "mappings" + "mapping"
 require Pathname(__FILE__).dirname + "clipper" + "mappings" + "relation"
+
+require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "association"
+require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "belongs_to"
+require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "has_many"
 
 require Pathname(__FILE__).dirname + "clipper" + "validations"
 require Pathname(__FILE__).dirname + "clipper" + "validations" + "validator"
@@ -53,7 +55,6 @@ require Pathname(__FILE__).dirname + "clipper" + "query" + "criteria"
 require Pathname(__FILE__).dirname + "clipper" + "syntax" + "sql"
 
 require Pathname(__FILE__).dirname + "clipper" + "session"
-require Pathname(__FILE__).dirname + "clipper" + "collection"
 require Pathname(__FILE__).dirname + "clipper" + "identity_map"
 require Pathname(__FILE__).dirname + "clipper" + "mappings"
 require Pathname(__FILE__).dirname + "clipper" + "schema"
