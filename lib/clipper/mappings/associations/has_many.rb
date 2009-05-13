@@ -12,6 +12,8 @@ module Clipper
 
       def add(item)
         super
+
+        @parent.__session__.enlist(item) if @parent.__session__
         @association.set_key(@parent, item)
 
         item
@@ -42,25 +44,60 @@ module Clipper
         c.field.set(child, c.value.field.get(parent))
       end
 
+      def unlink(parent, child)
+        mapping_criteria = Clipper::Query::Criteria.new(self.mapping)
+        criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
+
+        c = criteria.__conditions__
+        c.field.set(child, nil)
+      end
+
+      def load(instance)
+        criteria = self.match_criteria.call(instance, Clipper::Query::Criteria.new(self.associated_mapping))
+
+        instance.__session__.find(self.associated_mapping, criteria.__options__, criteria.__conditions__)
+      end
+
       def to_s
         "<#{self.class.name} Mapping: #{mapping.name} have_many #{name}>"
       end
 
-      def self.bind!(association, target)
-        target.send(:define_method, association.name) do
-          associated_mapping = association.associated_mapping
-          criteria = association.match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
+      def instance_variable_name
+        "@__#{self.name}_collection__"
+      end
 
-          if data = instance_variable_get("@__#{association.name}_collection__")
+      def self.bind!(association, target)
+        target.send(:define_method, association.getter) do
+
+          if data = instance_variable_get(association.instance_variable_name)
             data
           else
             if __session__
-              data = __session__.find(associated_mapping, criteria.__options__, criteria.__conditions__)
-              instance_variable_set("@__#{association.name}_collection__", HasManyCollection.new(association, self, data))
+              instance_variable_set(association.instance_variable_name, HasManyCollection.new(association, self, association.load(self)))
             else
-              instance_variable_set("@__#{association.name}_collection__", HasManyCollection.new(association, self, Collection.new(association.associated_mapping, [])))
+              instance_variable_set(association.instance_variable_name, HasManyCollection.new(association, self, [])) #Collection.new(association.associated_mapping, [])))
             end
           end
+        end
+
+        target.send(:define_method, association.setter) do |new_value|
+          raise ArgumentError.new("#{self.class}.#{association.setter} only accepts enumerables") unless new_value.is_a?(Enumerable)
+
+          if items = self.send(association.getter)
+            if __session__
+              items.each do |item|
+                association.unlink(self, item)
+                __session__.enlist(item)
+              end
+            end
+          end
+
+          new_value.each do |item|
+            association.set_key(self, item)
+            self.__session__.enlist(item) if self.__session__
+          end
+
+          instance_variable_set(association.instance_variable_name, HasManyCollection.new(association, self, new_value))
         end
       end
     end

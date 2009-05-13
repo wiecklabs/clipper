@@ -25,10 +25,10 @@ class Integration::SessionTest < Test::Unit::TestCase
     Clipper::close("default")
   end
 
-  def test_session_save_should_return_true
+  def test_session_save_should_return_session
     zoo = Zoo.new
     zoo.name = "Dallas"
-    assert(orm.save(zoo))
+    assert_kind_of(Clipper::Session, orm.save(zoo))
   end
 
   def test_session_save_should_update_existing_data

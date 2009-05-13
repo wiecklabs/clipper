@@ -14,7 +14,9 @@ module Clipper
     end
 
     def eql?(other)
-      (@__session__ && other.__session__) && (@__session__.key(self) == other.__session__.key(other))
+      return super unless @__session__
+
+      (@__session__ && other.__session__) && @__session__.stored?(self) && other.__session__.stored?(other) && (@__session__.key(self) == other.__session__.key(other))
     end
     alias == eql?
 

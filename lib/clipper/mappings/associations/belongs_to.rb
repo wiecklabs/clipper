@@ -30,6 +30,14 @@ module Clipper
         c.value.field.set(parent, c.field.get(child))
       end
 
+      def unlink(parent)
+        mapping_criteria = Clipper::Query::Criteria.new(self.mapping)
+        criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
+
+        c = criteria.__conditions__
+        c.value.field.set(parent, nil)
+      end
+
       def self.bind!(association, target)
 
         target.send(:define_method, association.getter) do
@@ -45,8 +53,15 @@ module Clipper
         end
 
         target.send(:define_method, association.setter) do |object|
-          association.set_key(self, object)
-          instance_variable_set(association.instance_variable_name, object)
+          if object
+            association.set_key(self, object)
+            __session__.enlist(object) if __session__
+            instance_variable_set(association.instance_variable_name, object)
+          else
+            association.unlink(self)
+            __session__.enlist(self)
+            instance_variable_set(association.instance_variable_name, nil)
+          end
         end
       end
     end

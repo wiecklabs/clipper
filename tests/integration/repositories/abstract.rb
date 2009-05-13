@@ -16,6 +16,10 @@ module Integration::AbstractRepositoryTest
         zoos.field "state", Clipper::Types::String.new(200)
         zoos.field "notes", Clipper::Types::Text
       end
+
+      def initialize(name)
+        self.name = name
+      end
     end
 
     @climate = Class.new do
@@ -102,10 +106,14 @@ module Integration::AbstractRepositoryTest
   def test_save_object
     schema = Clipper::Schema.new("default")
     schema.create(@zoo)
-    zoo = @zoo.new
-    zoo.name = "Dallas"
 
-    assert_nothing_raised { orm.save(zoo) }
+    zoo = @zoo.new('Dallas')
+
+    orm do |session|
+      session << zoo
+      session
+    end
+
     assert_not_nil(zoo.id)
 
   ensure
@@ -116,18 +124,47 @@ module Integration::AbstractRepositoryTest
     schema = Clipper::Schema.new("default")
     schema.create(@zoo)
 
-    zoo = @zoo.new
-    zoo.name = "Dallas"
-    orm.save(zoo)
+    dallas_zoo = @zoo.new('Dallas')
+    ftworth_zoo = @zoo.new('Ft Worth')
 
-    zoo = @zoo.new
-    zoo.name = "Dallas2"
-    orm.save(zoo)
+    orm do |session|
+      session << dallas_zoo
+      session << ftworth_zoo
+    end
 
+    assert_equal(true, orm.stored?(dallas_zoo))
     assert_equal(2, orm.all(@zoo).size)
-    orm.delete(zoo)
 
-    assert_equal(false, orm.stored?(zoo))
+    orm.delete(dallas_zoo)
+
+    assert_equal(false, orm.stored?(dallas_zoo))
+    assert_equal(1, orm.all(@zoo).size)
+
+    ftworth_zoo = orm.get(@zoo, ftworth_zoo.id)
+    assert_equal('Ft Worth', ftworth_zoo.name)
+  ensure
+    schema.destroy(@zoo)
+  end
+
+  def test_deleting_a_new_object
+    schema = Clipper::Schema.new("default")
+    schema.create(@zoo)
+
+    dallas_zoo = @zoo.new('Dallas')
+    ftworth_zoo = @zoo.new('Ft Worth')
+
+    orm.save(dallas_zoo)
+
+    # Force the ID of the ftworth_zoo to be equal to the dallas_zoo.  Deleting
+    # the ftworth_zoo zoo shouldn't do anything since its NEW
+    ftworth_zoo.id = dallas_zoo.id
+
+    assert_equal(1, orm.all(@zoo).size)
+
+    orm do |session|
+      session.delete(ftworth_zoo)
+    end
+
     assert_equal(1, orm.all(@zoo).size)
   ensure
     schema.destroy(@zoo)
@@ -173,25 +210,26 @@ module Integration::AbstractRepositoryTest
     schema.destroy(@article) rescue nil
   end
 
-  def test_insert_multiple_records
-    schema = Clipper::Schema.new("default")
-    schema.create(@person)
-
-    person1 = @person.new
-    person1.name = "John"
-
-    person2 = @person.new
-    person2.name = "Jane"
-
-    people = Clipper::Collection.new(Clipper::Mappings["default"][@person], [person1, person2])
-
-    orm.save(people)
-
-    assert_not_nil(person1.id)
-    assert_not_nil(person2.id)
-  ensure
-    schema.destroy(@person)
-  end
+  # TODO: Reimplement support for batch-insert
+  # def test_insert_multiple_records
+  #   schema = Clipper::Schema.new("default")
+  #   schema.create(@person)
+  # 
+  #   person1 = @person.new
+  #   person1.name = "John"
+  # 
+  #   person2 = @person.new
+  #   person2.name = "Jane"
+  # 
+  #   people = Clipper::Collection.new(Clipper::Mappings["default"][@person], [person1, person2])
+  # 
+  #   orm.save(people)
+  # 
+  #   assert_not_nil(person1.id)
+  #   assert_not_nil(person2.id)
+  # ensure
+  #   schema.destroy(@person)
+  # end
 
   def test_get_object
     schema = Clipper::Schema.new("default")

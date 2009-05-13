@@ -74,7 +74,6 @@ module Clipper
 
           while results.next
             resource = query.mapping.target.allocate
-            resource.instance_variable_set("@__session__", session)
             values = (1..results_metadata.getColumnCount).zip(mapping_fields).map do |i, field|
               get_value_from_result_set(results, i, field.type)
             end
@@ -105,13 +104,6 @@ module Clipper
         else
           results.getObject(index)
         end
-      end
-
-      def save(collection, session)
-        update(collection.stored_entries, session)
-        create(collection.new_entries, session)
-
-        collection
       end
 
       def create(collection, session)
@@ -158,11 +150,12 @@ module Clipper
               result = generated_keys(connection)
 
               serial_key.set(object, result) if serial_key && result
+
+              session.identity_map.add(object)
             end
 
             # HACK: Find a better way to do this
-            object.instance_variable_set("@__session__", session)
-            session.identity_map.add(object)
+            # object.instance_variable_set("@__session__", session)
           end
 
           if supports_generated_keys
@@ -171,7 +164,10 @@ module Clipper
             if serial_key
               keys = generated_keys(connection, stmt)
 
-              collection.zip(keys) { |object, value| serial_key.set(object, value) }
+              collection.zip(keys) do |object, value|
+                serial_key.set(object, value)
+                session.identity_map.add(object)
+              end
             end
 
             stmt.close

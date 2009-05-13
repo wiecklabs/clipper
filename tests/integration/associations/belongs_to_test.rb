@@ -39,7 +39,7 @@ class BelongsToTest < Test::Unit::TestCase
   end
 
   def test_belongs_to_method_returns_associated_object
-    zoo = Zoo.new
+    zoo = Zoo.new('Dallas')
     orm.save(zoo)
 
     exhibit = Exhibit.new('Panda')
@@ -52,7 +52,7 @@ class BelongsToTest < Test::Unit::TestCase
   end
 
   def test_has_many_getter_returns_same_instance
-    zoo = Zoo.new
+    zoo = Zoo.new('Dallas')
     orm.save(zoo)
 
     exhibit = Exhibit.new('Panda')
@@ -70,25 +70,35 @@ class BelongsToTest < Test::Unit::TestCase
   
   def test_sets_child_key_when_objects_are_new
     exhibit = Exhibit.new('Buzzard')
-    zoo = Zoo.new
+    zoo = Zoo.new('Dallas')
     exhibit.zoo = zoo
-  
+
     orm.save(exhibit)
-  
+
     assert_not_nil(exhibit.zoo_id)
     assert_equal(exhibit.zoo_id, zoo.id)
   end
-  
+
   def test_belongs_to_sets_association_key
     exhibit = Exhibit.new('Buzzard')
-    orm.save(zoo = Zoo.new)
+    zoo = Zoo.new('Dallas')
+
+    orm.save(exhibit)
+    orm.save(zoo)
+
     assert_not_blank(zoo.id, "Zoo#id must not be blank")
+
     exhibit.zoo = zoo
     assert_equal(zoo.id, exhibit.zoo_id)
+
     orm.save(exhibit)
-  
-    exhibit = orm.get(Exhibit, exhibit.id)
-    assert_not_nil(exhibit.zoo)
+
+    orm do |session|
+      exhibit = session.get(Exhibit, exhibit.id)
+      zoo = session.get(Zoo, zoo.id)
+    end
+
+    assert_equal(zoo.id, exhibit.zoo_id)
     assert_equal(exhibit.zoo, zoo)
   end
 end

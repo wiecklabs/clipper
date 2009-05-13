@@ -15,6 +15,10 @@ module Integration::SampleModels
       end
     end
 
+    def initialize(name)
+      self.name = name
+    end
+
   end
 
   class Exhibit
