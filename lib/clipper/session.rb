@@ -90,21 +90,6 @@ module Clipper
                 end
               end
             end
-          # when :update then
-          #   collection = work_order[1].is_a?(Collection) ? work_order[1] : Collection.new(@session.mappings[work_order[1].class], [work_order[1]].flatten)
-          #   @session.repository.update(collection, @session)
-          # 
-          #   @session.mappings[work_order[1].class].associations.each do |association|
-          #     next unless association.is_a?(Clipper::Mappings::HasMany)
-          # 
-          #     # Since we just created the instance, we need to ensure that all of associated items know about
-          #     # its parent's key
-          #     collection.each do |instance|
-          #       association.get(instance).each do |associated_instance|
-          #         association.set_key(instance, associated_instance)
-          #       end
-          #     end
-          #   end
           when :delete then
             collection = work_order[1].is_a?(Collection) ? work_order[1] : Collection.new(@session.mappings[work_order[1].class], [work_order[1]].flatten)
             @session.repository.delete(collection, @session)
@@ -202,64 +187,6 @@ module Clipper
         field.get(instance)
       end
     end
-
-    # def save(instance)
-    #   self << instance
-    # 
-    #   @unit_of_work.flush if @flush_immediately
-    # end
-
-    # def save_cascade(collection, visited = [])
-    #   return if visited.include?(collection)
-    # 
-    #   collection = collection.is_a?(Collection) ? collection : Collection.new(mappings[collection.class], [collection].flatten)
-    # 
-    #   repository.save(collection, self)
-    # 
-    #   visited << collection
-    #   collection.each do |item|
-    #     visited << self.key(item)
-    #   end
-    # 
-    #   collection.mapping.associations.each do |association|
-    #     case association
-    #     when Mappings::BelongsTo then
-    #       collection.each do |item|
-    #         data = association.get(item)
-    #         return if data.nil?
-    #         return if visited.include?(self.key(data))
-    # 
-    #         if data
-    #           save_cascade(data, visited)
-    #           association.set_key(item, data)
-    # 
-    #           # This should really only be called if the item was new to begin with
-    #           save(item)
-    #         end
-    #       end
-    #     when Mappings::HasMany then
-    #       collection.each do |item|
-    #         data = association.get(item)
-    #         next if visited.include?(data)
-    # 
-    #         data.each do |associated_item|
-    #           association.set_key(item, associated_item)
-    #         end
-    # 
-    #         save_cascade(data, visited)
-    #       end
-    #     end
-    #   end
-    # 
-    #   collection
-    # end
-
-    # def delete(collection)
-    #   collection = Collection.new(mappings[collection.class], [collection].flatten) unless collection.is_a?(Collection)
-    #   
-    #   result = repository.delete(collection, self)
-    #   result
-    # end
 
     def validate(object, context_name = 'default')
       Clipper::validate(object, context_name)
