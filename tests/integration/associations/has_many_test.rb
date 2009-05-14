@@ -101,10 +101,7 @@ class HasManyTest < Test::Unit::TestCase
   def test_setter_accepts_array_of_new_objects
     zoo = Zoo.new('Dallas')
     zoo.exhibits = [Exhibit.new('Bat'), Exhibit.new('Yak'), Exhibit.new('Rhino')]
-
-    orm do |session|
-      session << zoo
-    end
+    orm.save(zoo)
 
     zoo = orm.get(Zoo, zoo.id)
 
@@ -112,22 +109,17 @@ class HasManyTest < Test::Unit::TestCase
   end
 
   def test_setter_clears_existing_associations
-    orm do |session|
-      zoo = Zoo.new('Dallas')
-      zoo.exhibits = [Exhibit.new('Bat'), Exhibit.new('Yak'), Exhibit.new('Rhino')]
+    zoo = Zoo.new('Dallas')
+    zoo.exhibits = [Exhibit.new('Bat'), Exhibit.new('Yak'), Exhibit.new('Rhino')]
+    orm.save(zoo)
 
-      session << zoo
-    end
-
-    orm do |session|
-      zoo = session.get(Zoo, 0)
-      zoo.exhibits = [Exhibit.new('Snake')]
-
-      session << zoo
-    end
+    zoo = orm.get(Zoo, 0)
+    zoo.exhibits = [Exhibit.new('Snake')]
+    orm.save(zoo)
 
     zoo = orm.get(Zoo, 0)
     assert_equal(1, zoo.exhibits.size)
+    assert_equal(4, orm.all(Exhibit).size)
   end
 
 end
