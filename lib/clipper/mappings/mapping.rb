@@ -75,15 +75,21 @@ module Clipper
         @fields.detect { |field| field.name == name }
       end
 
-      def belongs_to(name, mapped_name, &match_criteria)
-        add_association BelongsTo.new(self, name, mapped_name, &match_criteria)
+      def many_to_one(name, mapped_name, &match_criteria)
+        add_association ManyToOne.new(self, name, mapped_name, &match_criteria)
       end
-      alias belong_to belongs_to
+      alias belongs_to many_to_one
+      alias belong_to many_to_one
 
-      def has_many(name, mapped_name, &match_criteria)
-        add_association HasMany.new(self, name, mapped_name, &match_criteria)
+      def one_to_many(name, mapped_name, &match_criteria)
+        add_association OneToMany.new(self, name, mapped_name, &match_criteria)
       end
-      alias have_many has_many
+      alias has_many one_to_many
+      alias have_many one_to_many
+
+      def many_to_many(name, mapped_name, join_mapping_name)
+        add_association ManyToMany.new(self, name, mapped_name, join_mapping_name)
+      end
 
       def eql?(other)
         other.is_a?(Mapping) && name == other.name

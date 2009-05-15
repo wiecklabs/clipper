@@ -66,6 +66,10 @@ module Clipper
         @type
       end
 
+      def default
+        @default
+      end
+
       def eql?(other)
         other.is_a?(Field) && mapping == other.mapping && type.class == other.type.class && name == other.name
       end

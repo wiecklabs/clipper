@@ -2,7 +2,7 @@ require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
 require Pathname(__FILE__).dirname + "sample_models"
 
-class HasManyTest < Test::Unit::TestCase
+class OneToManyTest < Test::Unit::TestCase
 
   include Clipper::Session::Helper
   include Integration::SampleModels
@@ -11,13 +11,11 @@ class HasManyTest < Test::Unit::TestCase
     Clipper::open("default", "jdbc:hsqldb:mem:test")
 
     @schema = Clipper::Schema.new("default")
-    @schema.create(Zoo)
-    @schema.create(Exhibit)
+    Clipper::Mappings['default'].each { |mapping| @schema.create(mapping.target) rescue true }
   end
 
   def teardown
-    @schema.destroy(Zoo)
-    @schema.destroy(Exhibit)
+    Clipper::Mappings['default'].each { |mapping| @schema.destroy(mapping.target) rescue true }
     Clipper::close("default")
   end
 

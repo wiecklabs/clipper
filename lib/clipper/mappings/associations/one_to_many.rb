@@ -1,7 +1,7 @@
 module Clipper
   class Mappings
 
-    class HasManyCollection < ::Clipper::Collection
+    class OneToManyCollection < ::Clipper::Collection
 
       def initialize(association, parent, children)
         @association = association
@@ -22,7 +22,7 @@ module Clipper
 
     end
 
-    class HasMany < Association
+    class OneToMany < Association
 
       def initialize(mapping, name, mapped_name, &match_criteria)
         @mapping = mapping
@@ -73,9 +73,9 @@ module Clipper
             data
           else
             if __session__
-              instance_variable_set(association.instance_variable_name, HasManyCollection.new(association, self, association.load(self)))
+              instance_variable_set(association.instance_variable_name, OneToManyCollection.new(association, self, association.load(self)))
             else
-              instance_variable_set(association.instance_variable_name, HasManyCollection.new(association, self, [])) #Collection.new(association.associated_mapping, [])))
+              instance_variable_set(association.instance_variable_name, OneToManyCollection.new(association, self, [])) #Collection.new(association.associated_mapping, [])))
             end
           end
         end
@@ -97,7 +97,7 @@ module Clipper
             self.__session__.enlist(item) if self.__session__
           end
 
-          instance_variable_set(association.instance_variable_name, HasManyCollection.new(association, self, new_value))
+          instance_variable_set(association.instance_variable_name, OneToManyCollection.new(association, self, new_value))
         end
       end
     end

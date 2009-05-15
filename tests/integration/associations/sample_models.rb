@@ -1,6 +1,7 @@
 module Integration::SampleModels
 
   class Zoo; end
+  class ZooKeeper; end
   class Exhibit; end
 
   class Zoo
@@ -13,6 +14,22 @@ module Integration::SampleModels
       zoos.have_many('exhibits', Exhibit) do |zoo, exhibit|
         exhibit.zoo_id.eq(zoo.id)
       end
+    end
+
+    def initialize(name)
+      self.name = name
+    end
+
+  end
+
+  class ZooKeeper
+    include Clipper::Model
+
+    orm.map(self, 'zoo_keepers') do |zoo_keepers|
+      zoo_keepers.key(zoo_keepers.field('id', Clipper::Types::Serial))
+      zoo_keepers.field('name', Clipper::Types::String.new(200))
+
+      zoo_keepers.many_to_many('exhibits', Exhibit, 'exhibits_zoo_keepers')
     end
 
     def initialize(name)

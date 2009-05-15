@@ -1,7 +1,7 @@
 module Clipper
   class Mappings
 
-    class BelongsTo < Association
+    class ManyToOne < Association
 
       def initialize(mapping, name, mapped_name, &match_criteria)
         @mapping = mapping

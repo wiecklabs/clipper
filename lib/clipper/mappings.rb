@@ -10,6 +10,16 @@ module Clipper
     end
 
     include Enumerable
+    include Hooks
+
+    # This lets us defer mapping of Many-To-Many join-maps
+    after :map do |mappings|
+      newest_map = mappings.entries.last.target
+
+      while (callback = mappings.map_callbacks[newest_map].shift)
+        callback.call(mappings.entries.last)
+      end
+    end
 
     class << self
       def [](repository_name)
@@ -19,7 +29,9 @@ module Clipper
     end
 
     def initialize
-      @mappings = {}
+      @mappings = java.util.LinkedHashMap.new
+
+      @map_callbacks = Hash.new { |h, k| h[k] = [] }
     end
 
     def [](mapped_class)
@@ -41,6 +53,15 @@ module Clipper
       self << mapping
       mapping
     end
+
+    def map_callbacks
+      @map_callbacks
+    end
+
+    def register_map_callback(mapped_name, &callback)
+      @map_callbacks[mapped_name] << callback
+    end
+
 
   end
 end
