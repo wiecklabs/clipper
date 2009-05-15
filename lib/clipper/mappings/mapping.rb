@@ -42,7 +42,7 @@ module Clipper
       def mappings
         @mappings
       end
-      
+
       def associations
         @associations
       end
@@ -61,6 +61,9 @@ module Clipper
       def key(*fields)
         if @key.empty?
           fields.each do |field|
+            unless field.is_a?(Field)
+              raise ArgumentError.new("+fields+ must contain only Field instances, but was #{fields.inspect}")
+            end
             @fields << field unless @fields.include?(field)
             @key << field
           end
@@ -123,7 +126,6 @@ module Clipper
           association
         end
       end
-      
 
     end
   end

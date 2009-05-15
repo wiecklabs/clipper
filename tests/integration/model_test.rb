@@ -9,7 +9,7 @@ class Integration::ModelTest < Test::Unit::TestCase
     include Clipper::Model
 
     orm.map(self, "zoos") do |zoos|
-      zoos.key "id", Integer
+      zoos.key zoos.field("id", Clipper::Types::Serial.new)
       zoos.field "name", Clipper::Types::String.new(200)
     end
   end

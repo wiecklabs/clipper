@@ -40,16 +40,17 @@ module Clipper
         mapping_criteria = Clipper::Query::Criteria.new(self.mapping)
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
-        c = criteria.__conditions__
-        c.field.set(child, c.value.field.get(parent))
+        conditions = criteria.__conditions__
+        p conditions
+        conditions.field.set(child, conditions.value.field.get(parent))
       end
 
       def unlink(parent, child)
         mapping_criteria = Clipper::Query::Criteria.new(self.mapping)
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
-        c = criteria.__conditions__
-        c.field.set(child, nil)
+        conditions = criteria.__conditions__
+        conditions.field.set(child, nil)
       end
 
       def load(instance)

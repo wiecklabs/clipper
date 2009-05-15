@@ -10,12 +10,18 @@ class OneToManyTest < Test::Unit::TestCase
   def setup
     Clipper::open("default", "jdbc:hsqldb:mem:test")
 
-    @schema = Clipper::Schema.new("default")
-    Clipper::Mappings['default'].each { |mapping| @schema.create(mapping.target) rescue true }
+    schema = Clipper::Schema.new("default")
+    schema.create(Zoo)
+    schema.create(ZooKeeper)
+    schema.create(Exhibit)
   end
 
   def teardown
-    Clipper::Mappings['default'].each { |mapping| @schema.destroy(mapping.target) rescue true }
+    schema = Clipper::Schema.new("default")
+    schema.destroy(Zoo)
+    schema.destroy(ZooKeeper)
+    schema.destroy(Exhibit)
+
     Clipper::close("default")
   end
 

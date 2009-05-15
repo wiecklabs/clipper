@@ -43,13 +43,21 @@ module Clipper
       end
 
       def get(object)
-        raise ArgumentError.new("Field#get must receive an instance of its declared Mapping target") unless object.is_a?(@mapping.target)
+        unless object.is_a?(@mapping.target)
+          raise ArgumentError.new(
+            "Field#get must receive an instance of #{@mapping.target} but recieved #{object.inspect}"
+          )
+        end
 
         object.send(self.name)
       end
 
       def set(object, value)
-        raise ArgumentError.new("Field#get must receive an instance of its declared Mapping target") unless object.is_a?(@mapping.target)
+        unless object.is_a?(@mapping.target)
+          raise ArgumentError.new(
+            "Field#set must receive an instance of #{@mapping.target} but recieved #{object.inspect}"
+          )
+        end
 
         object.send(self.name + "=", value)
       end

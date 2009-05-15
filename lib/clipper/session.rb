@@ -1,7 +1,7 @@
 module Clipper
 
   class Session
-    
+
     class UnitOfWork
 
       def initialize(session, flush_immediately = false)
