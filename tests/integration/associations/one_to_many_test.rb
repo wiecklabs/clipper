@@ -1,6 +1,6 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
-require Pathname(__FILE__).dirname + "sample_models"
+require Pathname(__FILE__).dirname.parent + "sample_models"
 
 class OneToManyTest < Test::Unit::TestCase
 

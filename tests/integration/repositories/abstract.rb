@@ -1,15 +1,12 @@
 module Integration::AbstractRepositoryTest
 
-  # class Zoo
-  # end
-
   include Clipper::Session::Helper
 
   def setup_abstract
     @zoo = Class.new do
       include Clipper::Model
 
-      Clipper::Mappings["default"].map(self, "zoos") do |zoos|
+      Clipper::Mappings["default"].map(self, "abstract_zoos") do |zoos|
         zoos.key zoos.field("id", Clipper::Types::Serial)
         zoos.field "name", Clipper::Types::String.new(200)
         zoos.field "city", Clipper::Types::String.new(200)

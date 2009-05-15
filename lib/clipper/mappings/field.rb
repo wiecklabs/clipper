@@ -45,7 +45,7 @@ module Clipper
       def get(object)
         unless object.is_a?(@mapping.target)
           raise ArgumentError.new(
-            "Field#get must receive an instance of #{@mapping.target} but recieved #{object.inspect}"
+            "Field#get (#{mapping.name}.#{self.name}) must receive an instance of #{@mapping.target} but recieved #{object.inspect}"
           )
         end
 

@@ -26,8 +26,8 @@ module Clipper
         mapping_criteria = Clipper::Query::Criteria.new(self.mapping)
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
-        c = criteria.__conditions__
-        c.value.field.set(parent, c.field.get(child))
+        conditions = criteria.__conditions__
+        conditions.value.field.set(parent, conditions.field.get(child))
       end
 
       def unlink(parent)
@@ -44,7 +44,7 @@ module Clipper
           associated_mapping = association.associated_mapping
           criteria = association.match_criteria.call(self, Clipper::Query::Criteria.new(associated_mapping))
 
-          # TODO: Side effect: Multiple calls w/ a nil association will run the fider each time.
+          # TODO: Side effect: Multiple calls w/ a nil association will run the finder each time.
           if data = instance_variable_get(association.instance_variable_name)
             data
           else

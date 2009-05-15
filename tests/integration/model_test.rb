@@ -1,18 +1,11 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent + "helper"
+require Pathname(__FILE__).dirname + "sample_models"
 
 class Integration::ModelTest < Test::Unit::TestCase
 
   include Clipper::Session::Helper
-
-  class Zoo
-    include Clipper::Model
-
-    orm.map(self, "zoos") do |zoos|
-      zoos.key zoos.field("id", Clipper::Types::Serial.new)
-      zoos.field "name", Clipper::Types::String.new(200)
-    end
-  end
+  include Integration::SampleModels
 
   def setup
     Clipper.open("default", "jdbc:hsqldb://#{Pathname(__FILE__).dirname.expand_path + "sqlite.db"}")
@@ -23,7 +16,7 @@ class Integration::ModelTest < Test::Unit::TestCase
   end
 
   def test_new_record
-    assert(!(orm.stored? Zoo.new))
+    assert(!(orm.stored? City.new('Dallas')))
   end
 
 end

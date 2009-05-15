@@ -1,7 +1,6 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
-
-require Pathname(__FILE__).dirname + "sample_models"
+require Pathname(__FILE__).dirname.parent + "sample_models"
 
 class ManyToOneTest < Test::Unit::TestCase
 
@@ -27,42 +26,42 @@ class ManyToOneTest < Test::Unit::TestCase
   end
 
   def test_can_only_be_defined_once
-
+  
     assert_raise(Clipper::Mappings::Mapping::DuplicateAssociationError) do
       # This association is already defined
       Clipper::Mappings['default'][Exhibit].belong_to('zoo', Zoo) do |exhibit, zoo|
         zoo.id.eq(exhibit.zoo_id)
       end
     end
-
+  
   end
-
+  
   def test_belongs_to_defines_getter_on_object
     exhibit = Exhibit.new('Emu')
     assert_respond_to(exhibit, :zoo)
   end
-
+  
   def test_belongs_to_method_returns_associated_object
     zoo = Zoo.new('Dallas')
     orm.save(zoo)
-
+  
     exhibit = Exhibit.new('Panda')
     exhibit.zoo_id = zoo.id
     orm.save(exhibit)
-
+  
     exhibit = orm.get(Exhibit, 0)
     assert_kind_of(Zoo, exhibit.zoo)
     assert_equal(0, exhibit.zoo.id)
   end
-
+  
   def test_has_many_getter_returns_same_instance
     zoo = Zoo.new('Dallas')
     orm.save(zoo)
-
+  
     exhibit = Exhibit.new('Panda')
     exhibit.zoo_id = zoo.id
     orm.save(exhibit)
-
+  
     exhibit = orm.get(Exhibit, 0)
     assert_equal(exhibit.zoo.object_id, exhibit.zoo.object_id)
   end
@@ -86,22 +85,22 @@ class ManyToOneTest < Test::Unit::TestCase
   def test_belongs_to_sets_association_key
     exhibit = Exhibit.new('Buzzard')
     zoo = Zoo.new('Dallas')
-
+  
     orm.save(exhibit)
     orm.save(zoo)
-
+  
     assert_not_blank(zoo.id, "Zoo#id must not be blank")
-
+  
     exhibit.zoo = zoo
     assert_equal(zoo.id, exhibit.zoo_id)
-
+  
     orm.save(exhibit)
-
+  
     orm do |session|
       exhibit = session.get(Exhibit, exhibit.id)
       zoo = session.get(Zoo, zoo.id)
     end
-
+  
     assert_equal(zoo.id, exhibit.zoo_id)
     assert_equal(exhibit.zoo, zoo)
   end

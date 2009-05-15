@@ -1,6 +1,6 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
-require Pathname(__FILE__).dirname + "sample_models"
+require Pathname(__FILE__).dirname.parent + "sample_models"
 
 class ManyToManyTest < Test::Unit::TestCase
 
@@ -35,8 +35,8 @@ class ManyToManyTest < Test::Unit::TestCase
     @mapping = nil
 
     Clipper::Mappings['default'].each { |m| @mapping = m if m.name == 'exhibits_zoo_keepers' }
-    assert_not_nil(@mapping)
 
+    assert_not_nil(@mapping)
   end
 
   def test_defines_getter_and_setter

@@ -1,8 +1,23 @@
 module Integration::SampleModels
 
+  class City; end
   class Zoo; end
   class ZooKeeper; end
   class Exhibit; end
+
+  class City
+    include Clipper::Model
+
+    orm.map(self, "cities") do |cities|
+      cities.key(cities.field("id", Clipper::Types::Serial))
+      cities.field("name", Clipper::Types::String.new(200))
+    end
+
+    def initialize(name)
+      self.name = name
+    end
+
+  end
 
   class Zoo
     include Clipper::Model
