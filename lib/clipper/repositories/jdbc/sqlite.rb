@@ -11,6 +11,11 @@ module Clipper
 
           @data_source = com.mchange.v2.c3p0.DataSources.unpooledDataSource(uri.to_s)
         end
+        
+        # SQLite3 doesn't have a boolean type: http://www.sqlite.org/datatype3.html
+        def column_definition_boolean(field)
+          "INTEGER"
+        end
 
         # If you define an auto-increment field in Sqlite3, it has to also be the primary key
         def column_definition_serial(field)

@@ -101,6 +101,8 @@ module Clipper
         when Clipper::Types::DateTime
           t = results.getTimestamp(index)
           Time.at(*t.getTime.divmod(1000)).send(:to_datetime)
+        when Clipper::Types::Boolean
+          results.getBoolean(index)
         else
           results.getObject(index)
         end
@@ -344,6 +346,8 @@ module Clipper
           "#{column_name} DATE"
         when Clipper::Types::Time
           "#{column_name} TIME"
+        when Clipper::Types::Boolean
+          "#{column_name} #{column_definition_boolean(field)}"
         else
           raise Clipper::UnsupportedTypeError.new(field.type)
         end
@@ -364,6 +368,10 @@ module Clipper
       def column_definition_text(field)
         "TEXT"
       end
+      
+      def column_definition_boolean(field)
+        "BOOL"
+      end
 
       def bind_value_to_statement(statement, index, field, value)
         if value.nil?
@@ -380,6 +388,8 @@ module Clipper
             statement.setString(index, value)
           when Clipper::Types::Float
             statement.setString(index, value.to_s)
+          when Clipper::Types::Boolean
+            statement.setBoolean(index, value)
           when Clipper::Types::Time
             statement.setTime(index, java.sql.Time.new(value.to_f * 1000))
           when Clipper::Types::Date

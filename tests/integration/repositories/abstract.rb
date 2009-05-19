@@ -37,6 +37,7 @@ module Integration::AbstractRepositoryTest
         cities.field("name", Clipper::Types::String.new(200))
         cities.field("state", Clipper::Types::String.new(200))
         cities.field("region", Clipper::Types::String.new(200))
+        cities.field("capital", Clipper::Types::Boolean)
 
         cities.key(cities["name"], cities["state"])
       end
@@ -180,6 +181,34 @@ module Integration::AbstractRepositoryTest
     assert_equal(3.5, orm.get(@person, person.id).gpa)
   ensure
     schema.destroy(@person)
+  end
+  
+  def test_support_for_boolean
+    schema = Clipper::Schema.new("default")
+    assert_nothing_raised { schema.create(@city) }
+    
+    city = @city.new
+    city.name = 'name'
+    city.state = 'ST'
+    city.region = 'region'
+    city.capital = false
+
+    assert_nothing_raised do
+      orm.save(city)
+    end
+
+    city = orm.get(@city, city.name, city.state)
+    assert_equal(false, city.capital)
+    
+    city.capital = true
+    assert_nothing_raised do
+      orm.save(city)
+    end
+    
+    city = orm.get(@city, city.name, city.state)
+    assert_equal(true, city.capital)
+  ensure
+    schema.destroy(@city)
   end
 
   def test_support_for_date_and_time_fields
