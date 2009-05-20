@@ -25,6 +25,8 @@ module Clipper
     class OneToMany < Association
 
       def initialize(mapping, name, mapped_name, &match_criteria)
+        raise ArgumentError.new("You must pass a block containing a criteria expression for '#{mapping.name} has_many #{name}'") unless match_criteria
+
         @mapping = mapping
         @name = name
         @mapped_name = mapped_name
