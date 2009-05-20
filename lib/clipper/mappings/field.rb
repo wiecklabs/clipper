@@ -28,7 +28,11 @@ module Clipper
 
         target.class_eval do
           define_method(field.name) do
-            instance_variable_get("@#{field.name}") || instance_variable_set("@#{field.name}", field.default_value(self))
+            if instance_variable_get("@#{field.name}").nil?
+              instance_variable_set("@#{field.name}", field.default_value(self))
+            else
+              instance_variable_get("@#{field.name}")
+            end
           end
 
           define_method("#{field.name}=") do |value|
@@ -59,7 +63,7 @@ module Clipper
           )
         end
 
-        object.send(self.name + "=", value)
+        object.instance_variable_set("@#{self.name}", value)
       end
 
       def mapping

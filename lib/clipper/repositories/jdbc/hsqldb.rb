@@ -19,6 +19,10 @@ module Clipper
         def column_definition_float(field)
           "FLOAT"
         end
+        
+        def column_definition_boolean(field)
+          "BOOLEAN"
+        end
 
         # TODO: Is this the only way?
         def column_definition_text(field)

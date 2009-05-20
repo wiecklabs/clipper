@@ -63,5 +63,7 @@ module Clipper
     class DateTime < Type
     end
 
+    class Boolean < Type
+    end
   end
 end
