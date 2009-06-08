@@ -61,7 +61,7 @@ class ManyToManyTest < Test::Unit::TestCase
     assert_equal(1, amber.exhibits.size)
     assert_equal(exhibit, amber.exhibits.first)
   end
-  
+
   def test_setter_overwrites_current_associations
     exhibit1 = Exhibit.new('Human Baby')
     exhibit2 = Exhibit.new('Dog')
@@ -84,6 +84,30 @@ class ManyToManyTest < Test::Unit::TestCase
     assert_equal(5, orm.all(Exhibit).size)
     assert_equal(1, amber.exhibits.size)
     assert_equal(exhibit2, amber.exhibits.first)
+  end
+
+  def test_multiple_appends
+    exhibit1 = Exhibit.new('Human Baby')
+    exhibit2 = Exhibit.new('Dog')
+
+    orm do |session|
+      amber = ZooKeeper.new('Amber')
+      amber.exhibits = [exhibit1]
+      session << amber
+    end
+
+    orm do |session|
+      amber = session.get(ZooKeeper, 0)
+      amber.exhibits << exhibit2
+      session << amber
+    end
+
+    amber = orm.get(ZooKeeper, 0)
+
+    assert_equal(1, orm.all(ZooKeeper).size)
+    assert_equal(5, orm.all(Exhibit).size)
+    assert_equal(2, amber.exhibits.size)
+    assert_equal([exhibit1, exhibit2].sort, amber.exhibits.entries.sort)
   end
 
 end

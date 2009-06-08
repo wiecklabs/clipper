@@ -23,7 +23,7 @@ module Clipper
         item
       end
       alias << add
-      
+
       def each
         @collection.zip(@links).each do |item, link|
           yield item, link
