@@ -5,14 +5,18 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent + "lib" + "clipper"
 
+include Clipper::Session::Helper
+
 sqlite_path = Pathname(__FILE__).dirname.expand_path + "sqlite.db"
-@uri = Clipper::Uri.new("jdbc:sqlite://#{sqlite_path}")
+@uri = Clipper::Uri.new("jdbc:hsqldb:mem:test")
 Clipper::open("default", @uri.to_s)
 
 class Person
-  Clipper::Mappings["default"].map(self, "people") do |people|
+  include Clipper::Model
+
+  orm.map(self, "people") do |people|
     people.key people.field("id", Clipper::Types::Serial)
-    people.field "name", String
+    people.field "name", Clipper::Types::String.new(200)
     people.field "gpa", Clipper::Types::Float(7, 2)
   end
 end
