@@ -2,10 +2,11 @@ module Clipper
   class Mappings
     class ValueProxy
 
-      attr_accessor :original_value, :value
+      attr_accessor :original_value, :value, :field
 
-      def initialize(val = nil)
+      def initialize(val = nil, field = nil)
         @value = val
+        @field = field
       end
 
       def inspect

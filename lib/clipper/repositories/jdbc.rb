@@ -111,73 +111,112 @@ module Clipper
       def create(collection, session)
         with_connection do |connection|
           metadata = connection.getMetaData
-          supports_generated_keys = metadata.supportsGetGeneratedKeys
 
           mapping = collection.mapping
-
-          fields = mapping.fields
           serial_key = mapping.keys.detect { |field| field.type.is_a?(Clipper::Types::Serial) }
 
-          statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
-          statement << fields.map { |field| quote_identifier(field.name) } * ", "
-          statement << ") VALUES ("
-          statement << (['?'] * fields.size) * ", "
-          statement << ")"
-
-          if supports_generated_keys
-            stmt = serial_key ? connection.prepareStatement(statement, 1) : connection.prepareStatement(statement)
-          end
-
           collection.each do |object|
-            unless supports_generated_keys
-              stmt = connection.prepareStatement(statement)
-            end
+            values = mapping.fields.map { |field| field.value(object) }.select { |value| value.dirty? }
+
+            statement = "INSERT INTO #{quote_identifier(collection.mapping.name)}"
+            statement << "(" + values.map { |value| quote_identifier(value.field.name) } * ", "
+            statement << ") VALUES ("
+            statement << (['?'] * values.size) * ", "
+            statement << ")"
+
+            stmt = connection.prepareStatement(statement)
 
             result = nil
 
-            attributes = fields.map { |field| [field, field.get(object)] }
+            logger.debug(statement + " -> #{values.map { |value| value.get }.inspect}")
 
-            logger.debug(statement + " -> #{attributes.transpose[1].inspect}")
-
-            attributes.each_with_index do |attribute, index|
-              bind_value_to_statement(stmt, index + 1, *attribute)
+            values.each_with_index do |value, index|
+              bind_value_to_statement(stmt, index + 1, value.field, value.get)
             end
 
-            if supports_generated_keys
-              stmt.addBatch
-            else
-              stmt.execute
-              stmt.close
+            stmt.execute
 
-              result = generated_keys(connection)
+            result = metadata.supportsGetGeneratedKeys ? generated_keys(connection, stmt) : generated_keys(connection)
 
-              serial_key.value(object).set!(result) if serial_key && result
+            serial_key.value(object).set!(result) if serial_key && result
+            values.each { |value| value.set_original_value! }
 
-              session.identity_map.add(object)
-            end
-
-            attributes.each { |field,| field.value(object).set_original_value! }
-
-            # HACK: Find a better way to do this
-            # object.instance_variable_set("@__session__", session)
-          end
-
-          if supports_generated_keys
-            stmt.executeBatch
-
-            if serial_key
-              keys = generated_keys(connection, stmt)
-
-              collection.zip(keys) do |object, value|
-                serial_key.value(object).set!(value)
-                session.identity_map.add(object)
-              end
-            end
-
+            session.identity_map.add(object)
             stmt.close
           end
         end
       end
+
+      # def create(collection, session)
+      #   with_connection do |connection|
+      #     metadata = connection.getMetaData
+      #     supports_generated_keys = metadata.supportsGetGeneratedKeys
+      # 
+      #     mapping = collection.mapping
+      # 
+      #     fields = mapping.fields
+      #     serial_key = mapping.keys.detect { |field| field.type.is_a?(Clipper::Types::Serial) }
+      # 
+      #     statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} ("
+      #     statement << fields.map { |field| quote_identifier(field.name) } * ", "
+      #     statement << ") VALUES ("
+      #     statement << (['?'] * fields.size) * ", "
+      #     statement << ")"
+      # 
+      #     if supports_generated_keys
+      #       stmt = serial_key ? connection.prepareStatement(statement, 1) : connection.prepareStatement(statement)
+      #     end
+      # 
+      #     collection.each do |object|
+      #       unless supports_generated_keys
+      #         stmt = connection.prepareStatement(statement)
+      #       end
+      # 
+      #       result = nil
+      # 
+      #       attributes = fields.map { |field| [field, field.get(object)] }
+      # 
+      #       logger.debug(statement + " -> #{attributes.transpose[1].inspect}")
+      # 
+      #       attributes.each_with_index do |attribute, index|
+      #         bind_value_to_statement(stmt, index + 1, *attribute)
+      #       end
+      # 
+      #       if supports_generated_keys
+      #         stmt.addBatch
+      #       else
+      #         stmt.execute
+      #         stmt.close
+      # 
+      #         result = generated_keys(connection)
+      # 
+      #         serial_key.value(object).set!(result) if serial_key && result
+      # 
+      #         session.identity_map.add(object)
+      #       end
+      # 
+      #       attributes.each { |field,| field.value(object).set_original_value! }
+      # 
+      #       # HACK: Find a better way to do this
+      #       # object.instance_variable_set("@__session__", session)
+      #     end
+      # 
+      #     if supports_generated_keys
+      #       stmt.executeBatch
+      # 
+      #       if serial_key
+      #         keys = generated_keys(connection, stmt)
+      # 
+      #         collection.zip(keys) do |object, value|
+      #           serial_key.value(object).set!(value)
+      #           session.identity_map.add(object)
+      #         end
+      #       end
+      # 
+      #       stmt.close
+      #     end
+      #   end
+      # end
 
       def update(collection, session)
         with_connection do |connection|
@@ -430,12 +469,12 @@ module Clipper
         keys = []
 
         while result_set.next
-          keys << result_set.getObject(1)
+          key = result_set.getObject(1)
         end
 
         result_set.close
 
-        keys
+        key
       end
 
     end
