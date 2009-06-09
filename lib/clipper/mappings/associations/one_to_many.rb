@@ -43,6 +43,7 @@ module Clipper
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
         conditions = criteria.__conditions__
+
         conditions.field.set(child, conditions.value.field.get(parent))
       end
 

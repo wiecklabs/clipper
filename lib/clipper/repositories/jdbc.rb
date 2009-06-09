@@ -249,7 +249,6 @@ module Clipper
       end
 
       def create_table(mapping)
-
         components = [
           mapping.fields.map { |field| column_definition(field) }.join(", "),
           key_definition(mapping)

@@ -88,7 +88,7 @@ module Clipper
               if parent
                 key_field.get(parent)
               else
-                instance_variable_get("@#{map[key_field].name}")
+                map[key_field].value(self).get()
               end
             end
           else
@@ -96,7 +96,7 @@ module Clipper
               if child
                 key_field.get(child)
               else
-                instance_variable_get("@#{map[key_field].name}")
+                map[key_field].value(self).get()
               end
             end
           end

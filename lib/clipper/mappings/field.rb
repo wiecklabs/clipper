@@ -1,3 +1,5 @@
+require Pathname(__FILE__).dirname + "value_proxy"
+
 module Clipper
   class Mappings
     class Field
@@ -28,15 +30,11 @@ module Clipper
 
         target.class_eval do
           define_method(field.name) do
-            if (value = instance_variable_get("@#{field.name}")).nil?
-              instance_variable_set("@#{field.name}", field.default_value(self))
-            else
-              value
-            end
+            field.value(self).get
           end
 
-          define_method("#{field.name}=") do |value|
-            instance_variable_set("@#{field.name}", value)
+          define_method("#{field.name}=") do |val|
+            field.value(self).set(val)
           end
         end
 
@@ -44,6 +42,21 @@ module Clipper
 
       def default_value(object)
         @default.is_a?(Proc) ? @default.call(object) : @default
+      end
+
+      def value(object)
+        unless object.is_a?(@mapping.target)
+          raise ArgumentError.new(
+            "Field#value (#{mapping.name}.#{self.name}) must receive an instance of #{@mapping.target} but recieved #{object.inspect}"
+          )
+        end
+
+        if value = object.instance_variable_get("@#{self.name}")
+          value
+        else
+          value = ValueProxy.new(self.default_value(object))
+          object.instance_variable_set("@#{self.name}", value)
+        end
       end
 
       def get(object)
@@ -59,11 +72,10 @@ module Clipper
       def set(object, value)
         unless object.is_a?(@mapping.target)
           raise ArgumentError.new(
-            "Field#set must receive an instance of #{@mapping.target} but recieved #{object.inspect}"
+            "Field#set (#{mapping.name}.#{self.name}) must receive an instance of #{@mapping.target} but recieved #{object.inspect}"
           )
         end
-
-        object.send(self.name + "=", value)
+        object.send("#{self.name}=", value)
       end
 
       def mapping
