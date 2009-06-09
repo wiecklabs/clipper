@@ -1,9 +1,19 @@
 module Integration::SampleModels
 
+  class Person; end
   class City; end
   class Zoo; end
   class ZooKeeper; end
   class Exhibit; end
+
+  class Person
+    include Clipper::Model
+
+    orm.map(self, "people") do |people|
+      people.key(people.field("id", Clipper::Types::Serial))
+      people.field("enabled", Clipper::Types::Integer, 1)
+    end
+  end
 
   class City
     include Clipper::Model

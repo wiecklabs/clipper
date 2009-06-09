@@ -78,7 +78,7 @@ module Clipper
               get_value_from_result_set(results, i, field.type)
             end
 
-            mapping_fields.zip(values) { |field, value| field.set(resource, value) }
+            mapping_fields.zip(values) { |field, value| field.value(resource).set!(value) }
             collection << resource
           end
 
@@ -151,10 +151,12 @@ module Clipper
 
               result = generated_keys(connection)
 
-              serial_key.set(object, result) if serial_key && result
+              serial_key.value(object).set!(result) if serial_key && result
 
               session.identity_map.add(object)
             end
+
+            attributes.each { |field,| field.value(object).set_original_value! }
 
             # HACK: Find a better way to do this
             # object.instance_variable_set("@__session__", session)
@@ -167,7 +169,7 @@ module Clipper
               keys = generated_keys(connection, stmt)
 
               collection.zip(keys) do |object, value|
-                serial_key.set(object, value)
+                serial_key.value(object).set!(value)
                 session.identity_map.add(object)
               end
             end
@@ -208,10 +210,12 @@ module Clipper
 
             stmt.execute
             stmt.close
+
+            fields.each { |field| field.value(object).set_original_value! }
           end
         end
       end
-      
+
       def delete(collection, session)
         with_connection do |connection|
           metadata = connection.getMetaData

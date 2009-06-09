@@ -2,8 +2,9 @@ module Clipper
   class Mappings
     class ValueProxy
 
+      attr_accessor :original_value, :value
+
       def initialize(val = nil)
-        @original_value = val.dup rescue val
         @value = val
       end
 
@@ -15,15 +16,20 @@ module Clipper
         @value = val
       end
 
+      def set!(val)
+        set(val)
+        set_original_value!
+      end
+
       def get
         @value
       end
 
       def dirty?
-        @original_value != self.read
+        @original_value != @value
       end
 
-      def reset!
+      def set_original_value!
         @original_value = @value.dup rescue @value
       end
 
