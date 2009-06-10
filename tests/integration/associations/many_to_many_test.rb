@@ -46,8 +46,6 @@ class ManyToManyTest < Test::Unit::TestCase
   end
 
   def test_saving_all_new_objects
-    flunk "Dirty tracking on create seems to have broken ManyToMany join models"
-
     exhibit = Exhibit.new('Human Baby')
 
     orm do |session|
@@ -65,8 +63,6 @@ class ManyToManyTest < Test::Unit::TestCase
   end
 
   def test_setter_overwrites_current_associations
-    flunk "Dirty tracking on create seems to have broken ManyToMany join models"
-
     exhibit1 = Exhibit.new('Human Baby')
     exhibit2 = Exhibit.new('Dog')
 
@@ -91,7 +87,7 @@ class ManyToManyTest < Test::Unit::TestCase
   end
 
   def test_multiple_appends
-    flunk "Dirty tracking on create seems to have broken ManyToMany join models"
+    flunk "Multiple appends is broken because of ManyToMany's #add implementation"
 
     exhibit1 = Exhibit.new('Human Baby')
     exhibit2 = Exhibit.new('Dog')

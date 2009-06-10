@@ -9,24 +9,24 @@ class ValueProxyTest < Test::Unit::TestCase
     value = ValueProxy.new
     assert_nil(value.original_value)
 
-    value = ValueProxy.new(1)
+    value = ValueProxy.new(nil, 1)
     assert_nil(value.original_value)
   end
 
   def test_value_is_set_by_initializer
-    value = ValueProxy.new(1)
+    value = ValueProxy.new(nil, 1)
     assert_equal(1, value.get)
   end
 
   def test_set_bang_updates_original_value
-    value = ValueProxy.new(1)
+    value = ValueProxy.new(nil, 1)
     value.set!(2)
 
     assert_equal(2, value.original_value)
   end
 
   def test_dirty_tracking_with_immutable_value
-    value = ValueProxy.new(1)
+    value = ValueProxy.new(nil, 1)
     value.set(2)
 
     assert(value.dirty?)

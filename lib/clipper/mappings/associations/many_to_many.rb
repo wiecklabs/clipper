@@ -66,11 +66,26 @@ module Clipper
         "#{field.mapping.name}_#{field.name}"
       end
 
+      class ValueProxy < Clipper::Mappings::ValueProxy
+        def initialize(type, instance, join_field, key_field)
+          @type = type
+          @instance = instance
+          @join_field = join_field
+          @key_field = key_field
+          super(join_field)
+        end
+
+        def get
+          @instance.send(@type) ? set(@key_field.get(@instance.send(@type))) : @value
+        end
+
+      end
+
       def setup_join_map
         @target_mapping = Mapping.new(@mapping.mappings, @target, @target_mapping_name)
 
         # Builds a hash of Source Key Field -> Anonymous Key Field
-        @key_field_map = (mapping.keys.entries + associated_mapping.keys.entries).inject({}) do |map, key_field|
+        key_field_map = @key_field_map = (mapping.keys.entries + associated_mapping.keys.entries).inject({}) do |map, key_field|
           type = case key_field.type
             when Clipper::Types::Serial then
               Clipper::Types::Integer
@@ -81,27 +96,25 @@ module Clipper
           join_key_field_name = key_field_name(key_field)
 
           map[key_field] = target_mapping.field(join_key_field_name, type, key_field.default)
+          map
+        end
 
-          # Define a getter on the join model that always gets the latest key from the associated models
-          if key_field.mapping == mapping
-            @target.send(:define_method, join_key_field_name) do
-              if parent
-                key_field.get(parent)
-              else
-                map[key_field].value(self).get()
-              end
-            end
-          else
-            @target.send(:define_method, join_key_field_name) do
-              if child
-                key_field.get(child)
-              else
-                map[key_field].value(self).get()
-              end
-            end
+        mapping = self.mapping
+
+        # We don't want to break how field.value(instance) works, so we need to replace
+        # the ValueProxy with our own. But since we don't have initialization hooks,
+        # we need to set them when they're accessed. Ugly. Works.
+        @target.send(:define_method, :instance_variable_get) do |name|
+          var = super
+
+          key_field, join_key_field = nil
+
+          if !var && key_field_map.detect { |key_field, join_key_field| "@#{join_key_field.name}" == name }
+            var = ValueProxy.new((key_field.mapping == mapping ? :parent : :child), self, join_key_field, key_field)
+            instance_variable_set("@#{join_key_field.name}", var)
           end
 
-          map
+          var
         end
 
         # Many-To-Many key spans each field in the table

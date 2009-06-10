@@ -4,13 +4,13 @@ module Clipper
 
       attr_accessor :original_value, :value, :field
 
-      def initialize(val = nil, field = nil)
-        @value = val
+      def initialize(field = nil, val = nil)
         @field = field
+        @value = val
       end
 
       def inspect
-        "<Value original_value=#{@original_value.inspect} value=#{@value.inspect}>"
+        "<Value original_value=#{@original_value.inspect} value=#{get.inspect}>"
       end
 
       def set(val)
@@ -27,11 +27,11 @@ module Clipper
       end
 
       def dirty?
-        @original_value != @value
+        @original_value != get
       end
 
       def set_original_value!
-        @original_value = @value.dup rescue @value
+        @original_value = get.dup rescue get
       end
 
     end

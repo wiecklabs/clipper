@@ -116,9 +116,10 @@ module Clipper
           serial_key = mapping.keys.detect { |field| field.type.is_a?(Clipper::Types::Serial) }
 
           collection.each do |object|
+
             values = mapping.fields.map { |field| field.value(object) }.select { |value| value.dirty? }
 
-            statement = "INSERT INTO #{quote_identifier(collection.mapping.name)}"
+            statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} "
             statement << "(" + values.map { |value| quote_identifier(value.field.name) } * ", "
             statement << ") VALUES ("
             statement << (['?'] * values.size) * ", "

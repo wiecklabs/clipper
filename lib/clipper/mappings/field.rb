@@ -54,7 +54,7 @@ module Clipper
         if value = object.instance_variable_get("@#{self.name}")
           value
         else
-          value = ValueProxy.new(self.default_value(object), self)
+          value = ValueProxy.new(self, self.default_value(object))
           object.instance_variable_set("@#{self.name}", value)
         end
       end
