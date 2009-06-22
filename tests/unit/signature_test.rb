@@ -75,8 +75,8 @@ class SignatureTest < Test::Unit::TestCase
   end
 
   def test_type_casting
-    typecast_left_procedure = lambda { |age| age.to_i }
-    typecast_right_procedure = lambda { |age| age.to_s }
+    typecast_left_procedure = lambda { |age| age.to_s }
+    typecast_right_procedure = lambda { |age| age.to_i }
 
     signature = Clipper::TypeMap::Signature.new(
       [String],
