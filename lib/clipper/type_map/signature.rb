@@ -44,6 +44,26 @@ module Clipper
         convert(@attribute_types, @repository_types, @typecast_right_procedure, args)
       end
 
+      def hash
+        [@attribute_types, @repository_types].hash
+      end
+
+      def eql?(other)
+        other.is_a?(Clipper::TypeMap::Signature) &&
+          @attribute_types == other.attribute_types &&
+          @repository_types == other.repository_types
+      end
+      alias == eql?
+
+      protected
+        def attribute_types
+          @attribute_types
+        end
+
+        def repository_types
+          @repository_types
+        end
+
       private
         def convert(source_types, target_types, typecast_procedure, args)
           matching_types = true

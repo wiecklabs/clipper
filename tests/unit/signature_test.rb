@@ -147,4 +147,16 @@ class SignatureTest < Test::Unit::TestCase
     end
   end
 
+  def test_signatures_should_be_type_equal
+    one = Clipper::TypeMap::Signature.new([String], [Integer], lambda { }, lambda { })
+    two = Clipper::TypeMap::Signature.new([String], [Integer], lambda { }, lambda { })
+    three = Clipper::TypeMap::Signature.new([String], [String], lambda { }, lambda { })
+
+    assert_equal(one, two)
+    assert_not_equal(one, three)
+
+    assert_equal(one.hash, two.hash)
+    assert_not_equal(two.hash, three.hash)
+  end
+
 end
