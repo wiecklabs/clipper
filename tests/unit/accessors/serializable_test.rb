@@ -10,8 +10,12 @@ class SerializableTest < Test::Unit::TestCase
 
     def self.load(reader)
       city = new
-      city.name = reader[:name].value
-      city.state_abbreviation = reader[:state_abbreviation].value
+
+      if reader
+        city.name = reader[:name]
+        city.state_abbreviation = reader[:state_abbreviation]
+      end
+
       city
     end
 

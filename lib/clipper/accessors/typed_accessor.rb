@@ -1,6 +1,29 @@
 module Clipper
   module Accessors
+
+    class StringSerializer
+      def self.load(value)
+        value.to_s
+      end
+    end
+
+    class IntegerSerializer
+      def self.load(value)
+        Integer(value)
+      end
+    end
+
     class TypedAccessor
+
+      ##
+      # Defines mappings from native types to Clipper Serializers.
+      # 
+      # @api private
+      ##
+      @@native_serializers = {
+        String => Clipper::Accessors::StringSerializer,
+        Integer => Clipper::Accessors::IntegerSerializer
+      }.freeze
 
       attr_reader :target, :name, :type
 
@@ -18,17 +41,12 @@ module Clipper
       end
 
       def typecast(value)
+        return value if value.is_a?(@type)
+
         case
-        when @type == String then typecast_to_string(value)
-        when @type == Integer then typecast_to_integer(value)
-        when Serializable > @type then
-          case value
-          when @type then value
-          when nil then @type.load(Serializable::EmptyReader.new)
-          when Hash then @type.load(Serializable::HashReader.new(value))
-          else
-            raise SerializationError.new("Don't know how to load value #{value.inspect}")
-          end
+        when @type === value then value
+        when serializer = @@native_serializers[@type] then serializer.load(value)
+        when Serializable > @type then @type.load(value)
         else
           raise SerializationError.new("Don't know how to serialize #{@type.inspect}")
         end
@@ -61,16 +79,10 @@ module Clipper
       alias == eql?
 
       private
+
       class SerializationError < StandardError
       end
 
-      def typecast_to_string(value)
-        value.to_s
-      end
-
-      def typecast_to_integer(value)
-        Integer(value)
-      end
     end
   end
 end
