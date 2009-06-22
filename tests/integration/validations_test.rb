@@ -5,6 +5,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
 
   def setup
     @user = Class.new do
+      include Clipper::Validations
       attr_accessor :id, :name, :email, :password, :password_confirmation, :age, :gender, :title
     end
 
@@ -12,7 +13,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
 
   def test_constraint_declarations
     assert_nothing_raised do
-      Clipper::constrain(@user, "test_constraint_declarations") do |check|
+      @user.constrain("test_constraint_declarations") do |check|
         check.size("name", 50) { |instance| instance.active? }
         check.required("name")
   
@@ -31,7 +32,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   end
 
   def test_default_validation_returns_invalid_result
-    Clipper::constrain(@user, 'default') do |check|
+    @user.constrain('default') do |check|
       check.required('name')
     end
 
@@ -42,7 +43,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   end
 
   def test_default_validation_returns_valid_result
-    Clipper::constrain(@user, 'default') do |check|
+    @user.constrain('default') do |check|
       check.required('name')
     end
   
@@ -54,11 +55,11 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   end
   
   def test_multiple_context_validation
-    Clipper::constrain(@user, 'default') do |check|
+    @user.constrain('default') do |check|
       check.required('name')
     end
   
-    Clipper::constrain(@user, 'email_marketing') do |check|
+    @user.constrain('email_marketing') do |check|
       check.required('name')
       check.required('email')
     end
