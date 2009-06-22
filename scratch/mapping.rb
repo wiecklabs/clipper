@@ -44,4 +44,20 @@
 # comprehensive TypeMap for a given Repository, but it's very simple work that
 # can be done easily, and as-needed.
 #
-# 
+# Because Attribute Types don't have to be extended for type-casting purposes,
+# Clipper specific classes for types already available in Ruby don't have to
+# be defined. A String can simply be a String, a DateTime a DateTime, etc.
+# The same is true for Repository Types. This means that many signatures in
+# the TypeMap can be inherited from an abstract set to minimize the work of
+# implementing a new Adapter.
+#
+# Further, Query operations, Materialization, ResultSet mapping, etc can all
+# be abstracted out of the Adapters. The Repository specific responsibilities
+# then will be defining a Syntax internal to the Adapter that will transform the
+# provided Query into a compatible command, and returning a ResultSet.
+#
+# Testing can then be done in-memory, supporting as much of, or as little of
+# the O/RM features as desired.
+#
+# The Query will be used by the Loader to materialize an object-graph based on
+# oridinals in the ResultSet. The only requirement for an adapter is that 
