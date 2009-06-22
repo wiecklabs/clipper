@@ -61,3 +61,5 @@
 #
 # The Query will be used by the Loader to materialize an object-graph based on
 # oridinals in the ResultSet. The only requirement for an adapter is that 
+#
+# I'm not sure how to handle Associations during Mapping...
