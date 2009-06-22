@@ -37,35 +37,45 @@ module Clipper
       end
 
       def typecast_left(*args)
-        matching_types = true
-        @repository_types.each_with_index do |type, i|
-          unless args[i] == nil || args[i].is_a?(type)
-            matching_types = false
-            break
-          end
-        end
-
-        unless matching_types
-          raise ArgumentError.new("Expected args to be instances of #{@repository_types.inspect} but was #{args.inspect}.")
-        end
-
-        @typecast_left_procedure.call(*args)
+        convert(@repository_types, @attribute_types, @typecast_left_procedure, args)
       end
 
       def typecast_right(*args)
-        matching_types = true
-        @attribute_types.each_with_index do |type, i|
-          unless args[i] == nil || args[i].is_a?(type)
-            matching_types = false
-            break
+        convert(@attribute_types, @repository_types, @typecast_right_procedure, args)
+      end
+
+      private
+        def convert(source_types, target_types, typecast_procedure, args)
+          matching_types = true
+          source_types.each_with_index do |type, i|
+            unless args[i] == nil || args[i].is_a?(type)
+              matching_types = false
+              break
+            end
+          end
+
+          unless matching_types
+            raise ArgumentError.new("Expected args to be instances of #{source_types.inspect} but was #{args.inspect}.")
+          end
+
+          value = typecast_procedure.call(*args)
+
+          case value
+          when nil then nil
+          when Array then
+            target_types.each_with_index do |type, i|
+              unless value[i] == nil || value[i].is_a?(type)
+                raise ArgumentError.new("Expected value to be an instance of #{type} but was #{value[i].inspect}")
+              end
+            end
+          else
+            if target_types.size == 1 && value.is_a?(target_types.first)
+              value
+            else
+              raise ArgumentError.new("Expected value to be an instance of #{target_types.first} but was #{value.inspect}")
+            end
           end
         end
-
-        unless matching_types
-          raise ArgumentError.new("Expected args to be instances of #{@attribute_types.inspect} but was #{args.inspect}.")
-        end
-        @typecast_right_procedure.call(*args)
-      end
     end # class Signature
   end # class TypeMap
 end # module Clipper

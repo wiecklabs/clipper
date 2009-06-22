@@ -93,8 +93,57 @@ class SignatureTest < Test::Unit::TestCase
       signature.typecast_left(nil)
     end
 
+    assert_nothing_raised do
+      signature.typecast_right("1")
+    end
+  end
+
+  def test_type_casting_verifies_value_type
+    typecast_left_procedure = lambda { |age| age.to_s }
+    typecast_right_procedure = lambda { |age| age.to_i }
+
+    signature = Clipper::TypeMap::Signature.new(
+      [String],
+      [Integer],
+      typecast_left_procedure,
+      typecast_right_procedure
+    )
+
     assert_raises(ArgumentError) do
       signature.typecast_left("one")
+    end
+  end
+
+  def test_type_casting_verifies_return_type
+    typecast_left_procedure = lambda { |age| age.to_s }
+    typecast_right_procedure = lambda { |age| age.to_i }
+
+    signature = Clipper::TypeMap::Signature.new(
+      [String],
+      [Integer],
+      typecast_left_procedure,
+      typecast_right_procedure
+    )
+
+    assert_nothing_raised do
+      signature.typecast_right("one")
+    end
+
+    typecast_right_procedure = lambda { |age| Integer(age) rescue age }
+
+    assert_nothing_raised do
+      assert_equal("one", typecast_right_procedure.call("one"))
+    end
+
+    signature = Clipper::TypeMap::Signature.new(
+      [String],
+      [Integer],
+      typecast_left_procedure,
+      typecast_right_procedure
+    )
+
+    assert_raises(ArgumentError) do
+      signature.typecast_right("one")
     end
   end
 
