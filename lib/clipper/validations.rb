@@ -1,14 +1,11 @@
 module Clipper
 
-  @validation_context_map = {}
-
-  def self.constrain(target, context_name, &block)
-    @validation_context_map[context_name] ||= {}
-    @validation_context_map[context_name][target] = Clipper::Validations::Context.new(target, context_name, &block)
+  def self.validation_context_map
+    @validation_context_map ||= {}
   end
 
   def self.validate(instance, context_name = 'default')
-    if context_map = @validation_context_map[context_name]
+    if context_map = validation_context_map[context_name]
       if context = context_map[instance.class]
         return context.validate(instance)
       else
@@ -19,4 +16,19 @@ module Clipper
     end
   end
 
+  module Validations
+
+    def self.included(target)
+      target.extend(ClassMethods)
+    end
+
+    module ClassMethods
+      def constrain(context_name, &block)
+        Clipper::validation_context_map[context_name] ||= {}
+        Clipper::validation_context_map[context_name][self] = Clipper::Validations::Context.new(self, context_name, &block)
+      end
+
+    end
+
+  end # module Validations
 end # module Clipper
