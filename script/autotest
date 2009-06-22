@@ -16,6 +16,8 @@ begin
       last_run ? (File.mtime(file) > last_run) : true
     end
 
+    last_run = Time.now
+
     unless changed_files.empty?
 
       test_files_to_run = []
@@ -37,8 +39,6 @@ begin
       end
 
     end
-
-    last_run = Time.now
 
     sleep 2
   end
