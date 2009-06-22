@@ -1,0 +1,1 @@
+require Pathname(__FILE__).dirname + "type_map" + "signature"

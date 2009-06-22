@@ -13,6 +13,7 @@ require Pathname(__FILE__).dirname + "wieck" + "string"
 
 
 require Pathname(__FILE__).dirname + "clipper" + "uri"
+require Pathname(__FILE__).dirname + "clipper" + "type_map"
 require Pathname(__FILE__).dirname + "clipper" + "model"
 require Pathname(__FILE__).dirname + "clipper" + "accessors"
 require Pathname(__FILE__).dirname + "clipper" + "hooks"
