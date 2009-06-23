@@ -7,7 +7,7 @@ module Clipper
       target.extend(ClassMethods)
     end
 
-    def valid?(context_name = 'default')
+    def validate(context_name = 'default')
       if context = self.class.__validation_contexts__[context_name]
         context.validate(self)
       else
