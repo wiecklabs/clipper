@@ -48,18 +48,23 @@ class Zoo
     check.size(zoo.address.state, 50)
   end
 
+  # This allows us to simply shortcut to the repository specific types.
+  # We could do this on include Clipper::Model: namely, copy over the types
+  # for any database adapters loaded, which in most cases, would be just one.
+  Postgres = Clipper::Adapters::Postgres::Types
+
   orm.map(self, "zoos") do |zoos|
-    # We can mix the Repository Types into this block so we don't need to specify the full
-    # class names. ie: Clipper::Adapters::Postgres::Types::Serial.new
-    zoos.field :id, Serial.new
+    zoos.field :id,   Postgres::Serial.new
+
     # The Field will use the bound-method name as the field-name by default.
-    zoos.field :name, String.new(200)
+    zoos.field :name, Postgres::String.new(200)
+
     # Here we must specify the field names for the embedded-value.
-    zoos.field :city, String.new(100, "address_address_1"),
-                      String.new(100, "address_address_2"),
-                      String.new(100, "address_city"),
-                      String.new(50, "address_state"),
-                      String.new(50, "address_zip_code")
+    zoos.field :city, Postgres::String.new(100, "address_address_1"),
+                      Postgres::String.new(100, "address_address_2"),
+                      Postgres::String.new(100, "address_city"),
+                      Postgres::String.new(50, "address_state"),
+                      Postgres::String.new(50, "address_zip_code")
   end
 
 end
