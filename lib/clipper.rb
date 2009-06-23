@@ -21,13 +21,14 @@ require Pathname(__FILE__).dirname + "clipper" + "collection"
 
 require Pathname(__FILE__).dirname + "clipper" + "type"
 require Pathname(__FILE__).dirname + "clipper" + "types"
-require Pathname(__FILE__).dirname + "clipper" + "mappings" + "mapping"
-require Pathname(__FILE__).dirname + "clipper" + "mappings" + "relation"
 
-require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "association"
-require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "many_to_one"
-require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "one_to_many"
-require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "many_to_many"
+# require Pathname(__FILE__).dirname + "clipper" + "mappings"
+# require Pathname(__FILE__).dirname + "clipper" + "mappings" + "mapping"
+# require Pathname(__FILE__).dirname + "clipper" + "mappings" + "relation"
+# require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "association"
+# require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "many_to_one"
+# require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "one_to_many"
+# require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "many_to_many"
 
 require Pathname(__FILE__).dirname + "clipper" + "validations"
 require Pathname(__FILE__).dirname + "clipper" + "validations" + "validator"
@@ -57,7 +58,6 @@ require Pathname(__FILE__).dirname + "clipper" + "syntax" + "sql"
 
 require Pathname(__FILE__).dirname + "clipper" + "session"
 require Pathname(__FILE__).dirname + "clipper" + "identity_map"
-require Pathname(__FILE__).dirname + "clipper" + "mappings"
 require Pathname(__FILE__).dirname + "clipper" + "schema"
 require Pathname(__FILE__).dirname + "clipper" + "session" + "helper"
 
