@@ -37,7 +37,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
     end
 
     user = @user.new
-    result = Clipper::validate(user)
+    result = user.valid?
     assert_equal(false, result.valid?)
     assert_equal(1, result.errors.size)
   end
@@ -49,7 +49,7 @@ class Integration::ValidationsTest < Test::Unit::TestCase
   
     user = @user.new
     user.name = 'Sample User'
-    result = Clipper::validate(user)
+    result = user.valid?
     assert_equal(true, result.valid?)
     assert_equal(0, result.errors.size)
   end
@@ -67,13 +67,13 @@ class Integration::ValidationsTest < Test::Unit::TestCase
     # Validate in the default context
     user = @user.new
     user.name = 'Sample User'
-    result = Clipper::validate(user)
+    result = user.valid?
     assert_equal(true, result.valid?)
     assert_equal(0, result.errors.size)
   
     # Validate in the email_marketing context
     user = @user.new
-    result = Clipper::validate(user, 'email_marketing')
+    result = user.valid?('email_marketing')
     assert_equal(false, result.valid?)
     assert_equal(2, result.errors.size)
   end

@@ -1,31 +1,28 @@
 module Clipper
 
-  def self.validation_context_map
-    @validation_context_map ||= {}
-  end
-
-  def self.validate(instance, context_name = 'default')
-    if context_map = validation_context_map[context_name]
-      if context = context_map[instance.class]
-        return context.validate(instance)
-      else
-        raise ArgumentError.new("No constraints are defined for #{instance.class.inspect} within the #{context_name} context.")
-      end
-    else
-      raise ArgumentError.new("The validation context #{context_name} is not defined")
-    end
-  end
-
   module Validations
 
     def self.included(target)
+      target.instance_variable_set(:@validation_contexts, {})
       target.extend(ClassMethods)
     end
 
+    def valid?(context_name = 'default')
+      if context = self.class.__validation_contexts__[context_name]
+        context.validate(self)
+      else
+        raise ArgumentError.new("No constraints are defined for #{instance.class.inspect} within the #{context_name} context.")
+      end
+    end
+
     module ClassMethods
+
+      def __validation_contexts__
+        @__validation_contexts__ ||= {}
+      end
+
       def constrain(context_name, &block)
-        Clipper::validation_context_map[context_name] ||= {}
-        Clipper::validation_context_map[context_name][self] = Clipper::Validations::Context.new(self, context_name, &block)
+        __validation_contexts__[context_name] = Clipper::Validations::Context.new(self, context_name, &block)
       end
 
     end

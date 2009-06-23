@@ -201,7 +201,7 @@ module Clipper
     end
 
     def validate(object, context_name = 'default')
-      Clipper::validate(object, context_name)
+      object.valid?(context_name)
     end
 
     def load(object, field)
