@@ -1,5 +1,8 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
+
+return unless ADAPTERS.include?("mysql")
+
 require Pathname(__FILE__).dirname + "abstract"
 
 class Integration::MysqlTest < Test::Unit::TestCase

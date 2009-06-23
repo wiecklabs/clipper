@@ -1,5 +1,8 @@
 require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
+
+return unless ADAPTERS.include?("sqlite")
+
 require Pathname(__FILE__).dirname + "abstract"
 
 class Integration::SqliteTest < Test::Unit::TestCase

@@ -6,5 +6,8 @@ $CLASSPATH << File.dirname(__FILE__)
 
 require Pathname(__FILE__).dirname.parent + "lib" + "clipper"
 
+adapters = ENV["ADAPTERS"] || "hsqldb"
+ADAPTERS = adapters.split(/,\s*/)
+
 module Integration
 end
