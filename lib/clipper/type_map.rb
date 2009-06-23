@@ -18,5 +18,23 @@ module Clipper
     def size
       @signatures.size
     end
+
+    def match(attribute_types, repository_types)
+      match = @signatures.detect do |signature|
+        signature.match?(attribute_types, repository_types)
+      end
+
+      if match
+        match
+      else
+        raise MatchError.new(attribute_types, repository_types)
+      end
+    end
+
+    class MatchError < StandardError
+      def initialize(attribute_types, repository_types)
+        super "No matching Signature found for #{attribute_types.inspect}:#{repository_types.inspect}"
+      end
+    end
   end # class TypeMap
 end # module Clipper

@@ -7,11 +7,18 @@ class TypeMapTest < Test::Unit::TestCase
     typecast_left_procedure = lambda { |age| age.to_s }
     typecast_right_procedure = lambda { |age| age.to_i }
 
-    @signature = Clipper::TypeMap::Signature.new(
+    @signature_one = Clipper::TypeMap::Signature.new(
       [String],
       [Integer],
-      typecast_left_procedure,
-      typecast_right_procedure
+      lambda { |age| age.to_s },
+      lambda { |age| age.to_i }
+    )
+
+    @signature_two = Clipper::TypeMap::Signature.new(
+      [String],
+      [String],
+      lambda { |name| name.to_s },
+      lambda { |name| name.to_s }
     )
   end
 
@@ -24,7 +31,7 @@ class TypeMapTest < Test::Unit::TestCase
   def test_can_add_new_signatures
     typemap = Clipper::TypeMap.new
     assert_nothing_raised do
-      typemap << @signature
+      typemap << @signature_one
     end
 
     assert_raises(ArgumentError) do
@@ -36,8 +43,8 @@ class TypeMapTest < Test::Unit::TestCase
     typemap = Clipper::TypeMap.new
 
     assert_nothing_raised do
-      typemap << @signature
-      typemap << @signature
+      typemap << @signature_one
+      typemap << @signature_one
     end
 
     assert_equal(1, typemap.size)
@@ -52,14 +59,21 @@ class TypeMapTest < Test::Unit::TestCase
     typemap << duplicate
     assert_equal(1, typemap.size)
 
-    other = Clipper::TypeMap::Signature.new(
-      [String],
-      [String],
-      lambda { },
-      lambda { }
-    )
-
-    typemap << other
+    typemap << @signature_two
     assert_equal(2, typemap.size)
+  end
+
+  def test_matching_signature
+    typemap = Clipper::TypeMap.new
+    typemap << @signature_one
+    typemap << @signature_two
+
+    assert_nothing_raised do
+      assert(typemap.match([String], [Integer]).is_a?(Clipper::TypeMap::Signature))
+    end
+
+    assert_raises(Clipper::TypeMap::MatchError) do
+      typemap.match([Integer], [Integer])
+    end
   end
 end
