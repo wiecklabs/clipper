@@ -51,4 +51,13 @@ class Integration::MappingTest < Test::Unit::TestCase
       mapping.field(:id, nil)
     end
   end
+
+  def test_field_adds_signature_accessor_and_types
+    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping.field(:id, @id_type.new)
+
+    assert_equal(1, mapping.signatures.size)
+    assert_equal(1, mapping.accessors.size)
+    assert_equal(1, mapping.types.size)
+  end
 end
