@@ -1,26 +1,26 @@
 module Clipper
   class Mapping
 
-    def self.map(session, mapped_class, table_name)
-      mapping = new(session, mapped_class, table_name)
+    def self.map(session, target, name)
+      mapping = new(session, target, name)
       yield mapping
       mapping
     end
 
     attr_reader :signatures, :accessors, :types
 
-    def initialize(session, mapped_class, table_name)
-      unless session.is_a?(Clipper::Session) && mapped_class.is_a?(Class) && table_name.is_a?(String)
-        raise ArgumentError.new("Expected [Clipper::Session<session>, Class<mapped_class>, String<table_name>] but got #{[session.class, mapped_class.class, table_name.class].inspect}")
+    def initialize(session, target, name)
+      unless session.is_a?(Clipper::Session) && target.is_a?(Class) && name.is_a?(String)
+        raise ArgumentError.new("Expected [Clipper::Session<session>, Class<target>, String<name>] but got #{[session.class, target.class, name.class].inspect}")
       end
 
-      unless Clipper::Accessors > mapped_class
-        raise ArgumentError.new("Mapped class #{mapped_class.inspect} must include Clipper::Accessors")
+      unless Clipper::Accessors > target
+        raise ArgumentError.new("Mapped class #{target.inspect} must include Clipper::Accessors")
       end
 
       @session = session
-      @mapped_class = mapped_class
-      @table_name = table_name
+      @target = target
+      @name = name
 
       @signatures = java.util.LinkedHashSet.new
       @accessors = java.util.LinkedHashSet.new
@@ -32,12 +32,12 @@ module Clipper
     end
 
     def field(field_name, *repository_types)
-      unless accessor = @mapped_class.accessors[field_name]
-        raise ArgumentError.new("Mappings#field can only map fields declared as accessors")
+      unless accessor = @target.accessors[field_name]
+        raise ArgumentError.new("#{field_name.inspect} has not been delcared as an accessor on #{@target}")
       end
 
       if repository_types.any? { |type| type.is_a?(Class) }
-        raise ArgumentError.new("Mappings#field only accepts type instances")
+        raise ArgumentError.new("Mapping#field expects only type instances, but got: #{repository_types.inspect}")
       end
 
       signature = type_map.match([accessor.type], repository_types.map { |type| type.class })
@@ -45,6 +45,18 @@ module Clipper
       @signatures << signature
       @accessors << accessor
       @types << repository_types
+    end
+
+    def key(*field_names)
+      raise ArgumentError.new("The key for Mapping<#{@name}> is already defined as #{@key.inspect}") if @keys
+
+      missing_fields = field_names.reject { |field_name| @accessors.any? { |accessor| accessor.name == field_name } }
+
+      unless missing_fields.empty?
+        raise ArgumentError.new("#{missing_fields.inspect} have not been delcared as fields.")
+      end
+
+      @keys = field_names
     end
 
   end

@@ -60,4 +60,32 @@ class Integration::MappingTest < Test::Unit::TestCase
     assert_equal(1, mapping.accessors.size)
     assert_equal(1, mapping.types.size)
   end
+
+  def test_key_with_proper_arguments
+    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping.field(:id, @id_type.new)
+
+    assert_nothing_raised do
+      mapping.key(:id)
+    end
+  end
+
+  def test_key_can_only_be_called_once
+    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping.field(:id, @id_type.new)
+    mapping.key(:id)
+
+    assert_raises(ArgumentError) do
+      mapping.key(:id)
+    end
+  end
+
+  def test_key_requires_field_to_be_declared
+    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+
+    assert_raises(ArgumentError) do
+      mapping.key(:id)
+    end
+  end
+
 end

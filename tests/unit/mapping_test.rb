@@ -6,46 +6,46 @@ class MappingTest < Test::Unit::TestCase
   def setup
     @session = Clipper::Session.new("abstract")
 
-    @mapped_class = Class.new do
+    @target = Class.new do
       include Clipper::Accessors
 
       accessor :id => Integer
     end
 
-    @table_name = "users"
+    @name = "users"
     @id_type = Class.new.new
   end
 
   def test_a_well_formed_mapping
     assert_nothing_raised do
-      Clipper::Mapping.new(@session, @mapped_class, @table_name)
+      Clipper::Mapping.new(@session, @target, @name)
     end
   end
 
   def test_requires_proper_arguments
     assert_raises(ArgumentError) do
-      Clipper::Mapping.new(nil, @mapped_class, @table_name)
+      Clipper::Mapping.new(nil, @target, @name)
       Clipper::Mapping.new(nil, Class.new, "classes")
     end
 
     assert_raises(ArgumentError) do
-      Clipper::Mapping.new(@session, nil, @table_name)
+      Clipper::Mapping.new(@session, nil, @name)
     end
 
     assert_raises(ArgumentError) do
-      Clipper::Mapping.new(@session, @mapped_class, nil)
+      Clipper::Mapping.new(@session, @target, nil)
     end
   end
 
-  def test_mapped_class_must_include_accessors
+  def test_target_must_include_accessors
     assert_raises(ArgumentError) do
-      Clipper::Mapping.new(@session, Class.new, @table_name)
+      Clipper::Mapping.new(@session, Class.new, @name)
     end
   end
 
   def test_map_with_valid_arguments
     assert_nothing_raised do
-      Clipper::Mapping.map(@session, @mapped_class, @table_name) {}
+      Clipper::Mapping.map(@session, @target, @name) {}
     end
   end
 
@@ -53,7 +53,7 @@ class MappingTest < Test::Unit::TestCase
     assert_nothing_raised do
       called = false
 
-      Clipper::Mapping.map(@session, @mapped_class, @table_name) do |map|
+      Clipper::Mapping.map(@session, @target, @name) do |map|
         called = true
         assert(map.is_a?(Clipper::Mapping))
       end
