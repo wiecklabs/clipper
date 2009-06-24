@@ -2,6 +2,9 @@ module Clipper
   module Model
 
     def self.included(target)
+      target.send(:include, Clipper::Accessors)
+      target.send(:include, Clipper::Validations)
+
       target.send(:extend, Clipper::Session::Helper)
     end
 
