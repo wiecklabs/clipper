@@ -21,10 +21,20 @@ module Clipper
       @table_name = table_name
     end
 
+    def type_map
+      @session.repository.class.type_map
+    end
+
     def field(field_name, *repository_types)
       unless accessor = @mapped_class.accessors[field_name]
         raise ArgumentError.new("Mappings#field can only map fields declared as accessors")
       end
+
+      if repository_types.any? { |type| type.is_a?(Class) }
+        raise ArgumentError.new("Mappings#field only accepts type instances")
+      end
+
+      signature = type_map.match([accessor.type], repository_types.map { |type| type.class })
     end
 
   end

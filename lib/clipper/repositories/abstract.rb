@@ -4,6 +4,10 @@ module Clipper
   module Repositories
     class Abstract
 
+      def self.type_map
+        @type_map ||= Clipper::TypeMap.new
+      end
+
       def initialize(name, uri)
         raise ArgumentError.new("Repository name must be a String") unless name.is_a?(String)
         raise ArgumentError.new("Repository name must not be blank") if name.blank?
@@ -34,7 +38,7 @@ module Clipper
 
       def update(collection)
       end
-    
+
       def delete(collection)
       end
 

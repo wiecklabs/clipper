@@ -1,9 +1,6 @@
 module Clipper
   module Repositories
-    class Type
-      def initialize(field)
-        @field = field
-      end
+    module Type
     end
   end
 end

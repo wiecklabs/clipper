@@ -4,6 +4,17 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class Integration::MappingTest < Test::Unit::TestCase
 
   def setup
+    @id_type = Class.new do
+      include Clipper::Repositories::Type
+    end
+
+    Clipper::Repositories::Abstract.type_map << Clipper::TypeMap::Signature.new(
+      [Integer],
+      [@id_type],
+      lambda {},
+      lambda {}
+    )
+
     uri = Clipper::Uri.new("abstract://localhost/example")
     @repository = Clipper::registrations["abstract"] = Clipper::Repositories::Abstract.new("abstract", uri)
     @session = Clipper::Session.new("abstract")
@@ -15,29 +26,28 @@ class Integration::MappingTest < Test::Unit::TestCase
     end
 
     @table_name = "users"
-    @id_type = Class.new.new
   end
 
   def test_field_with_valid_arguments
-    flunk("TypeMap must be integrated into Repository to properly test field declarations")
-
     mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
 
     assert_nothing_raised do
-      mapping.field(:id, @id_type)
+      mapping.field(:id, @id_type.new)
     end
   end
 
   def test_field_requires_proper_arguments
-    flunk("TypeMap must be integrated into Repository to properly test field declarations")
-
     mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
 
     assert_raises(ArgumentError) do
-      mapping.field(:undeclared_field, @id_type)
+      mapping.field(:undeclared_accessor, @id_type.new)
     end
 
     assert_raises(ArgumentError) do
+      mapping.field(:id, @id_type)
+    end
+
+    assert_raises(Clipper::TypeMap::MatchError) do
       mapping.field(:id, nil)
     end
   end
