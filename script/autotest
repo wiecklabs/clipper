@@ -1,9 +1,11 @@
 #!/usr/bin/env jruby
 
 require "pathname"
-puts "Watching for changes.."
+puts "Watching for changes.. type 'r' + enter to re-run all tests"
 
 last_run = nil
+
+require "io/wait"
 
 begin
   loop do
@@ -11,6 +13,8 @@ begin
 
     lib_files = Dir["lib/**/*.rb"]
     test_files = Dir["tests/**/*_test.rb"]
+
+    last_run = nil if $stdin.ready? && $stdin.gets.chomp == "r"
 
     files = lib_files + test_files
 
