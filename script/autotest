@@ -7,6 +7,8 @@ last_run = nil
 
 begin
   loop do
+    start_time = Time.now
+
     lib_files = Dir["lib/**/*.rb"]
     test_files = Dir["tests/**/*_test.rb"]
 
@@ -15,8 +17,6 @@ begin
     changed_files = files.select do |file|
       last_run ? (File.mtime(file) > last_run) : true
     end
-
-    last_run = Time.now
 
     unless changed_files.empty?
 
@@ -39,6 +39,8 @@ begin
       end
 
     end
+
+    last_run = start_time
 
     sleep 2
   end
