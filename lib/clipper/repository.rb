@@ -31,19 +31,23 @@ module Clipper
     end
 
     def save(collection)
+      raise NotImplementedError.new("#{self.class}#save must be implemented.")
     end
 
     def create(collection)
-      true
+      raise NotImplementedError.new("#{self.class}#create must be implemented.")
     end
 
     def update(collection)
+      raise NotImplementedError.new("#{self.class}#update must be implemented.")
     end
 
     def delete(collection)
+      raise NotImplementedError.new("#{self.class}#delete must be implemented.")
     end
 
     def close
+      raise NotImplementedError.new("#{self.class}#close must be implemented.")
     end
   end
 end
