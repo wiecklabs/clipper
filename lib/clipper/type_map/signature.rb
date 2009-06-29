@@ -88,6 +88,8 @@ module Clipper
                 raise ArgumentError.new("Expected value to be an instance of #{type} but was #{value[i].inspect}")
               end
             end
+
+            value
           else
             if target_types.size == 1 && value.is_a?(target_types.first)
               value

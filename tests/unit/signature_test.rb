@@ -147,6 +147,45 @@ class SignatureTest < Test::Unit::TestCase
     end
   end
 
+  def test_type_casting_with_custom_type
+    signature = nil
+
+    type = Class.new do
+      attr_accessor :city, :state
+
+      def self.__load__(*values)
+        location = new
+        [:city, :state].zip(values) { |accessor, value| location.send("#{accessor}=", value) }
+        location
+      end
+
+      def self.__dump__(location)
+        [:city, :state].map { |accessor| location.send(accessor) }
+      end
+
+      signature = Clipper::TypeMap::Signature.new(
+        [self],
+        [String, String],
+        method(:__load__),
+        method(:__dump__)
+      )
+    end
+
+    assert_nothing_raised do
+      location = signature.typecast_left("city", "state")
+      assert(location.is_a?(type))
+      assert_equal("city", location.city)
+    end
+
+    assert_nothing_raised do
+      location = type.new
+      location.city = "city"
+
+      result = signature.typecast_right(location)
+      assert_equal("city", result[0])
+    end
+  end
+
   def test_signatures_should_be_type_equal
     one = Clipper::TypeMap::Signature.new([String], [Integer], lambda { }, lambda { })
     two = Clipper::TypeMap::Signature.new([String], [Integer], lambda { }, lambda { })

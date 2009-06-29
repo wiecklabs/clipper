@@ -21,6 +21,25 @@ class Address # Our custom, embedded-value type
     address
   end
 
+  def self.__load__(*values)
+    address = new
+    accessors.values.zip(values) { |accessor, value| accessor.set(address, value) }
+    address
+  end
+
+  def self.__dump__(address)
+    Address.accessors.values.map { |accessor| accessor.get(address) }
+  end
+
+  TYPES = Clipper::Repositories::Abstract::Types
+
+  Clipper::Repositories::Abstract.type_map << Clipper::TypeMap::Signature.new(
+    [self],
+    [TYPES::String, TYPES::String, TYPES::String, TYPES::String, TYPES::String],
+    method(:__load__),
+    method(:__dump__)
+  )
+
 end
 
 class Zoo
