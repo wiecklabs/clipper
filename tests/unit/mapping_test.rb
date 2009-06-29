@@ -62,4 +62,11 @@ class MappingTest < Test::Unit::TestCase
     end
   end
 
+  def test_map_yield_only_when_block_provided
+    assert_nothing_raised do
+      mapping = Clipper::Mapping.map(@session, @target, @name)
+      assert(mapping.is_a?(Clipper::Mapping))
+    end
+  end
+
 end

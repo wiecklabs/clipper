@@ -3,7 +3,7 @@ module Clipper
 
     def self.map(session, target, name)
       mapping = new(session, target, name)
-      yield mapping
+      yield mapping if block_given?
       mapping
     end
 

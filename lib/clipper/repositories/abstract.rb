@@ -26,7 +26,7 @@ module Clipper
       end
 
       def mappings
-        Clipper::Mappings[name]
+        @mappings ||= {}
       end
 
       def save(collection)
