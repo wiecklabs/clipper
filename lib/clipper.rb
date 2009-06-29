@@ -19,6 +19,8 @@ require Pathname(__FILE__).dirname + "clipper" + "accessors"
 require Pathname(__FILE__).dirname + "clipper" + "hooks"
 require Pathname(__FILE__).dirname + "clipper" + "collection"
 
+require Pathname(__FILE__).dirname + "clipper" + "repository"
+
 # require Pathname(__FILE__).dirname + "clipper" + "type"
 # require Pathname(__FILE__).dirname + "clipper" + "types"
 

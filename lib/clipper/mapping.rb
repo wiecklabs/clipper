@@ -1,24 +1,24 @@
 module Clipper
   class Mapping
 
-    def self.map(session, target, name)
-      mapping = new(session, target, name)
+    def self.map(repository, target, name)
+      mapping = new(repository, target, name)
       yield mapping if block_given?
       mapping
     end
 
     attr_reader :signatures, :accessors, :types
 
-    def initialize(session, target, name)
-      unless session.is_a?(Clipper::Session) && target.is_a?(Class) && name.is_a?(String)
-        raise ArgumentError.new("Expected [Clipper::Session<session>, Class<target>, String<name>] but got #{[session.class, target.class, name.class].inspect}")
+    def initialize(repository, target, name)
+      unless repository.is_a?(Clipper::Repository) && target.is_a?(Class) && name.is_a?(String)
+        raise ArgumentError.new("Expected [Clipper::Repository<repository>, Class<target>, String<name>] but got #{[repository.class, target.class, name.class].inspect}")
       end
 
       unless Clipper::Accessors > target
         raise ArgumentError.new("Mapped class #{target.inspect} must include Clipper::Accessors")
       end
 
-      @session = session
+      @repository = repository
       @target = target
       @name = name
 
@@ -28,7 +28,7 @@ module Clipper
     end
 
     def type_map
-      @session.repository.class.type_map
+      @repository.class.type_map
     end
 
     def field(field_name, *repository_types)

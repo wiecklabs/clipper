@@ -17,7 +17,6 @@ class Integration::MappingTest < Test::Unit::TestCase
 
     uri = Clipper::Uri.new("abstract://localhost/example")
     @repository = Clipper::registrations["abstract"] = Clipper::Repositories::Abstract.new("abstract", uri)
-    @session = Clipper::Session.new("abstract")
 
     @mapped_class = Class.new do
       include Clipper::Accessors
@@ -29,7 +28,7 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_field_with_valid_arguments
-    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
 
     assert_nothing_raised do
       mapping.field(:id, @id_type.new)
@@ -37,7 +36,7 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_field_requires_proper_arguments
-    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
 
     assert_raises(ArgumentError) do
       mapping.field(:undeclared_accessor, @id_type.new)
@@ -53,7 +52,7 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_field_adds_signature_accessor_and_types
-    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
 
     assert_equal(1, mapping.signatures.size)
@@ -62,7 +61,7 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_key_with_proper_arguments
-    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
 
     assert_nothing_raised do
@@ -71,7 +70,7 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_key_can_only_be_called_once
-    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
     mapping.key(:id)
 
@@ -81,7 +80,7 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_key_requires_field_to_be_declared
-    mapping = Clipper::Mapping.new(@session, @mapped_class, @table_name)
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
 
     assert_raises(ArgumentError) do
       mapping.key(:id)

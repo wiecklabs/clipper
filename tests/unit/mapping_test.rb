@@ -4,7 +4,7 @@ require Pathname(__FILE__).dirname.parent + "helper"
 class MappingTest < Test::Unit::TestCase
 
   def setup
-    @session = Clipper::Session.new("abstract")
+    @repository = Clipper::Repositories::Abstract.new("abstract", Clipper::Uri.new("abstract://localhost/example"))
 
     @target = Class.new do
       include Clipper::Accessors
@@ -18,7 +18,7 @@ class MappingTest < Test::Unit::TestCase
 
   def test_a_well_formed_mapping
     assert_nothing_raised do
-      Clipper::Mapping.new(@session, @target, @name)
+      Clipper::Mapping.new(@repository, @target, @name)
     end
   end
 
@@ -29,23 +29,23 @@ class MappingTest < Test::Unit::TestCase
     end
 
     assert_raises(ArgumentError) do
-      Clipper::Mapping.new(@session, nil, @name)
+      Clipper::Mapping.new(@repository, nil, @name)
     end
 
     assert_raises(ArgumentError) do
-      Clipper::Mapping.new(@session, @target, nil)
+      Clipper::Mapping.new(@repository, @target, nil)
     end
   end
 
   def test_target_must_include_accessors
     assert_raises(ArgumentError) do
-      Clipper::Mapping.new(@session, Class.new, @name)
+      Clipper::Mapping.new(@repository, Class.new, @name)
     end
   end
 
   def test_map_with_valid_arguments
     assert_nothing_raised do
-      Clipper::Mapping.map(@session, @target, @name) {}
+      Clipper::Mapping.map(@repository, @target, @name) {}
     end
   end
 
@@ -53,7 +53,7 @@ class MappingTest < Test::Unit::TestCase
     assert_nothing_raised do
       called = false
 
-      Clipper::Mapping.map(@session, @target, @name) do |map|
+      Clipper::Mapping.map(@repository, @target, @name) do |map|
         called = true
         assert(map.is_a?(Clipper::Mapping))
       end
@@ -64,7 +64,7 @@ class MappingTest < Test::Unit::TestCase
 
   def test_map_yield_only_when_block_provided
     assert_nothing_raised do
-      mapping = Clipper::Mapping.map(@session, @target, @name)
+      mapping = Clipper::Mapping.map(@repository, @target, @name)
       assert(mapping.is_a?(Clipper::Mapping))
     end
   end

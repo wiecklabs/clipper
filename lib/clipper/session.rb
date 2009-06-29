@@ -165,7 +165,7 @@ module Clipper
     end
 
     def map(target, mapped_name, &b)
-      mappings[target] = Clipper::Mapping.map(self, target, mapped_name, &b)
+      mappings[target] = Clipper::Mapping.map(repository, target, mapped_name, &b)
     end
 
     def get(target, *keys)
