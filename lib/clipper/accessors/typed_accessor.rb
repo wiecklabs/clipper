@@ -48,7 +48,7 @@ module Clipper
         when serializer = @@native_serializers[@type] then serializer.load(value)
         when Serializable > @type then @type.load(value)
         else
-          raise SerializationError.new("Don't know how to serialize #{@type.inspect}")
+          raise SerializationError.new(type, value)
         end
       end
 
@@ -66,6 +66,14 @@ module Clipper
         EOS
       end
 
+      def set(instance, value)
+        instance.send(:instance_variable_set, "@#{name}", value)
+      end
+
+      def get(instance)
+        instance.send(:instance_variable_get, "@#{name}")
+      end
+
       def hash
         [@target, @name, @type].hash
       end
@@ -78,11 +86,14 @@ module Clipper
       end
       alias == eql?
 
-      private
+    end
 
-      class SerializationError < StandardError
+    private
+
+    class SerializationError < StandardError
+      def initialize(type, value)
+        super("Don't know how to serialize #{value.inspect} to #{type.inspect}")
       end
-
     end
   end
 end

@@ -47,5 +47,37 @@ class SerializableTest < Test::Unit::TestCase
     assert_kind_of(City, me.home)
   end
 
+  def test_default_load_raises_error_when_clipper_accessor_not_included
+    type = Class.new do
+      include Clipper::Accessors::Serializable
+    end
+
+    assert_raises(Clipper::Accessors::SerializationError) { type.load("value") }
+  end
+
+  def test_default_load_raises_error_when_no_accessors_defined
+    type = Class.new do
+      include Clipper::Accessors
+      include Clipper::Accessors::Serializable
+    end
+
+    assert_raises(Clipper::Accessors::SerializationError) { type.load({ :city => "City" }) }
+  end
+
+  def test_default_load_handles_hash
+    type = Class.new do
+      include Clipper::Accessors
+      include Clipper::Accessors::Serializable
+
+      accessor :city => String
+    end
+
+    assert_nothing_raised do
+      value = type.load({ :city => "City" })
+      assert(value.is_a?(type))
+      assert_equal("City", value.city)
+    end
+  end
+
 end
 

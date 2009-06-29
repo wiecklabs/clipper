@@ -23,5 +23,19 @@ class TypedAccessorTest < Test::Unit::TestCase
     assert_equal("Bob", bob.name)
     assert_equal(30, bob.age)
   end
+
+  def test_get
+    bob = Person.new
+    bob.name = "Bob"
+
+    assert_equal("Bob", Person.accessors[:name].get(bob))
+  end
+
+  def test_set
+    bob = Person.new
+    Person.accessors[:name].set(bob, "Bob")
+
+    assert_equal("Bob", bob.name)
+  end
 end
 
