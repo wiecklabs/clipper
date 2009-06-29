@@ -1,6 +1,10 @@
 module Clipper
   class Repository
 
+    ##
+    # Returns instance of Clipper::TypeMap for holding this repository's
+    # type mappings.
+    ##
     def self.type_map
       @type_map ||= Clipper::TypeMap.new
     end
