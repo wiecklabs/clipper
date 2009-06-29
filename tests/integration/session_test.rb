@@ -5,6 +5,8 @@ class Integration::SessionTest < Test::Unit::TestCase
   def setup
     @person = Class.new do
       include Clipper::Model
+
+      constrain("default")
     end
 
     Clipper::open("default", "abstract://localhost/example")
@@ -32,6 +34,15 @@ class Integration::SessionTest < Test::Unit::TestCase
     end
 
     assert_equal(mapping, session.mappings[@person])
+  end
+
+  def test_validate
+    session = Clipper::Session.new("default")
+
+    assert_nothing_raised do
+      result = session.validate(@person.new)
+      assert(result.is_a?(Clipper::Validations::ValidationResult))
+    end
   end
 
 end

@@ -11,7 +11,7 @@ module Clipper
       if context = self.class.__validation_contexts__[context_name]
         context.validate(self)
       else
-        raise ArgumentError.new("No constraints are defined for #{instance.class.inspect} within the #{context_name} context.")
+        raise ArgumentError.new("No constraints are defined for #{self.class.inspect} within the #{context_name} context.")
       end
     end
 
