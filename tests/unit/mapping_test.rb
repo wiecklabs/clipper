@@ -69,4 +69,11 @@ class MappingTest < Test::Unit::TestCase
     end
   end
 
+  def test_keys_are_required
+    assert_raise(Clipper::Mapping::NoKeyError) do
+      mapping = Clipper::Mapping.new(@repository, @target, @name)
+      mapping.keys
+    end
+  end
+
 end

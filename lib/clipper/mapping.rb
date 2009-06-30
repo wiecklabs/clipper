@@ -22,6 +22,8 @@ module Clipper
       @target = target
       @name = name
 
+      @keys = java.util.LinkedHashSet.new
+
       @signatures = java.util.LinkedHashSet.new
       @accessors = java.util.LinkedHashSet.new
       @types = java.util.LinkedHashSet.new
@@ -48,15 +50,27 @@ module Clipper
     end
 
     def key(*field_names)
-      raise ArgumentError.new("The key for Mapping<#{@name}> is already defined as #{@key.inspect}") if @keys
+      raise ArgumentError.new("The key for Mapping<#{@name}> is already defined as #{@keys.inspect}") unless @keys.empty?
 
       missing_fields = field_names.reject { |field_name| @accessors.any? { |accessor| accessor.name == field_name } }
 
       unless missing_fields.empty?
-        raise ArgumentError.new("#{missing_fields.inspect} have not been delcared as fields.")
+        raise UnmappedFieldError.new("Mapping<#{@name}>: #{missing_fields.inspect} #{missing_fields.size > 1 ? "have" : "has"} not been delcared as #{missing_fields.size > 1 ? "fields" : "a field"}.")
       end
 
       @keys = field_names
+    end
+
+    def keys
+      raise NoKeyError.new("No keys for Mapping<#{@name}> were defined.") if @keys.empty?
+    end
+
+    private
+
+    class UnmappedFieldError < StandardError
+    end
+
+    class NoKeyError < StandardError
     end
 
   end

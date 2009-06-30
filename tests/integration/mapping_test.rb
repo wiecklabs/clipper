@@ -5,7 +5,7 @@ class Integration::MappingTest < Test::Unit::TestCase
 
   def setup
     @id_type = Class.new do
-      include Clipper::Repositories::Type
+      include Clipper::Repository::Type
     end
 
     Clipper::Repositories::Abstract.type_map << Clipper::TypeMap::Signature.new(
@@ -82,7 +82,7 @@ class Integration::MappingTest < Test::Unit::TestCase
   def test_key_requires_field_to_be_declared
     mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
 
-    assert_raises(ArgumentError) do
+    assert_raises(Clipper::Mapping::UnmappedFieldError) do
       mapping.key(:id)
     end
   end

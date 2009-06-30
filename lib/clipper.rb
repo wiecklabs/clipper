@@ -11,7 +11,6 @@ require Pathname(__FILE__).dirname + "wieck" + "string"
 
 # require Pathname(__FILE__).dirname.parent + "clipper_internal.jar"
 
-
 require Pathname(__FILE__).dirname + "clipper" + "uri"
 require Pathname(__FILE__).dirname + "clipper" + "type_map"
 require Pathname(__FILE__).dirname + "clipper" + "model"
@@ -20,11 +19,13 @@ require Pathname(__FILE__).dirname + "clipper" + "hooks"
 require Pathname(__FILE__).dirname + "clipper" + "collection"
 
 require Pathname(__FILE__).dirname + "clipper" + "repository"
+require Pathname(__FILE__).dirname + "clipper" + "repository" + "type"
 
 # require Pathname(__FILE__).dirname + "clipper" + "type"
 # require Pathname(__FILE__).dirname + "clipper" + "types"
 
 require Pathname(__FILE__).dirname + "clipper" + "mapping"
+require Pathname(__FILE__).dirname + "clipper" + "mapping" + "field"
 # require Pathname(__FILE__).dirname + "clipper" + "mappings" + "mapping"
 # require Pathname(__FILE__).dirname + "clipper" + "mappings" + "relation"
 # require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "association"
