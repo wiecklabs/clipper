@@ -24,6 +24,18 @@ module Clipper
         true
       end
 
+      def table_exists?(table_name)
+        true
+      end
+
+      def create_table(mapping)
+        true
+      end
+
+      def drop_table(mapping)
+        true
+      end
+
       def close
         true
       end
