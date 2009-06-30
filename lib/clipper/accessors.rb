@@ -8,7 +8,7 @@ module Clipper
     module ClassMethods
 
       def accessors
-        @accessors ||= {}
+        @accessors ||= java.util.LinkedHashMap.new
       end
 
       def accessor(methods)
