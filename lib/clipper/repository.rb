@@ -46,6 +46,18 @@ module Clipper
       raise NotImplementedError.new("#{self.class}#delete must be implemented.")
     end
 
+    def table_exists?(table_name)
+      raise NotImplementedError.new("#{self.class}#table_exists? must be implemented.")
+    end
+
+    def create_table(mapping)
+      raise NotImplementedError.new("#{self.class}#table_exists? must be implemented.")
+    end
+
+    def drop_table(mapping)
+      raise NotImplementedError.new("#{self.class}#table_exists? must be implemented.")
+    end
+
     def close
       raise NotImplementedError.new("#{self.class}#close must be implemented.")
     end
