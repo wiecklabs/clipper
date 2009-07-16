@@ -1,53 +1,58 @@
 #!/usr/bin/env jruby
 
 require "pathname"
-puts "Watching for changes.. type 'r' + enter to re-run all tests"
 
 last_run = nil
+interrupted = false
 
 require "io/wait"
 
-begin
-  loop do
-    start_time = Time.now
-
-    lib_files = Dir["lib/**/*.rb"]
-    test_files = Dir["tests/**/*_test.rb"]
-
-    last_run = nil if $stdin.ready? && $stdin.gets.chomp == "r"
-
-    files = lib_files + test_files
-
-    changed_files = files.select do |file|
-      last_run ? (File.mtime(file) > last_run) : true
-    end
-
-    unless changed_files.empty?
-
-      test_files_to_run = []
-
-      changed_files.each do |file|
-        if file =~ /lib\//
-          test_files_to_run |= test_files.select { |f| "#{File.basename(file, ".rb")}_test.rb" == File.basename(f) }
-        elsif file =~ /tests\//
-          test_files_to_run |= [file]
-        end
-      end
-
-      puts "Testing: #{test_files_to_run.join(", ")}"
-      IO.popen("jruby -e 'ARGV.each{|f| load f}' #{test_files_to_run.join(" ")}", "r") do |stream|
-        while (d = stream.read(1))
-          STDOUT.print d
-          STDOUT.flush
-        end
-      end
-
-    end
-
-    last_run = start_time
-
-    sleep 2
+Signal.trap("INT") do
+  if interrupted
+    puts "Shutting down..."
+    exit
+  else
+    puts "Re-running all tests..."
+    last_run = nil
+    interrupted = true
   end
-rescue Interrupt
-  puts "Shutting down..."
+end
+
+loop do
+  interrupted = false
+  start_time = Time.now
+
+  lib_files = Dir["lib/**/*.rb"]
+  test_files = Dir["tests/**/*_test.rb"]
+
+  files = lib_files + test_files
+
+  changed_files = files.select do |file|
+    last_run ? (File.mtime(file) > last_run) : true
+  end
+
+  unless changed_files.empty?
+
+    test_files_to_run = []
+
+    changed_files.each do |file|
+      if file =~ /lib\//
+        test_files_to_run |= test_files.select { |f| "#{File.basename(file, ".rb")}_test.rb" == File.basename(f) }
+      elsif file =~ /tests\//
+        test_files_to_run |= [file]
+      end
+    end
+
+    puts "Testing: #{test_files_to_run.join(", ")}"
+    IO.popen("jruby -e 'ARGV.each{|f| load f}' #{test_files_to_run.join(" ")}", "r") do |stream|
+      while (d = stream.read(1))
+        STDOUT.print d
+        STDOUT.flush
+      end
+    end
+
+  end
+
+  last_run = start_time
+  sleep 2
 end
