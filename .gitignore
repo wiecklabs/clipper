@@ -2,3 +2,7 @@ mem.*
 profile.txt
 pkg
 *.db
+bkp
+.autotest
+.ssh
+_viminfo

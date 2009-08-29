@@ -301,29 +301,30 @@ module Clipper
       end
 
       def column_definition(field)
-        column_name = quote_identifier(field.name)
-        case field.type
-        when Clipper::Types::Integer
-          "#{column_name} INTEGER"
-        when Clipper::Types::Serial
-          "#{column_name} #{column_definition_serial(field)}"
-        when Clipper::Types::Float
-          "#{column_name} #{column_definition_float(field)}"
-        when Clipper::Types::String
-          "#{column_name} #{column_definition_string(field)}"
-        when Clipper::Types::Text
-          "#{column_name} #{column_definition_text(field)}"
-        when Clipper::Types::DateTime
-          "#{column_name} TIMESTAMP"
-        when Clipper::Types::Date
-          "#{column_name} DATE"
-        when Clipper::Types::Time
-          "#{column_name} TIME"
-        when Clipper::Types::Boolean
-          "#{column_name} #{column_definition_boolean(field)}"
-        else
-          raise Clipper::UnsupportedTypeError.new(field.type)
-        end
+        "#{quote_identifier(field.name)} #{field.type.col_definition}"
+#        column_name = quote_identifier(field.name)
+#        case field.type
+#        when Clipper::Types::Integer
+#          "#{column_name} INTEGER"
+#        when Clipper::Types::Serial
+#          "#{column_name} #{column_definition_serial(field)}"
+#        when Clipper::Types::Float
+#          "#{column_name} #{column_definition_float(field)}"
+#        when Clipper::Types::String
+#          "#{column_name} #{column_definition_string(field)}"
+#        when Clipper::Types::Text
+#          "#{column_name} #{column_definition_text(field)}"
+#        when Clipper::Types::DateTime
+#          "#{column_name} TIMESTAMP"
+#        when Clipper::Types::Date
+#          "#{column_name} DATE"
+#        when Clipper::Types::Time
+#          "#{column_name} TIME"
+#        when Clipper::Types::Boolean
+#          "#{column_name} #{column_definition_boolean(field)}"
+#        else
+#          raise Clipper::UnsupportedTypeError.new(field.type)
+#        end
       end
 
       def column_definition_float(field)

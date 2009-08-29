@@ -22,7 +22,7 @@ require Pathname(__FILE__).dirname + "clipper" + "repository"
 require Pathname(__FILE__).dirname + "clipper" + "repository" + "type"
 
 # require Pathname(__FILE__).dirname + "clipper" + "type"
-# require Pathname(__FILE__).dirname + "clipper" + "types"
+require Pathname(__FILE__).dirname + "clipper" + "types"
 
 require Pathname(__FILE__).dirname + "clipper" + "mapping"
 require Pathname(__FILE__).dirname + "clipper" + "mapping" + "field"
@@ -51,6 +51,7 @@ require Pathname(__FILE__).dirname + "clipper" + "validations" + "equality_valid
 require Pathname(__FILE__).dirname + "clipper" + "repositories"
 require Pathname(__FILE__).dirname + "clipper" + "repositories" + "schema"
 require Pathname(__FILE__).dirname + "clipper" + "repositories" + "abstract"
+require Pathname(__FILE__).dirname + "clipper" + "repositories" + "types" + "types"
 
 require Pathname(__FILE__).dirname + "clipper" + "query" + "query"
 require Pathname(__FILE__).dirname + "clipper" + "query" + "expression"

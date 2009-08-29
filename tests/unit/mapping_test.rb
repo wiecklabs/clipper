@@ -22,6 +22,10 @@ class MappingTest < Test::Unit::TestCase
     end
   end
 
+  def test_has_a_name
+    assert_equal(@name, Clipper::Mapping.new(@repository, @target, @name).name)
+  end
+
   def test_requires_proper_arguments
     assert_raises(ArgumentError) do
       Clipper::Mapping.new(nil, @target, @name)
