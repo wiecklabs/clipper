@@ -6,3 +6,5 @@ bkp
 .autotest
 .ssh
 _viminfo
+.bash_history
+nbproject

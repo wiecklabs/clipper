@@ -63,6 +63,7 @@ require Pathname(__FILE__).dirname + "clipper" + "syntax" + "sql"
 require Pathname(__FILE__).dirname + "clipper" + "session"
 require Pathname(__FILE__).dirname + "clipper" + "identity_map"
 require Pathname(__FILE__).dirname + "clipper" + "schema"
+require Pathname(__FILE__).dirname + "clipper" + "unit_of_work"
 require Pathname(__FILE__).dirname + "clipper" + "session" + "helper"
 
 module Clipper
