@@ -5,6 +5,7 @@ module Clipper
       @session = session
       @flush_immediately = flush_immediately
       @work_orders = []
+      @original_values = {}
     end
 
     def register(object)
@@ -67,6 +68,19 @@ module Clipper
       end
 
       execute if @flush_immediately
+    end
+
+    def register_clean(object)
+      original = {}
+      @session.mappings[object.class].fields.each do |field|
+        original[field] = field.accessor.get(object)
+      end
+      @original_values[object.object_id] = original
+      nil
+    end
+
+    def proxy_for(object)
+      Clipper::Model::Proxy.new(object, @session.mappings[object.class], @original_values[object.object_id])
     end
 
     def execute
