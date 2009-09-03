@@ -83,7 +83,7 @@ module Clipper
     end
 
     def find(target, options, conditions)
-      mapping = target.is_a?(Clipper::Mappings::Mapping) ? target : repository.mappings[target]
+      mapping = target.is_a?(Clipper::Mapping) ? target : repository.mappings[target]
 
       map_results(repository.select(Query.new(mapping, options, conditions), self))
     end
@@ -91,7 +91,7 @@ module Clipper
     def key(instance)
       mapping = repository.mappings[instance.class]
       mapping.keys.map do |field|
-        field.get(instance)
+        field.accessor.get(instance)
       end
     end
 

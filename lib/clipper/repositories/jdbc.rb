@@ -3,7 +3,6 @@ require Pathname(__FILE__).dirname.parent.parent + "vendor" + "c3p0-0.9.1.2.jar"
 module Clipper
   module Repositories
     class Jdbc < Abstract
-
       import 'org.apache.log4j.Logger'
       import 'java.sql.Types'
 
@@ -78,7 +77,7 @@ module Clipper
               get_value_from_result_set(results, i, field.type)
             end
 
-            mapping_fields.zip(values) { |field, value| field.value(resource).set!(value) }
+            mapping_fields.zip(values) { |field, value| field.accessor.set(resource, value) }
             collection << resource
           end
 
@@ -91,21 +90,21 @@ module Clipper
       end
 
       def get_value_from_result_set(results, index, type)
-        case type
-        when Clipper::Types::Time
-          t = results.getTime(index)
-          Time.local(t.seconds, t.minutes, t.hours, *Time.now.to_a[3..-1])
-        when Clipper::Types::Date
-          d = results.getDate(index)
-          Date.new(d.year + 1900, d.month + 1, d.date)
-        when Clipper::Types::DateTime
-          t = results.getTimestamp(index)
-          Time.at(*t.getTime.divmod(1000)).send(:to_datetime)
-        when Clipper::Types::Boolean
-          results.getBoolean(index)
-        else
+#        case type
+#        when Clipper::Types::Time
+#          t = results.getTime(index)
+#          Time.local(t.seconds, t.minutes, t.hours, *Time.now.to_a[3..-1])
+#        when Clipper::Types::Date
+#          d = results.getDate(index)
+#          Date.new(d.year + 1900, d.month + 1, d.date)
+#        when Clipper::Types::DateTime
+#          t = results.getTimestamp(index)
+#          Time.at(*t.getTime.divmod(1000)).send(:to_datetime)
+#        when Clipper::Types::Boolean
+#          results.getBoolean(index)
+#        else
           results.getObject(index)
-        end
+#        end
       end
 
       def create(collection, session)
@@ -113,11 +112,11 @@ module Clipper
           metadata = connection.getMetaData
 
           mapping = collection.mapping
-          serial_key = mapping.keys.detect { |field| field.type.is_a?(Clipper::Types::Serial) }
+          serial_key = mapping.keys.detect { |field| field.type.is_a?(self.class::Types::Serial) }
 
           collection.each do |object|
 
-            values = mapping.fields.map { |field| field.value(object) }.select { |value| value.dirty? }
+            values = session.unit_of_work.proxy_for(object).dirty_values
 
             statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} "
             statement << "(" + values.map { |value| quote_identifier(value.field.name) } * ", "
@@ -139,10 +138,10 @@ module Clipper
 
             result = metadata.supportsGetGeneratedKeys ? generated_keys(connection, stmt) : generated_keys(connection)
 
-            serial_key.value(object).set!(result) if serial_key && result
-            values.each { |value| value.set_original_value! }
+            serial_key.accessor.set(object, result) if serial_key && result
 
             session.identity_map.add(object)
+            session.unit_of_work.register_clean(object)
             stmt.close
           end
         end
@@ -156,9 +155,9 @@ module Clipper
           mapping = collection.mapping
 
           collection.each do |object|
-
-            key_values = mapping.keys.map { |field| field.value(object) }
-            values = mapping.fields.map { |field| field.value(object) }.select { |value| value.dirty? }
+            proxy = session.unit_of_work.proxy_for(object)
+            key_values = proxy.key_values
+            values = proxy.dirty_values
 
             next if values.empty?
 
@@ -181,7 +180,7 @@ module Clipper
             stmt.execute
             stmt.close
 
-            values.each { |value| value.set_original_value! }
+            session.unit_of_work.register_clean(object)
           end
         end
       end
@@ -206,7 +205,7 @@ module Clipper
           collection.each do |object|
             result = nil
 
-            attributes = key_fields.map { |key_field| [key_field, key_field.get(object)] }
+            attributes = key_fields.map { |key_field| [key_field, key_field.accessor.get(object)] }
 
             attributes.each_with_index do |attribute, index|
               bind_value_to_statement(stmt, index + 1, *attribute)
@@ -327,57 +326,58 @@ module Clipper
 #        end
       end
 
-      def column_definition_float(field)
-        "FLOAT(#{field.type.scale}, #{field.type.precision})"
-      end
-
-      def column_definition_serial(field)
-        "INTEGER AUTO_INCREMENT"
-      end
-
-      def column_definition_string(field)
-        "VARCHAR(#{field.type.size})"
-      end
-
-      def column_definition_text(field)
-        "TEXT"
-      end
-      
-      def column_definition_boolean(field)
-        "BOOL"
-      end
+#      def column_definition_float(field)
+#        "FLOAT(#{field.type.scale}, #{field.type.precision})"
+#      end
+#
+#      def column_definition_serial(field)
+#        "INTEGER AUTO_INCREMENT"
+#      end
+#
+#      def column_definition_string(field)
+#        "VARCHAR(#{field.type.size})"
+#      end
+#
+#      def column_definition_text(field)
+#        "TEXT"
+#      end
+#
+#      def column_definition_boolean(field)
+#        "BOOL"
+#      end
 
       def bind_value_to_statement(statement, index, field, value)
         if value.nil?
           statement.setNull(index, 4)
         else
           case field.type
-          when Clipper::Types::Integer
+          # FIXME: Should work for other repositories types
+          when self.class::Types::Integer
             statement.setInt(index, value)
-          when Clipper::Types::Serial
+          when self.class::Types::Serial
             statement.setInt(index, value)
-          when Clipper::Types::String
+          when self.class::Types::String
             statement.setString(index, value)
-          when Clipper::Types::Text
-            statement.setString(index, value)
-          when Clipper::Types::Float
+#          when Clipper::Types::Text
+#            statement.setString(index, value)
+          when self.class::Types::Float
             statement.setString(index, value.to_s)
-          when Clipper::Types::Boolean
+          when self.class::Types::Boolean
             statement.setBoolean(index, value)
-          when Clipper::Types::Time
-            statement.setTime(index, java.sql.Time.new(value.to_f * 1000))
-          when Clipper::Types::Date
-            statement.setDate(index, java.sql.Date.new(Time.local(value.year, value.month, value.day).to_f * 1000))
-          when Clipper::Types::DateTime
-            case value
-            when Time
-              time = value.utc
-            else
-              d = value.new_offset
-              time = Time.utc(d.year, d.month, d.day, d.hour, d.min, d.sec, d.sec_fraction * 86400000000)
-            end
-
-            statement.setTimestamp(index, java.sql.Timestamp.new(time.to_f * 1000))
+#          when Clipper::Types::Time
+#            statement.setTime(index, java.sql.Time.new(value.to_f * 1000))
+#          when Clipper::Types::Date
+#            statement.setDate(index, java.sql.Date.new(Time.local(value.year, value.month, value.day).to_f * 1000))
+#          when Clipper::Types::DateTime
+#            case value
+#            when Time
+#              time = value.utc
+#            else
+#              d = value.new_offset
+#              time = Time.utc(d.year, d.month, d.day, d.hour, d.min, d.sec, d.sec_fraction * 86400000000)
+#            end
+#
+#            statement.setTimestamp(index, java.sql.Timestamp.new(time.to_f * 1000))
           else
             raise Clipper::UnsupportedTypeError.new(field.type)
           end

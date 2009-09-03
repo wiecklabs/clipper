@@ -26,3 +26,48 @@ git status
 git status
 git status
 exit
+git status
+git branch master
+git checkou master
+git checkout master
+git checkout -b working
+git status
+git commit -m "Moving UoW out to a file"
+git add .
+git commit -m "Moving UoW out to a file"
+git status
+git checkout master
+git branch -a
+git branch -d crud 
+git branch -d working 
+git branch -D working 
+git branch -a
+git checkout -b working
+git status
+git commit -m "Moving unit of work out to a file and creating an accessor for it on session"
+git add .
+git commit -m "Moving unit of work out to a file and creating an accessor for it on session"
+git status
+git status
+git status
+git help
+git help diff
+git diff lib/clipper/unit_of_work.rb
+git status
+git status
+git commit -m 
+git commit -m "Introducing Model::Proxy"
+git add .
+git commit -m "Introducing Model::Proxy"
+git status
+git status
+git add .
+git status
+git rm .gitk
+git rm -f .gitk
+git status
+git commit -m "Integrating Model::Proxy into UnitOfWork"
+git branch~-a
+git branch -a
+git status
+exit

@@ -103,4 +103,11 @@ class Integration::MappingTest < Test::Unit::TestCase
     end
   end
 
+  def test_is_key
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    id = mapping.field(:id, @id_type.new)
+    mapping.key(:id)
+
+    assert(mapping.is_key?(id))
+  end
 end

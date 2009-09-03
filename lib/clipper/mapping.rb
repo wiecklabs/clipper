@@ -14,7 +14,7 @@ module Clipper
       field
     end
 
-    attr_reader :signatures, :accessors, :types, :name, :fields
+    attr_reader :signatures, :accessors, :types, :name, :fields, :target
 
     def initialize(repository, target, name)
       unless repository.is_a?(Clipper::Repository) && target.is_a?(Class) && name.is_a?(String)
@@ -77,6 +77,10 @@ module Clipper
     def keys
       raise NoKeyError.new("No keys for Mapping<#{@name}> were defined.") if @keys.empty?
       @keys.map {|key| self[key]}
+    end
+
+    def is_key?(field)
+      keys.include?(field)
     end
 
     private

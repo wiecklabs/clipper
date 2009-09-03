@@ -44,6 +44,12 @@ module Clipper
           Value.new(field, original, field.accessor.get(@model))
         end
       end
+
+      def key_values
+        @key_values ||= values.select do |value|
+          @mapping.is_key?(value.field)
+        end
+      end
     end
   end
 end

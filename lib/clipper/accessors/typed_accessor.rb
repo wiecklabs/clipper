@@ -13,7 +13,18 @@ module Clipper
       end
     end
 
+    class BooleanSerializer
+      def self.load(value)
+        if value.nil? or value == false or value == 0
+          return false
+        else
+          return true
+        end
+      end
+    end
+
     class TypedAccessor
+      include Clipper::Types
 
       ##
       # Defines mappings from native types to Clipper Serializers.
@@ -22,7 +33,8 @@ module Clipper
       ##
       @@native_serializers = {
         String => Clipper::Accessors::StringSerializer,
-        Integer => Clipper::Accessors::IntegerSerializer
+        Integer => Clipper::Accessors::IntegerSerializer,
+        Boolean => Clipper::Accessors::BooleanSerializer
       }.freeze
 
       attr_reader :target, :name, :type

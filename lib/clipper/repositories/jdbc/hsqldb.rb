@@ -6,27 +6,12 @@ module Clipper
     class Jdbc
       class Hsqldb < Jdbc
 
+        Types = Clipper::Repositories::Types::Hsqldb
+
         def initialize(name, uri)
           super
 
           @data_source = com.mchange.v2.c3p0.DataSources.unpooledDataSource(uri.to_s)
-        end
-
-        def column_definition_serial(field)
-          "IDENTITY"
-        end
-
-        def column_definition_float(field)
-          "FLOAT"
-        end
-        
-        def column_definition_boolean(field)
-          "BOOLEAN"
-        end
-
-        # TODO: Is this the only way?
-        def column_definition_text(field)
-          "VARCHAR(#{java.lang.Integer::MAX_VALUE})"
         end
 
         def generated_keys(connection)
@@ -46,7 +31,7 @@ module Clipper
           key
         end
 
-      end # class Sqlite
+      end # class Hsqldb
     end # class Jdbc
   end # module Repositories
 end # module Clipper

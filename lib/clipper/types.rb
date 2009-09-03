@@ -5,6 +5,9 @@ module Clipper
     class Serial
     end
 
+    class Boolean
+    end
+
 #    @types = {}
 #
 #    def self.[](name)
