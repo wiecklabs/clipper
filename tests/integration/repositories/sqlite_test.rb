@@ -33,13 +33,4 @@ class Integration::SqliteTest < Test::Unit::TestCase
     assert(File.exists?(@sqlite_path))
   end
 
-  def test_has_a_syntax
-    assert_kind_of(Clipper::Syntax::Sql, Clipper::registrations["default"].syntax)
-  end
-
-  def test_schema_raises_for_unmapped_classes
-    schema = Clipper::Schema.new("default")
-    assert_raise(Clipper::Mappings::UnmappedClassError) { schema.create(Class.new) }
-  end
-
 end

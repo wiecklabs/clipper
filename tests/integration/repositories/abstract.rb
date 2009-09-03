@@ -468,4 +468,13 @@ module Integration::AbstractRepositoryTest
   ensure
     schema.destroy(@person)
   end
+
+  def test_has_a_syntax
+    assert_kind_of(Clipper::Syntax::Sql, Clipper::registrations["default"].syntax)
+  end
+
+  def test_schema_raises_for_unmapped_classes
+    schema = Clipper::Schema.new("default")
+    assert_raise(Clipper::Schema::UnmappedClassError) { schema.create(Class.new) }
+  end
 end

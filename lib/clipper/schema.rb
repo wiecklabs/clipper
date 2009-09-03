@@ -6,6 +6,7 @@ module Clipper
 
     def create(mapped_class)
       mapping = @repository.mappings[mapped_class]
+      raise UnmappedClassError.new() if mapping.nil?
 #      mapping.associations.each do |association|
 #        next unless association.is_a?(Clipper::Mappings::ManyToMany)
 #        @repository.schema.create(association.target_mapping)
@@ -25,6 +26,10 @@ module Clipper
 #        @repository.schema.destroy(association.target_mapping)
 #      end
       @repository.schema.destroy(mapping)
+    end
+
+    class UnmappedClassError < StandardError
+
     end
   end
 end
