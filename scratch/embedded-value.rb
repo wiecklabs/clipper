@@ -31,14 +31,13 @@ class Address # Our custom, embedded-value type
     Address.accessors.values.map { |accessor| accessor.get(address) }
   end
 
-  TYPES = Clipper::Repositories::Abstract::Types
-
-  Clipper::Repositories::Abstract.type_map << Clipper::TypeMap::Signature.new(
-    [self],
-    [TYPES::String, TYPES::String, TYPES::String, TYPES::String, TYPES::String],
-    method(:__load__),
-    method(:__dump__)
-  )
+  # Adds signature to default repository type map
+  orm.map_type do |signature, types|
+    signature.from [self]
+    signature.typecast_left method(:__load__)
+    signature.to [types.string, types.string, types.string, types.string, types.string]
+    signature.typecast_right method(:__dump__)
+  end
 
 end
 
@@ -67,23 +66,19 @@ class Zoo
     check.size(zoo.address.state, 50)
   end
 
-  # This allows us to simply shortcut to the repository specific types.
-  # We could do this on include Clipper::Model: namely, copy over the types
-  # for any database adapters loaded, which in most cases, would be just one.
-  Postgres = Clipper::Adapters::Postgres::Types
-
-  orm.map(self, "zoos") do |zoos|
-    zoos.field :id,   Postgres::Serial.new
+  # type object is a shortcut to current repository types
+  orm.map(self, "zoos") do |zoos, type|
+    zoos.field :id,      type.serial
 
     # The Field will use the bound-method name as the field-name by default.
-    zoos.field :name, Postgres::String.new(200)
+    zoos.field :name,    type.string(200)
 
     # Here we must specify the field names for the embedded-value.
-    zoos.field :city, Postgres::String.new(100, "address_address_1"),
-                      Postgres::String.new(100, "address_address_2"),
-                      Postgres::String.new(100, "address_city"),
-                      Postgres::String.new(50, "address_state"),
-                      Postgres::String.new(50, "address_zip_code")
+    zoos.field :address, type.string(200, "address_address_1"),
+                         type.string(100, "address_address_2"),
+                         type.string(100, "address_city"),
+                         type.string(50, "address_state"),
+                         type.string(50, "address_zip_code")
   end
 
 end
