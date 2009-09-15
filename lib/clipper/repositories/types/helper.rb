@@ -10,8 +10,10 @@ module Clipper
         end
 
         def method_missing(method, *args)
-          type = @types_module.const_get(method.to_s.capitalize)
-          type = type.allocate
+          # TODO: Is there a better way of doing this?
+          type_class = method.to_s.split('_').map{|str| str.capitalize}.join
+          type_class = @types_module.const_get(type_class)
+          type = type_class.allocate
           type.send(:initialize, *args)
           type
         rescue NameError
