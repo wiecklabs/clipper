@@ -25,7 +25,7 @@ class Integration::UnitOfWorkTest < Test::Unit::TestCase
       accessor :children => Integer
     end
 
-    orm.map(@person, 'person') do |person|
+    orm.map(@person, 'person') do |person, type|
       person.field(:id, @repository_type.new)
       person.field(:children, @repository_type.new)
     end

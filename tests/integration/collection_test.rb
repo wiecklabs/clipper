@@ -22,8 +22,8 @@ class Integration::CollectionTest < Test::Unit::TestCase
 
       accessor :id => Integer
 
-      orm.map(self, "people") do |people|
-        people.field :id, Clipper::Repositories::Types::Hsqldb::Serial.new
+      orm.map(self, "people") do |people, type|
+        people.field :id, type.serial
         people.key :id
       end
     end

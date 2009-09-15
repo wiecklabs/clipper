@@ -42,12 +42,12 @@ module Integration::AbstractRepositoryTest
       accessor :city => String
       accessor :state => String
 
-      orm.map(self, "abstract_zoos") do |zoos|
-        zoos.field :id, repository_types::Serial.new
-        zoos.field :name, repository_types::String.new(200)
-        zoos.field :city, repository_types::String.new(200)
-        zoos.field :state, repository_types::String.new(200)
-#        zoos.field "notes", Clipper::Types::Text
+      orm.map(self, "abstract_zoos") do |zoos, type|
+        zoos.field :id, type.serial
+        zoos.field :name, type.string(200)
+        zoos.field :city, type.string(200)
+        zoos.field :state, type.string(200)
+#        zoos.field :notes, type.text
         zoos.key :id
       end
 
@@ -59,11 +59,11 @@ module Integration::AbstractRepositoryTest
 #    @climate = Class.new do
 #      include Clipper::Model
 #
-#      Clipper::Mappings["default"].map(self, "climates") do |climates|
-#        climates.field("region", Clipper::Types::String.new(200))
-#        climates.field("climate", Clipper::Types::String.new(200))
+#      orm.map(self, "climates") do |climates, type|
+#        climates.field :region", type.string(200)
+#        climates.field :climate", type.string(200)
 #
-#        climates.key(climates["region"])
+#        climates.key :region
 #      end
 #    end
 #
@@ -75,11 +75,11 @@ module Integration::AbstractRepositoryTest
       accessor :region => String
       accessor :capital => Boolean
 
-      orm.map(self, "cities") do |cities|
-        cities.field :name, repository_types::String.new(200)
-        cities.field :state, repository_types::String.new(200)
-        cities.field :region, repository_types::String.new(200)
-        cities.field :capital, repository_types::Boolean.new
+      orm.map(self, "cities") do |cities, type|
+        cities.field :name, type.string(200)
+        cities.field :state, type.string(200)
+        cities.field :region, type.string(200)
+        cities.field :capital, type.boolean
 
         cities.key(:name, :state)
       end
@@ -92,10 +92,10 @@ module Integration::AbstractRepositoryTest
       accessor :name => String
       accessor :gpa => Float
 
-      orm.map(self, "people") do |people|
-        people.field :id, repository_types::Serial.new
-        people.field :name, repository_types::String.new(200)
-        people.field :gpa, repository_types::Float.new#(7, 2)
+      orm.map(self, "people") do |people, type|
+        people.field :id, type.serial
+        people.field :name, type.string(200)
+        people.field :gpa, type.float#(7, 2)
 
         people.key :id
       end
@@ -104,12 +104,12 @@ module Integration::AbstractRepositoryTest
 #    @article = Class.new do
 #      include Clipper::Model
 #
-#      Clipper::Mappings["default"].map(self, "articles") do |articles|
-#        articles.field("id", Clipper::Types::Serial)
-#        articles.field("time", Time)
-#        articles.field("date", Date)
-#        articles.field("datetime", DateTime)
-#        articles.key(articles["id"])
+#      Clipper::Mappings["default"].map(self, "articles") do |articles, type|
+#        articles.field :id, type.serial
+#        articles.field :time, type.time
+#        articles.field :date, type.date
+#        articles.field :datetime, type.date_time
+#        articles.key :id
 #      end
 #    end
   end

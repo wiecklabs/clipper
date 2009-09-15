@@ -1,9 +1,11 @@
 module Clipper
   class Mapping
+    Helper = Clipper::Repositories::Types::Helper
 
     def self.map(repository, target, name)
       mapping = new(repository, target, name)
-      yield mapping if block_given?
+      helper = Helper.new(repository.class.const_get(:Types))
+      yield(mapping, helper) if block_given?
       mapping
     end
 
