@@ -1,4 +1,5 @@
 require Pathname(__FILE__).dirname + "type_map" + "signature"
+require Pathname(__FILE__).dirname + "type_map" + "signature_helper"
 
 module Clipper
   class TypeMap
