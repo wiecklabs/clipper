@@ -17,11 +17,11 @@ require Pathname(__FILE__).dirname + "clipper" + "type_map"
 require Pathname(__FILE__).dirname + "clipper" + "model"
 require Pathname(__FILE__).dirname + "clipper" + "model" + "proxy"
 
-require Pathname(__FILE__).dirname + "clipper" + "repository"
-require Pathname(__FILE__).dirname + "clipper" + "repository" + "type"
-
 # require Pathname(__FILE__).dirname + "clipper" + "type"
 require Pathname(__FILE__).dirname + "clipper" + "types"
+
+require Pathname(__FILE__).dirname + "clipper" + "repository"
+require Pathname(__FILE__).dirname + "clipper" + "repository" + "type"
 
 require Pathname(__FILE__).dirname + "clipper" + "accessors"
 require Pathname(__FILE__).dirname + "clipper" + "hooks"

@@ -5,35 +5,6 @@ module Integration::AbstractRepositoryTest
   include Clipper::Types
 
   def setup_abstract
-    @repository = Clipper::registrations["default"]
-    repository_types = @repository.class::Types
-    # TODO: add by default
-    type_map = @repository.class.type_map
-    type_map << Clipper::TypeMap::Signature.new(
-      [String],
-      [repository_types::String],
-      lambda { |value| value.to_s },
-      lambda { |value| value.to_s }
-    )
-    type_map << Clipper::TypeMap::Signature.new(
-      [Integer],
-      [repository_types::Serial],
-      lambda { |value| value.to_i },
-      lambda { |value| value }
-    )
-    type_map << Clipper::TypeMap::Signature.new(
-      [Float],
-      [repository_types::Float],
-      lambda { |value| Float(value) },
-      lambda { |value| value }
-    )
-    type_map << Clipper::TypeMap::Signature.new(
-      [Boolean],
-      [repository_types::Boolean],
-      lambda { |value| value },
-      lambda { |value| value }
-    )
-
     @zoo = Class.new do
       include Clipper::Model
 
