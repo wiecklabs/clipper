@@ -16,6 +16,7 @@ module Clipper
 
       @signatures << signature
     end
+    alias add <<
 
     def size
       @signatures.size
@@ -31,6 +32,13 @@ module Clipper
       else
         raise MatchError.new(attribute_types, repository_types)
       end
+    end
+
+    def map_type(types_module)
+      helper = SignatureHelper.new
+      yield(helper, RepositoriesTypesHelper.new(types_module))
+
+      add(helper.create_signature)
     end
 
     class MatchError < StandardError

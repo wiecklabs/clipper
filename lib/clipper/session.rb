@@ -108,6 +108,11 @@ module Clipper
         instance.__session__.identity_map.include?(instance)
     end
 
+    def map_type(&b)
+      # TODO: Better way of doing this?
+      repository.class.type_map.map_type(repository.class::Types, &b)
+    end
+
     private
 
     def map_results(results)

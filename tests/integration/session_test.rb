@@ -45,4 +45,18 @@ class Integration::SessionTest < Test::Unit::TestCase
     end
   end
 
+  def test_map_type_adds_signature_to_repository_type_map
+    session = Clipper::Session.new("default")
+    datetime = string = nil
+    session.map_type do |signature, types|
+      signature.from [(datetime = types.date_time)]
+      signature.to [(string = types.string)]
+      signature.typecast_left lambda { }
+      signature.typecast_right lambda { }
+    end
+
+    assert_nothing_raised do
+      session.repository.class.type_map.match([datetime], [string])
+    end
+  end
 end
