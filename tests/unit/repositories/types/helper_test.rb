@@ -3,7 +3,7 @@ require Pathname(__FILE__).dirname.parent.parent.parent + "helper"
 
 class HelperTest < Test::Unit::TestCase
   Helper = Clipper::Repositories::Types::Helper
-  UnknownTypeError = Clipper::Repositories::Types::Helper::UnknownTypeError
+  UnknownTypeError = Clipper::UnknownTypeError
 
   def test_initialize_with_proper_arguments
     assert_nothing_raised do

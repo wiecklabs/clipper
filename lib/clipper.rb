@@ -90,4 +90,11 @@ module Clipper
       raise ArgumentError.new("#{connection_name.inspect} is not a registered connection.")
     end
   end
+
+
+  class UnknownTypeError < StandardError
+    def initialize(type)
+      super("Unkown type #{type.to_s}")
+    end
+  end
 end
