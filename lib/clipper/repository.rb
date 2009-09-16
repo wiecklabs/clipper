@@ -1,12 +1,13 @@
 module Clipper
   class Repository
+    include Clipper::Types
 
     ##
     # Returns instance of Clipper::TypeMap for holding this repository's
     # type mappings.
     ##
     def self.type_map
-      @type_map ||= Clipper::TypeMap.new
+      @type_map ||= create_default_map
     end
 
     def initialize(name, uri)
@@ -60,6 +61,50 @@ module Clipper
 
     def close
       raise NotImplementedError.new("#{self.class}#close must be implemented.")
+    end
+
+    private
+
+    def self.create_default_map
+      type_map = Clipper::TypeMap.new
+      rep_types = const_get(:Types)
+
+      type_map.map_type(rep_types) do |signature, types|
+        signature.from [String]
+        signature.to [types.string]
+        signature.typecast_left lambda { |value| value.to_s }
+        signature.typecast_right lambda { |value| value.to_s }
+      end
+
+      type_map.map_type(rep_types) do |signature, types|
+        signature.from [Integer]
+        signature.to [types.serial]
+        signature.typecast_left lambda { |value| value.to_i }
+        signature.typecast_right lambda { |value| value }
+      end
+
+      type_map.map_type(rep_types) do |signature, types|
+        signature.from [Integer]
+        signature.to [types.integer]
+        signature.typecast_left lambda { |value| value.to_i }
+        signature.typecast_right lambda { |value| value }
+      end
+
+      type_map.map_type(rep_types) do |signature, types|
+        signature.from [Float]
+        signature.to [types.float]
+        signature.typecast_left lambda { |value| Float(value) }
+        signature.typecast_right lambda { |value| value }
+      end
+
+      type_map.map_type(rep_types) do |signature, types|
+        signature.from [Boolean]
+        signature.to [types.boolean]
+        signature.typecast_left lambda { |value| value }
+        signature.typecast_right lambda { |value| value }
+      end
+
+      type_map
     end
   end
 end

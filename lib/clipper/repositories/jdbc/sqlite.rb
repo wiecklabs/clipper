@@ -6,13 +6,15 @@ module Clipper
     class Jdbc
       class Sqlite < Jdbc
 
+        Types = Clipper::Repositories::Types::Sqlite
+
         def initialize(name, uri)
           super
 
           @data_source = com.mchange.v2.c3p0.DataSources.unpooledDataSource(uri.to_s)
         end
         
-        # SQLite3 doesn't have a boolean type: http://www.sqlite.org/datatype3.html
+        
         def column_definition_boolean(field)
           "INTEGER"
         end
@@ -26,7 +28,7 @@ module Clipper
 
         def key_definition(mapping)
           # If we've already declared a serial column, don't worry about the key definition
-          return nil if mapping.keys.any? { |field| field.type.is_a?(Clipper::Types::Serial) }
+          return nil if mapping.keys.any? { |field| field.type.is_a?(Types::Serial) }
 
           "PRIMARY KEY (#{mapping.keys.map { |field| quote_identifier(field.name) }.join(', ')})"
         end

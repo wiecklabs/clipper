@@ -4,6 +4,7 @@ module Clipper
     def self.included(target)
       target.send(:include, Clipper::Accessors)
       target.send(:include, Clipper::Validations)
+      target.send(:include, Clipper::Types)
 
       target.send(:extend, Clipper::Session::Helper)
     end

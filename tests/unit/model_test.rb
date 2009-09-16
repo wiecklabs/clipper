@@ -8,7 +8,11 @@ class ModelTest < Test::Unit::TestCase
   end
 
   def test_including_model_includes_validations
-    assert(Clipper::Validations > Class.new { include Clipper::Validations })
+    assert(Clipper::Validations > Class.new { include Clipper::Model })
+  end
+
+  def test_including_model_includes_types
+    assert(Clipper::Types > Class.new { include Clipper::Model })
   end
 
 end

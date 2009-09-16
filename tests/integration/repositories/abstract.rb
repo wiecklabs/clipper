@@ -1,17 +1,25 @@
 module Integration::AbstractRepositoryTest
-
   include Clipper::Session::Helper
+  # TODO: this shouldn't be needed
+  include Clipper::Repositories::Types
+  include Clipper::Types
 
   def setup_abstract
     @zoo = Class.new do
       include Clipper::Model
 
-      Clipper::Mappings["default"].map(self, "abstract_zoos") do |zoos|
-        zoos.key zoos.field("id", Clipper::Types::Serial)
-        zoos.field "name", Clipper::Types::String.new(200)
-        zoos.field "city", Clipper::Types::String.new(200)
-        zoos.field "state", Clipper::Types::String.new(200)
-        zoos.field "notes", Clipper::Types::Text
+      accessor :id => Integer
+      accessor :name => String
+      accessor :city => String
+      accessor :state => String
+
+      orm.map(self, "abstract_zoos") do |zoos, type|
+        zoos.field :id, type.serial
+        zoos.field :name, type.string(200)
+        zoos.field :city, type.string(200)
+        zoos.field :state, type.string(200)
+#        zoos.field :notes, type.text
+        zoos.key :id
       end
 
       def initialize(name)
@@ -19,50 +27,73 @@ module Integration::AbstractRepositoryTest
       end
     end
 
-    @climate = Class.new do
-      include Clipper::Model
-
-      Clipper::Mappings["default"].map(self, "climates") do |climates|
-        climates.field("region", Clipper::Types::String.new(200))
-        climates.field("climate", Clipper::Types::String.new(200))
-
-        climates.key(climates["region"])
-      end
-    end
-
+#    @climate = Class.new do
+#      include Clipper::Model
+#
+#      orm.map(self, "climates") do |climates, type|
+#        climates.field :region", type.string(200)
+#        climates.field :climate", type.string(200)
+#
+#        climates.key :region
+#      end
+#    end
+#
     @city = Class.new do
       include Clipper::Model
 
-      Clipper::Mappings["default"].map(self, "cities") do |cities|
-        cities.field("name", Clipper::Types::String.new(200))
-        cities.field("state", Clipper::Types::String.new(200))
-        cities.field("region", Clipper::Types::String.new(200))
-        cities.field("capital", Clipper::Types::Boolean)
+      accessor :name => String
+      accessor :state => String
+      accessor :region => String
+      accessor :capital => Boolean
 
-        cities.key(cities["name"], cities["state"])
+      orm.map(self, "cities") do |cities, type|
+        cities.field :name, type.string(200)
+        cities.field :state, type.string(200)
+        cities.field :region, type.string(200)
+        cities.field :capital, type.boolean
+
+        cities.key(:name, :state)
       end
     end
 
     @person = Class.new do
       include Clipper::Model
 
-      Clipper::Mappings["default"].map(self, "people") do |people|
-        people.key people.field("id", Clipper::Types::Serial)
-        people.field "name", Clipper::Types::String.new(200)
-        people.field "gpa", Clipper::Types::Float(7, 2)
+      accessor :id => Integer
+      accessor :name => String
+      accessor :gpa => Float
+
+      orm.map(self, "people") do |people, type|
+        people.field :id, type.serial
+        people.field :name, type.string(200)
+        people.field :gpa, type.float#(7, 2)
+
+        people.key :id
       end
     end
+#
+#    @article = Class.new do
+#      include Clipper::Model
+#
+#      Clipper::Mappings["default"].map(self, "articles") do |articles, type|
+#        articles.field :id, type.serial
+#        articles.field :time, type.time
+#        articles.field :date, type.date
+#        articles.field :datetime, type.date_time
+#        articles.key :id
+#      end
+#    end
+  end
 
-    @article = Class.new do
-      include Clipper::Model
-
-      Clipper::Mappings["default"].map(self, "articles") do |articles|
-        articles.field("id", Clipper::Types::Serial)
-        articles.field("time", Time)
-        articles.field("date", Date)
-        articles.field("datetime", DateTime)
-        articles.key(articles["id"])
-      end
+  def test_adding_default_signatures
+    types = orm.repository.class.send(:const_get, :Types)
+    type_map = orm.repository.class.type_map
+    assert_nothing_raised do
+      type_map.match([Integer], [types::Serial])
+      type_map.match([Integer], [types::Integer])
+      type_map.match([String], [types::String])
+      type_map.match([Float], [types::Float])
+      type_map.match([Boolean], [types::Boolean])
     end
   end
 
@@ -182,11 +213,11 @@ module Integration::AbstractRepositoryTest
   ensure
     schema.destroy(@person)
   end
-  
+
   def test_support_for_boolean
     schema = Clipper::Schema.new("default")
     assert_nothing_raised { schema.create(@city) }
-    
+
     city = @city.new
     city.name = 'name'
     city.state = 'ST'
@@ -199,64 +230,64 @@ module Integration::AbstractRepositoryTest
 
     city = orm.get(@city, city.name, city.state)
     assert_equal(false, city.capital)
-    
+
     city.capital = true
     assert_nothing_raised do
       orm.save(city)
     end
-    
+
     city = orm.get(@city, city.name, city.state)
     assert_equal(true, city.capital)
   ensure
     schema.destroy(@city)
   end
 
-  def test_support_for_date_and_time_fields
-    schema = Clipper::Schema.new("default")
-    assert_nothing_raised { schema.create(@article) }
-    assert(schema.exists?(@article))
-
-    article = @article.new
-
-    date = Date.today
-    time = Time.now
-    datetime = DateTime.now
-
-    article.datetime = datetime
-    article.date = date
-    article.time = time
-
-    assert_nothing_raised { orm.save(article) }
-    assert_not_nil(article.id)
-
-    assert_equal(time.to_s, orm.get(@article, article.id).time.to_s)
-    assert_equal(date.to_s, orm.get(@article, article.id).date.to_s)
-    assert_equal(datetime.to_s, orm.get(@article, article.id).datetime.to_s)
-  ensure
-    schema.destroy(@article) rescue nil
-  end
-
-  # TODO: Reimplement support for batch-insert
-  # def test_insert_multiple_records
-  #   schema = Clipper::Schema.new("default")
-  #   schema.create(@person)
-  # 
-  #   person1 = @person.new
-  #   person1.name = "John"
-  # 
-  #   person2 = @person.new
-  #   person2.name = "Jane"
-  # 
-  #   people = Clipper::Collection.new(Clipper::Mappings["default"][@person], [person1, person2])
-  # 
-  #   orm.save(people)
-  # 
-  #   assert_not_nil(person1.id)
-  #   assert_not_nil(person2.id)
-  # ensure
-  #   schema.destroy(@person)
-  # end
-
+#  def test_support_for_date_and_time_fields
+#    schema = Clipper::Schema.new("default")
+#    assert_nothing_raised { schema.create(@article) }
+#    assert(schema.exists?(@article))
+#
+#    article = @article.new
+#
+#    date = Date.today
+#    time = Time.now
+#    datetime = DateTime.now
+#
+#    article.datetime = datetime
+#    article.date = date
+#    article.time = time
+#
+#    assert_nothing_raised { orm.save(article) }
+#    assert_not_nil(article.id)
+#
+#    assert_equal(time.to_s, orm.get(@article, article.id).time.to_s)
+#    assert_equal(date.to_s, orm.get(@article, article.id).date.to_s)
+#    assert_equal(datetime.to_s, orm.get(@article, article.id).datetime.to_s)
+#  ensure
+#    schema.destroy(@article) rescue nil
+#  end
+#
+#  # TODO: Reimplement support for batch-insert
+#  # def test_insert_multiple_records
+#  #   schema = Clipper::Schema.new("default")
+#  #   schema.create(@person)
+#  #
+#  #   person1 = @person.new
+#  #   person1.name = "John"
+#  #
+#  #   person2 = @person.new
+#  #   person2.name = "Jane"
+#  #
+#  #   people = Clipper::Collection.new(Clipper::Mappings["default"][@person], [person1, person2])
+#  #
+#  #   orm.save(people)
+#  #
+#  #   assert_not_nil(person1.id)
+#  #   assert_not_nil(person2.id)
+#  # ensure
+#  #   schema.destroy(@person)
+#  # end
+#
   def test_get_object
     schema = Clipper::Schema.new("default")
     schema.create(@person)
@@ -330,11 +361,11 @@ module Integration::AbstractRepositoryTest
 
     person = @person.new
     person.name = "James"
-    person.gpa = 2
+    person.gpa = 2.0
     orm.save(person)
 
     assert_nothing_raised do
-      low_gpa = Clipper::Query::Condition.lt(Clipper::Mappings["default"][@person]["gpa"], 3)
+      low_gpa = Clipper::Query::Condition.lt(orm.mappings[@person]["gpa"], 3)
       people = orm.find(@person, nil, low_gpa)
       assert_equal(1, people.size)
     end
@@ -419,5 +450,14 @@ module Integration::AbstractRepositoryTest
     end
   ensure
     schema.destroy(@person)
+  end
+
+  def test_has_a_syntax
+    assert_kind_of(Clipper::Syntax::Sql, Clipper::registrations["default"].syntax)
+  end
+
+  def test_schema_raises_for_unmapped_classes
+    schema = Clipper::Schema.new("default")
+    assert_raise(Clipper::Schema::UnmappedClassError) { schema.create(Class.new) }
   end
 end

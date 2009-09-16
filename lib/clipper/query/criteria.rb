@@ -6,7 +6,7 @@ module Clipper
         alias __new__ new
 
         def new(mapping)
-          unless mapping.is_a?(Clipper::Mappings::Mapping)
+          unless mapping.is_a?(Clipper::Mapping)
             raise ArgumentError.new("Clipper::Query::Criteria#initialize requires a Clipper::Mappings::Mapping")
           end
 

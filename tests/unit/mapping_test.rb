@@ -22,6 +22,10 @@ class MappingTest < Test::Unit::TestCase
     end
   end
 
+  def test_has_a_name
+    assert_equal(@name, Clipper::Mapping.new(@repository, @target, @name).name)
+  end
+
   def test_requires_proper_arguments
     assert_raises(ArgumentError) do
       Clipper::Mapping.new(nil, @target, @name)
@@ -49,13 +53,14 @@ class MappingTest < Test::Unit::TestCase
     end
   end
 
-  def test_map_yields_mapping_instance
+  def test_map_yields_mapping_instance_and_types_helper
     assert_nothing_raised do
       called = false
 
-      Clipper::Mapping.map(@repository, @target, @name) do |map|
+      Clipper::Mapping.map(@repository, @target, @name) do |map, helper|
         called = true
         assert(map.is_a?(Clipper::Mapping))
+        assert(helper.is_a?(Clipper::Repositories::Types::Helper))
       end
 
       assert(called, "Clipper::Mapping#map did not yield to block.")

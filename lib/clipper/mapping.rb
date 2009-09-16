@@ -1,13 +1,22 @@
 module Clipper
   class Mapping
+    Helper = Clipper::Repositories::Types::Helper
 
     def self.map(repository, target, name)
       mapping = new(repository, target, name)
-      yield mapping if block_given?
+      helper = Helper.new(repository.class.const_get(:Types))
+      yield(mapping, helper) if block_given?
       mapping
     end
 
-    attr_reader :signatures, :accessors, :types
+    def [](field_name)
+      name = field_name.to_s
+      field = @fields.detect { |f| f.name == name }
+      raise UnmappedFieldError.new("Mapping<#{@name}>: #{field_name} has not been declared as a field") if field.nil?
+      field
+    end
+
+    attr_reader :signatures, :accessors, :types, :name, :fields, :target
 
     def initialize(repository, target, name)
       unless repository.is_a?(Clipper::Repository) && target.is_a?(Class) && name.is_a?(String)
@@ -23,6 +32,7 @@ module Clipper
       @name = name
 
       @keys = java.util.LinkedHashSet.new
+      @fields = java.util.LinkedHashSet.new
 
       @signatures = java.util.LinkedHashSet.new
       @accessors = java.util.LinkedHashSet.new
@@ -47,6 +57,11 @@ module Clipper
       @signatures << signature
       @accessors << accessor
       @types << repository_types
+
+      # FIXME: a field should be able to map to more than one type as in embedded values
+      field = Field.new(repository_types[0], accessor, field_name.to_s, self)
+      @fields << field
+      field
     end
 
     def key(*field_names)
@@ -63,6 +78,11 @@ module Clipper
 
     def keys
       raise NoKeyError.new("No keys for Mapping<#{@name}> were defined.") if @keys.empty?
+      @keys.map {|key| self[key]}
+    end
+
+    def is_key?(field)
+      keys.include?(field)
     end
 
     private

@@ -13,16 +13,22 @@ require Pathname(__FILE__).dirname + "wieck" + "string"
 
 require Pathname(__FILE__).dirname + "clipper" + "uri"
 require Pathname(__FILE__).dirname + "clipper" + "type_map"
+
 require Pathname(__FILE__).dirname + "clipper" + "model"
-require Pathname(__FILE__).dirname + "clipper" + "accessors"
-require Pathname(__FILE__).dirname + "clipper" + "hooks"
-require Pathname(__FILE__).dirname + "clipper" + "collection"
+require Pathname(__FILE__).dirname + "clipper" + "model" + "proxy"
+
+# require Pathname(__FILE__).dirname + "clipper" + "type"
+require Pathname(__FILE__).dirname + "clipper" + "types"
 
 require Pathname(__FILE__).dirname + "clipper" + "repository"
 require Pathname(__FILE__).dirname + "clipper" + "repository" + "type"
 
-# require Pathname(__FILE__).dirname + "clipper" + "type"
-# require Pathname(__FILE__).dirname + "clipper" + "types"
+require Pathname(__FILE__).dirname + "clipper" + "accessors"
+require Pathname(__FILE__).dirname + "clipper" + "hooks"
+require Pathname(__FILE__).dirname + "clipper" + "collection"
+
+require Pathname(__FILE__).dirname + "clipper" + "repositories" + "types" + "types"
+require Pathname(__FILE__).dirname + "clipper" + "repositories" + "types" + "helper"
 
 require Pathname(__FILE__).dirname + "clipper" + "mapping"
 require Pathname(__FILE__).dirname + "clipper" + "mapping" + "field"
@@ -62,6 +68,7 @@ require Pathname(__FILE__).dirname + "clipper" + "syntax" + "sql"
 require Pathname(__FILE__).dirname + "clipper" + "session"
 require Pathname(__FILE__).dirname + "clipper" + "identity_map"
 require Pathname(__FILE__).dirname + "clipper" + "schema"
+require Pathname(__FILE__).dirname + "clipper" + "unit_of_work"
 require Pathname(__FILE__).dirname + "clipper" + "session" + "helper"
 
 module Clipper
@@ -81,6 +88,13 @@ module Clipper
       driver.close
     else
       raise ArgumentError.new("#{connection_name.inspect} is not a registered connection.")
+    end
+  end
+
+
+  class UnknownTypeError < StandardError
+    def initialize(type)
+      super("Unkown type #{type.to_s}")
     end
   end
 end

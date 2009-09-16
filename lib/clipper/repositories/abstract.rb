@@ -5,6 +5,7 @@ module Clipper
     # Abstract repository class to match "abstract://" scheme.
     ##
     class Abstract < Clipper::Repository
+      Types = Clipper::Repositories::Types::Abstract
 
       def save(collection)
         true

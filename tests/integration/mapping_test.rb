@@ -60,6 +60,22 @@ class Integration::MappingTest < Test::Unit::TestCase
     assert_equal(1, mapping.types.size)
   end
 
+  def test_accessing_fields
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    assert_raise(Clipper::Mapping::UnmappedFieldError) do
+      mapping[:id]
+    end
+    field = mapping.field(:id, @id_type.new)
+    assert_equal(mapping[:id], field)
+  end
+
+  def test_field_has_a_mapping
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    mapping.field(:id, @id_type.new)
+
+    assert_not_nil(mapping[:id].mapping, mapping)
+  end
+
   def test_key_with_proper_arguments
     mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
@@ -87,4 +103,11 @@ class Integration::MappingTest < Test::Unit::TestCase
     end
   end
 
+  def test_is_key
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    id = mapping.field(:id, @id_type.new)
+    mapping.key(:id)
+
+    assert(mapping.is_key?(id))
+  end
 end

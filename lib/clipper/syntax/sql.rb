@@ -43,7 +43,7 @@ module Clipper
       end
 
       def normalize_value(value)
-        if value.is_a?(Clipper::Mappings::Field)
+        if value.is_a?(Clipper::Mapping::Field)
           @repository.quote_identifier("#{value.mapping.name}.#{value.name}")
         else
           "?"
