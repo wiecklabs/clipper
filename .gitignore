@@ -2,9 +2,11 @@ mem.*
 profile.txt
 pkg
 *.db
-bkp
 .autotest
 .ssh
-_viminfo
 .bash_history
 .gitk
+.gitconfig
+bkp
+_viminfo
+nbproject
