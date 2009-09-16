@@ -85,7 +85,7 @@ module Clipper
 
       type_map.map_type(rep_types) do |signature, types|
         signature.from [Integer]
-        signature.to [types.serial]
+        signature.to [types.integer]
         signature.typecast_left lambda { |value| value.to_i }
         signature.typecast_right lambda { |value| value }
       end

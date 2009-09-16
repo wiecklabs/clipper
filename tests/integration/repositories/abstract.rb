@@ -85,6 +85,18 @@ module Integration::AbstractRepositoryTest
 #    end
   end
 
+  def test_adding_default_signatures
+    types = orm.repository.class.send(:const_get, :Types)
+    type_map = orm.repository.class.type_map
+    assert_nothing_raised do
+      type_map.match([Integer], [types::Serial])
+      type_map.match([Integer], [types::Integer])
+      type_map.match([String], [types::String])
+      type_map.match([Float], [types::Float])
+      type_map.match([Boolean], [types::Boolean])
+    end
+  end
+
   def test_schema_create
     schema = Clipper::Schema.new("default")
     assert(!schema.exists?(@zoo))
