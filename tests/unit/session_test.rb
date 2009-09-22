@@ -19,6 +19,7 @@ class SessionTest < Test::Unit::TestCase
     end
     assert_nothing_raised do
       session = orm("default")
+      session = Clipper::Session::Helper.orm('default')
     end
   end
 
