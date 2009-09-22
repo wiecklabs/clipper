@@ -23,21 +23,24 @@ class Integration::MappingTest < Test::Unit::TestCase
 
       accessor :id => Integer
     end
+    @child_class = Class.new do
+      include Clipper::Accessors
+
+      accessor :id => Integer
+      accessor :parent_id => Integer
+    end
 
     @table_name = "users"
+    @mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
   end
 
   def test_field_with_valid_arguments
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
-
     assert_nothing_raised do
       mapping.field(:id, @id_type.new)
     end
   end
 
   def test_field_requires_proper_arguments
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
-
     assert_raises(ArgumentError) do
       mapping.field(:undeclared_accessor, @id_type.new)
     end
@@ -52,7 +55,6 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_field_adds_signature_accessor_and_types
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
 
     assert_equal(1, mapping.signatures.size)
@@ -61,7 +63,6 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_accessing_fields
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     assert_raise(Clipper::Mapping::UnmappedFieldError) do
       mapping[:id]
     end
@@ -70,14 +71,12 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_field_has_a_mapping
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
 
     assert_not_nil(mapping[:id].mapping, mapping)
   end
 
   def test_key_with_proper_arguments
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
 
     assert_nothing_raised do
@@ -86,7 +85,6 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_key_can_only_be_called_once
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.field(:id, @id_type.new)
     mapping.key(:id)
 
@@ -96,18 +94,34 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_key_requires_field_to_be_declared
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
-
     assert_raises(Clipper::Mapping::UnmappedFieldError) do
       mapping.key(:id)
     end
   end
 
   def test_is_key
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     id = mapping.field(:id, @id_type.new)
     mapping.key(:id)
 
     assert(mapping.is_key?(id))
+  end
+
+  def test_one_to_many
+    assert_nothing_raised do
+      mapping.one_to_many(:children, @child_class) do |parent, child|
+      end
+    end
+  end
+
+  def test_one_to_many_requires_block
+    assert_raise(ArgumentError) do
+      mapping.one_to_many(:children, @child_class)
+    end
+  end
+
+  private
+
+  def mapping
+    @mapping
   end
 end

@@ -1,5 +1,5 @@
 module Clipper
-  class Mappings
+  class Mapping
 
     class OneToManyCollection < ::Clipper::Collection
 

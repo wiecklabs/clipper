@@ -36,6 +36,7 @@ module Clipper
 
       @signatures = java.util.LinkedHashSet.new
       @accessors = java.util.LinkedHashSet.new
+      @associations = java.util.LinkedHashSet.new
       @types = java.util.LinkedHashSet.new
     end
 
@@ -85,7 +86,21 @@ module Clipper
       keys.include?(field)
     end
 
+    def one_to_many(name, mapped_name, &match_criteria)
+      add_association OneToMany.new(self, name, mapped_name, &match_criteria)
+    end
+
     private
+
+    def add_association(association)
+      if @associations.include?(association)
+        raise DuplicateAssociationError.new("Association #{association} is already a member of Mapping #{name.inspect}")
+      else
+        @associations << association
+        association.class.bind!(association, target)
+        association
+      end
+    end
 
     class UnmappedFieldError < StandardError
     end
