@@ -23,16 +23,16 @@ class SessionTest < Test::Unit::TestCase
     end
   end
 
-  # def test_has_a_repository
-  #   session = Clipper::Session.new("default")
-  #   assert_respond_to(session, :repository)
-  #   assert_equal(Clipper::registrations["default"], session.repository)
-  # end
-  # 
-  # def test_has_a_mappings_shortcut
-  #   session = Clipper::Session.new("default")
-  #   assert_respond_to(session, :mappings)
-  #   assert_equal(session.repository.mappings, session.mappings)
-  # end
+   def test_has_a_repository
+     session = Clipper::Session.new("default")
+     assert_respond_to(session, :repository)
+     assert_equal(Clipper::registrations["default"], session.repository)
+   end
+   
+   def test_has_a_mappings_shortcut
+     session = Clipper::Session.new("default")
+     assert_respond_to(session, :mappings)
+     assert_equal(session.repository.mappings, session.mappings)
+   end
 
 end
