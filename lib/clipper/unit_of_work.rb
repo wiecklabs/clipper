@@ -40,16 +40,16 @@ module Clipper
           end
         end
       end
-#
-#      @session.mappings[object.class].associations.each do |association|
-#        if association.is_a?(Clipper::Mappings::ManyToMany)
-#
-#          association.get(object).each do |associated_object, link|
-#            @session.enlist(associated_object)
-#            @session.enlist(link)
-#          end
-#        end
-#      end
+
+      @session.mappings[object.class].associations.each do |association|
+        if association.is_a?(Clipper::Mapping::ManyToMany)
+
+          association.get(object).each do |associated_object, link|
+            @session.enlist(associated_object)
+            @session.enlist(link)
+          end
+        end
+      end
 
       execute if @flush_immediately
     end

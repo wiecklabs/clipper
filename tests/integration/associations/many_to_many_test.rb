@@ -2,13 +2,14 @@ require "pathname"
 require Pathname(__FILE__).dirname.parent.parent + "helper"
 require Pathname(__FILE__).dirname.parent + "sample_models"
 
-class ManyToManyTest < Test::Unit::TestCase
+class Integration::ManyToManyTest < Test::Unit::TestCase
 
   include Clipper::Session::Helper
   include Integration::SampleModels
 
   def setup
-    Clipper::open("default", "jdbc:hsqldb:mem:test")
+    @repository = Clipper::open("default", "jdbc:hsqldb:mem:test")
+    load Pathname(__FILE__).dirname.parent + "sample_models_mapping.rb"
 
     schema = Clipper::Schema.new("default")
     schema.create(Zoo)
@@ -32,11 +33,9 @@ class ManyToManyTest < Test::Unit::TestCase
   end
 
   def test_creates_anonymous_mapping
-    @mapping = nil
+    m = @repository.mappings.values.find { |map| map.name == 'exhibits_zoo_keepers' }
 
-    Clipper::Mappings['default'].each { |m| @mapping = m if m.name == 'exhibits_zoo_keepers' }
-
-    assert_not_nil(@mapping)
+    assert_not_nil(m)
   end
 
   def test_defines_getter_and_setter

@@ -83,14 +83,20 @@ module Clipper
 #      end
 
       def setup_join_map
-        @target_mapping = Clipper::Mapping.map(@repository, @target, @target_mapping_name)
+        @repository.mappings[@target] = @target_mapping = Clipper::Mapping.map(@repository, @target, @target_mapping_name)
         keys = []
 
         # Builds a hash of Source Key Field -> Anonymous Key Field
-        @key_field_map = (mapping.keys.entries + associated_mapping.keys.entries).inject({}) do |map, key_field|
+        key_field_map = @key_field_map = (mapping.keys.entries + associated_mapping.keys.entries).inject({}) do |map, key_field|
           join_key_field_name = key_field_name(key_field)
+          
+          type = if key_field.type.is_a?(@repository.class::Types::Serial)
+            @repository.class::Types::Integer.new
+          else
+            key_field.type
+          end
 
-          target_mapping.property(join_key_field_name.to_sym, key_field.accessor.type, key_field.type)#.default)
+          target_mapping.property(join_key_field_name.to_sym, key_field.accessor.type, type)#.default)
 
           map[key_field] = target_mapping[join_key_field_name.to_sym]
           keys << join_key_field_name.to_sym
@@ -102,18 +108,18 @@ module Clipper
         # We don't want to break how field.value(instance) works, so we need to replace
         # the ValueProxy with our own. But since we don't have initialization hooks,
         # we need to set them when they're accessed. Ugly. Works.
-#        @target.send(:define_method, :instance_variable_get) do |name|
-#          var = super
-#
-#          key_field, join_key_field = nil
-#
-#          if !var && key_field_map.detect { |key_field, join_key_field| "@#{join_key_field.name}" == name }
-#            var = ValueProxy.new((key_field.mapping == mapping ? :parent : :child), self, join_key_field, key_field)
-#            instance_variable_set("@#{join_key_field.name}", var)
-#          end
-#
-#          var
-#        end
+        @target.send(:define_method, :instance_variable_get) do |name|
+          var = super
+
+          key_field, join_key_field = nil
+
+          if !var && key_field_map.detect { |key_field, join_key_field| "@#{join_key_field.name}" == name }
+            var = key_field.accessor.get(self.send((key_field.mapping == mapping ? :parent : :child)))
+            instance_variable_set("@#{join_key_field.name}", var)
+          end
+
+          var
+        end
 
         # Many-To-Many key spans each field in the table
         @target_mapping.key(*keys)
@@ -159,7 +165,7 @@ module Clipper
         self.mapping.keys.each do |key_field|
           join_key_field = @key_field_map[key_field]
 
-          criteria.send(join_key_field.name.to_sym).send(:eq, key_field.get(instance))
+          criteria.send(join_key_field.name.to_sym).send(:eq, key_field.accessor.get(instance))
         end
 
         instance.__session__.find(self.target, criteria.__options__, criteria.__conditions__)
@@ -193,7 +199,6 @@ module Clipper
 
       def self.bind!(association, target)
         target.send(:define_method, association.getter) do
-
           if data = instance_variable_get(association.instance_variable_name)
             data
           else

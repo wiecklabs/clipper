@@ -28,15 +28,6 @@ orm.map(Integration::SampleModels::Zoo, "zoos") do |zoos, type|
   end
 end
 
-orm.map(Integration::SampleModels::ZooKeeper, 'zoo_keepers') do |zoo_keepers, type|
-  zoo_keepers.field :id, type.integer
-  zoo_keepers.field :name, type.string(200)
-
-  zoo_keepers.key :id
-
-#  zoo_keepers.many_to_many(:exhibits, Integration::SampleModels::Exhibit, 'exhibits_zoo_keepers')
-end
-
 orm.map(Integration::SampleModels::Exhibit, "exhibits") do |exhibits, type|
   exhibits.field :id, type.serial
   exhibits.field :name, type.string(200)
@@ -47,4 +38,14 @@ orm.map(Integration::SampleModels::Exhibit, "exhibits") do |exhibits, type|
   exhibits.many_to_one(:zoo, Integration::SampleModels::Zoo) do |exhibit, zoo|
     zoo.id.eq(exhibit.zoo_id)
   end
+end
+
+# TODO: this should work if defined before Exhibit
+orm.map(Integration::SampleModels::ZooKeeper, 'zoo_keepers') do |zoo_keepers, type|
+  zoo_keepers.field :id, type.serial
+  zoo_keepers.field :name, type.string(200)
+
+  zoo_keepers.key :id
+
+  zoo_keepers.many_to_many(:exhibits, Integration::SampleModels::Exhibit, 'exhibits_zoo_keepers')
 end
