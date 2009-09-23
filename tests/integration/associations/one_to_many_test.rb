@@ -107,18 +107,19 @@ class Integration::OneToManyTest < Test::Unit::TestCase
     assert_equal(3, zoo.exhibits.size)
   end
 
-# TODO: Make this test pass
-#  def test_setter_clears_existing_associations
-#    zoo = Zoo.new('Dallas')
-#    zoo.exhibits = [Exhibit.new('Bat'), Exhibit.new('Yak'), Exhibit.new('Rhino')]
-#    orm.save(zoo)
-#
-#    zoo = orm.get(Zoo, 0)
-#    zoo.exhibits = [Exhibit.new('Snake')]
-#    orm.save(zoo)
-#
-#    zoo = orm.get(Zoo, 0)
-#    assert_equal(1, zoo.exhibits.size)
-#    assert_equal(4, orm.all(Exhibit).size)
-#  end
+  def test_setter_clears_existing_associations
+    zoo = Zoo.new('Dallas')
+    zoo.exhibits = [Exhibit.new('Bat'), Exhibit.new('Yak'), Exhibit.new('Rhino')]
+    orm.save(zoo)
+    
+    zoo = orm.get(Zoo, 0)
+    zoo.exhibits = [Exhibit.new('Snake')]
+
+    # don't need to do this since session will get flushed after setting array
+    #orm.save(zoo)
+
+    zoo = orm.get(Zoo, 0)
+    assert_equal(1, zoo.exhibits.size)
+    assert_equal(4, orm.all(Exhibit).size)
+  end
 end

@@ -140,7 +140,6 @@ module Clipper
             serial_key.accessor.set(object, result) if serial_key && result
 
             session.identity_map.add(object)
-            session.unit_of_work.register_clean(object)
             stmt.close
           end
         end
@@ -157,7 +156,7 @@ module Clipper
             proxy = session.unit_of_work.proxy_for(object)
             key_values = proxy.key_values
             values = proxy.dirty_values
-
+            
             next if values.empty?
 
             statement = "UPDATE #{quote_identifier(collection.mapping.name)} SET "

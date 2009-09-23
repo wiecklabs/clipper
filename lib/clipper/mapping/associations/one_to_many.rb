@@ -43,7 +43,6 @@ module Clipper
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
         conditions = criteria.__conditions__
-
         conditions.field.accessor.set(child, conditions.value.field.accessor.get(parent))
       end
 
@@ -88,16 +87,21 @@ module Clipper
 
           if items = self.send(association.getter)
             if __session__
+#              puts 'iii'
               items.each do |item|
                 association.unlink(self, item)
                 __session__.enlist(item)
+#                puts self.send(association.getter).size
               end
+
+#              puts self.send(association.getter).size
             end
           end
 
           new_value.each do |item|
             association.set_key(self, item)
             __session__.enlist(item) if self.__session__
+#            puts self.send(association.getter).size if self.__session__
           end
 
           instance_variable_set(association.instance_variable_name, OneToManyCollection.new(association, self, new_value))
