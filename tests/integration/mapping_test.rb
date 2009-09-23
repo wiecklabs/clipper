@@ -2,6 +2,7 @@ require "pathname"
 require Pathname(__FILE__).dirname.parent + "helper"
 
 class Integration::MappingTest < Test::Unit::TestCase
+  include Clipper::Session::Helper
 
   def setup
     @id_type = Class.new do
@@ -16,7 +17,7 @@ class Integration::MappingTest < Test::Unit::TestCase
     )
 
     uri = Clipper::Uri.new("abstract://localhost/example")
-    @repository = Clipper::registrations["abstract"] = Clipper::Repositories::Abstract.new("abstract", uri)
+    @repository = Clipper::registrations["default"] = Clipper::Repositories::Abstract.new("default", uri)
 
     @mapped_class = Class.new do
       include Clipper::Accessors
@@ -30,8 +31,8 @@ class Integration::MappingTest < Test::Unit::TestCase
       accessor :parent_id => Integer
     end
 
-    @parent_mapping = Clipper::Mapping.new(@repository, @mapped_class, 'parents')
-    @child_mapping = Clipper::Mapping.new(@repository, @child_class, 'children')
+    @parent_mapping = orm.map(@mapped_class, 'parents')
+    @child_mapping = orm.map(@child_class, 'children')
   end
 
   def test_field_with_valid_arguments
@@ -147,6 +148,17 @@ class Integration::MappingTest < Test::Unit::TestCase
   def test_many_to_one_requires_block
     assert_raise(ArgumentError) do
       child_mapping.many_to_one(:parent, @parent_class)
+    end
+  end
+
+  def test_many_to_many
+    mapping.field(:id, @id_type.new)
+    mapping.key :id
+    child_mapping.field(:id, @id_type.new)
+    child_mapping.key :id
+    
+    assert_nothing_raised do
+      mapping.many_to_many(:children, @child_class, 'parent_children')
     end
   end
 

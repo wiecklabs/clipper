@@ -1,5 +1,5 @@
 module Clipper
-  class Mappings
+  class Mapping
 
     class ManyToManyCollection < ::Clipper::Collection
 
@@ -34,7 +34,8 @@ module Clipper
 
     class ManyToMany < Association
 
-      def initialize(mapping, name, mapped_name, target_mapping_name)
+      def initialize(repository, mapping, name, mapped_name, target_mapping_name)
+        @repository = repository
         @mapping = mapping
         @name = name
         @mapped_name = mapped_name
@@ -52,7 +53,7 @@ module Clipper
 
         begin
           setup_join_map
-        rescue Clipper::Mappings::UnmappedClassError
+        rescue Clipper::Mapping::UnmappedClassError
           # setup_join_map failed because the mapping referenced by "mapped_name" doesn't exist yet
           # this callback registartion lets just recieve a notification when the map is added
           # so we can finish creating our join map
@@ -66,36 +67,33 @@ module Clipper
         "#{field.mapping.name}_#{field.name}"
       end
 
-      class ValueProxy < Clipper::Mappings::ValueProxy
-        def initialize(type, instance, join_field, key_field)
-          @type = type
-          @instance = instance
-          @join_field = join_field
-          @key_field = key_field
-          super(join_field)
-        end
-
-        def get
-          @instance.send(@type) ? set(@key_field.get(@instance.send(@type))) : @value
-        end
-
-      end
+#      class ValueProxy < Clipper::Mapping::ValueProxy
+#        def initialize(type, instance, join_field, key_field)
+#          @type = type
+#          @instance = instance
+#          @join_field = join_field
+#          @key_field = key_field
+#          super(join_field)
+#        end
+#
+#        def get
+#          @instance.send(@type) ? set(@key_field.get(@instance.send(@type))) : @value
+#        end
+#
+#      end
 
       def setup_join_map
-        @target_mapping = Mapping.new(@mapping.mappings, @target, @target_mapping_name)
+        @target_mapping = Clipper::Mapping.map(@repository, @target, @target_mapping_name)
+        keys = []
 
         # Builds a hash of Source Key Field -> Anonymous Key Field
-        key_field_map = @key_field_map = (mapping.keys.entries + associated_mapping.keys.entries).inject({}) do |map, key_field|
-          type = case key_field.type
-            when Clipper::Types::Serial then
-              Clipper::Types::Integer
-            else
-              key_field.type
-            end
-
+        @key_field_map = (mapping.keys.entries + associated_mapping.keys.entries).inject({}) do |map, key_field|
           join_key_field_name = key_field_name(key_field)
 
-          map[key_field] = target_mapping.field(join_key_field_name, type, key_field.default)
+          target_mapping.property(join_key_field_name.to_sym, key_field.accessor.type, key_field.type)#.default)
+
+          map[key_field] = target_mapping[join_key_field_name.to_sym]
+          keys << join_key_field_name.to_sym
           map
         end
 
@@ -104,24 +102,21 @@ module Clipper
         # We don't want to break how field.value(instance) works, so we need to replace
         # the ValueProxy with our own. But since we don't have initialization hooks,
         # we need to set them when they're accessed. Ugly. Works.
-        @target.send(:define_method, :instance_variable_get) do |name|
-          var = super
-
-          key_field, join_key_field = nil
-
-          if !var && key_field_map.detect { |key_field, join_key_field| "@#{join_key_field.name}" == name }
-            var = ValueProxy.new((key_field.mapping == mapping ? :parent : :child), self, join_key_field, key_field)
-            instance_variable_set("@#{join_key_field.name}", var)
-          end
-
-          var
-        end
+#        @target.send(:define_method, :instance_variable_get) do |name|
+#          var = super
+#
+#          key_field, join_key_field = nil
+#
+#          if !var && key_field_map.detect { |key_field, join_key_field| "@#{join_key_field.name}" == name }
+#            var = ValueProxy.new((key_field.mapping == mapping ? :parent : :child), self, join_key_field, key_field)
+#            instance_variable_set("@#{join_key_field.name}", var)
+#          end
+#
+#          var
+#        end
 
         # Many-To-Many key spans each field in the table
-        @target_mapping.key(*@key_field_map.values)
-
-        # Register our "anonymous" mapping
-        mapping.mappings << @target_mapping
+        @target_mapping.key(*keys)
       end
 
       # The "parent" mapping
@@ -143,11 +138,11 @@ module Clipper
 
       def set_key(parent, child, link)
         mapping.keys.each do |key_field|
-          @key_field_map[key_field].set(link, key_field.get(parent))
+          @key_field_map[key_field].accessor.set(link, key_field.accessor.get(parent))
         end
 
         associated_mapping.keys.each do |key_field|
-          @key_field_map[key_field].set(link, key_field.get(child))
+          @key_field_map[key_field].accessor.set(link, key_field.accessor.get(child))
         end
       end
 

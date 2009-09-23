@@ -98,6 +98,10 @@ module Clipper
       add_association ManyToOne.new(self, name, mapped_name, &match_criteria)
     end
 
+    def many_to_many(name, mapped_name, join_mapping_name)
+      add_association ManyToMany.new(@repository, self, name, mapped_name, join_mapping_name)
+    end
+
     def property(field_name, property_type, *repository_types)
       @target.accessor field_name => property_type
       field(field_name, *repository_types)
@@ -113,6 +117,9 @@ module Clipper
         association.class.bind!(association, target)
         association
       end
+    end
+
+    class UnmappedClassError < StandardError
     end
 
     class UnmappedFieldError < StandardError

@@ -37,7 +37,7 @@ require Pathname(__FILE__).dirname + "clipper" + "mapping" + "field"
  require Pathname(__FILE__).dirname + "clipper" + "mapping" + "associations" + "association"
  require Pathname(__FILE__).dirname + "clipper" + "mapping" + "associations" + "many_to_one"
  require Pathname(__FILE__).dirname + "clipper" + "mapping" + "associations" + "one_to_many"
-# require Pathname(__FILE__).dirname + "clipper" + "mappings" + "associations" + "many_to_many"
+ require Pathname(__FILE__).dirname + "clipper" + "mapping" + "associations" + "many_to_many"
 
 require Pathname(__FILE__).dirname + "clipper" + "validations"
 require Pathname(__FILE__).dirname + "clipper" + "validations" + "validator"
