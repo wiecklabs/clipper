@@ -25,6 +25,17 @@ class Integration::OneToManyTest < Test::Unit::TestCase
     Clipper::close("default")
   end
 
+  def test_can_only_be_defined_once
+
+    assert_raise(Clipper::Mapping::DuplicateAssociationError) do
+      # This association is already defined
+      orm.repository.mappings[Zoo].one_to_many(:exhibits, Exhibit) do |zoos, exhibit|
+        exhibit.zoo_id.eq(zoo.id)
+      end
+    end
+
+  end
+
   def test_saving_all_new_objects
     orm do |session|
       zoo = Zoo.new('Dallas')
