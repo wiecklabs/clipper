@@ -94,6 +94,10 @@ module Clipper
       add_association OneToMany.new(self, name, mapped_name, &match_criteria)
     end
 
+    def many_to_one(name, mapped_name, &match_criteria)
+      add_association ManyToOne.new(self, name, mapped_name, &match_criteria)
+    end
+
     def property(field_name, property_type, *repository_types)
       @target.accessor field_name => property_type
       field(field_name, *repository_types)

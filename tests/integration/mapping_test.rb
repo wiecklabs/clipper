@@ -30,8 +30,8 @@ class Integration::MappingTest < Test::Unit::TestCase
       accessor :parent_id => Integer
     end
 
-    @table_name = "users"
-    @mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    @parent_mapping = Clipper::Mapping.new(@repository, @mapped_class, 'parents')
+    @child_mapping = Clipper::Mapping.new(@repository, @child_class, 'children')
   end
 
   def test_field_with_valid_arguments
@@ -107,21 +107,18 @@ class Integration::MappingTest < Test::Unit::TestCase
   end
 
   def test_property
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     assert_nothing_raised do
       mapping.property(:id, Integer, @id_type.new)
     end
   end
 
   def test_property_defines_an_accessor
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.property(:property, Integer, @id_type.new)
 
     assert_not_nil(@mapped_class.accessors[:property])
   end
 
   def test_property_adds_a_field_to_mapping
-    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
     mapping.property(:property, Integer, @id_type.new)
 
     assert_nothing_raised { mapping[:property] }
@@ -140,9 +137,26 @@ class Integration::MappingTest < Test::Unit::TestCase
     end
   end
 
+  def test_many_to_one
+    assert_nothing_raised do
+      child_mapping.many_to_one(:parent, @parent_class) do |child, parent|
+      end
+    end
+  end
+
+  def test_many_to_one_requires_block
+    assert_raise(ArgumentError) do
+      child_mapping.many_to_one(:parent, @parent_class)
+    end
+  end
+
   private
 
   def mapping
-    @mapping
+    @parent_mapping
+  end
+
+  def child_mapping
+    @child_mapping
   end
 end
