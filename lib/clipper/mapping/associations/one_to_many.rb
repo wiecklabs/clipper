@@ -44,7 +44,7 @@ module Clipper
 
         conditions = criteria.__conditions__
 
-        conditions.field.set(child, conditions.value.field.get(parent))
+        conditions.field.accessor.set(child, conditions.value.field.accessor.get(parent))
       end
 
       def unlink(parent, child)
@@ -52,7 +52,7 @@ module Clipper
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
         conditions = criteria.__conditions__
-        conditions.field.set(child, nil)
+        conditions.field.accessor.set(child, nil)
       end
 
       def load(instance)
