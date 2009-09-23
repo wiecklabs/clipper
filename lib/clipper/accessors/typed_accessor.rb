@@ -3,22 +3,24 @@ module Clipper
 
     class StringSerializer
       def self.load(value)
-        value.to_s
+        value.nil? ? nil : value.to_s
       end
     end
 
     class IntegerSerializer
       def self.load(value)
-        Integer(value)
+        value.nil? ? nil : Integer(value)
       end
     end
 
     class BooleanSerializer
       def self.load(value)
-        if value.nil? or value == false or value == 0
-          return false
+        if value.nil?
+          nil
+        elsif value == false or value == 0
+          false
         else
-          return true
+          true
         end
       end
     end

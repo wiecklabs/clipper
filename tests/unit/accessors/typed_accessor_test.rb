@@ -37,5 +37,14 @@ class TypedAccessorTest < Test::Unit::TestCase
 
     assert_equal("Bob", bob.name)
   end
+
+  def test_set_nil
+    bob = Person.new
+    Person.accessors[:name].set(bob, nil)
+    Person.accessors[:age].set(bob, nil)
+
+    assert_nil(bob.name)
+    assert_nil(bob.age)
+  end
 end
 
