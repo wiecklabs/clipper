@@ -85,6 +85,11 @@ module Clipper
       keys.include?(field)
     end
 
+    def property(field_name, property_type, *repository_types)
+      @target.accessor field_name => property_type
+      field(field_name, *repository_types)
+    end
+
     private
 
     class UnmappedFieldError < StandardError
