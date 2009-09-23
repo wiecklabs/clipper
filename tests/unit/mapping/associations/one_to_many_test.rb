@@ -21,11 +21,11 @@ class OneToManyTest < Test::Unit::TestCase
     @child_class = Class.new do
       include Clipper::Model
 
-      orm.map(self, 'parent') do |parent, type|
-        parent.property :id, Integer, type.serial
-        parent.property :parent_id, Integer, type.integer
+      orm.map(self, 'children') do |child, type|
+        child.property :id, Integer, type.serial
+        child.property :parent_id, Integer, type.integer
 
-        parent.key :id
+        child.key :id
       end
     end
 

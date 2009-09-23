@@ -87,14 +87,10 @@ module Clipper
 
           if items = self.send(association.getter)
             if __session__
-#              puts 'iii'
               items.each do |item|
                 association.unlink(self, item)
                 __session__.enlist(item)
-#                puts self.send(association.getter).size
               end
-
-#              puts self.send(association.getter).size
             end
           end
 
