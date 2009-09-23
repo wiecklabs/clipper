@@ -72,7 +72,7 @@ class OneToManyTest < Test::Unit::TestCase
   def test_bind!
     OneToMany.bind!(@association, @parent_class)
     
-    assert(@parent_class.respond_to?(:children))
-    assert(@parent_class.respond_to?(:children=))
+    assert(@parent_class.new.respond_to?(:children))
+    assert(@parent_class.new.respond_to?(:children=))
   end
 end
