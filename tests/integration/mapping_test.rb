@@ -106,6 +106,27 @@ class Integration::MappingTest < Test::Unit::TestCase
     assert(mapping.is_key?(id))
   end
 
+  def test_property
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    assert_nothing_raised do
+      mapping.property(:id, Integer, @id_type.new)
+    end
+  end
+
+  def test_property_defines_an_accessor
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    mapping.property(:property, Integer, @id_type.new)
+
+    assert_not_nil(@mapped_class.accessors[:property])
+  end
+
+  def test_property_adds_a_field_to_mapping
+    mapping = Clipper::Mapping.new(@repository, @mapped_class, @table_name)
+    mapping.property(:property, Integer, @id_type.new)
+
+    assert_nothing_raised { mapping[:property] }
+  end
+
   def test_one_to_many
     assert_nothing_raised do
       mapping.one_to_many(:children, @child_class) do |parent, child|

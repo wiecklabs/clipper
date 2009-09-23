@@ -2,25 +2,33 @@ require "pathname"
 require Pathname(__FILE__).dirname.parent + "helper"
 
 class Integration::CriteriaTest < Test::Unit::TestCase
-
   include Clipper::Session::Helper
+  
   def setup
     @uri = Clipper::Uri.new("abstract://localhost/example")
-    Clipper::open("example", @uri.to_s)
+    Clipper::open("default", @uri.to_s)
 
     @person = Class.new do
-      Clipper::Mappings["example"].map(self, "people") do |people|
-        people.key people.field("id", Clipper::Types::Serial)
-        people.field "name", Clipper::Types::String.new(200)
-        people.field "gpa", Clipper::Types::Float(7, 2)
+      include Clipper::Model
+
+      accessor :id => Integer
+      accessor :name => String
+      accessor :gpa => Float
+
+      orm.map(self, "people") do |people, type|
+        people.field :id, type.serial
+        people.field :name, type.string(200)
+        people.field :gpa, type.float
+
+        people.key :id
       end
     end
 
-    @mapping = orm("example").repository.mappings[@person]
+    @mapping = orm.repository.mappings[@person]
   end
 
   def teardown
-    Clipper::close("example")
+    Clipper::close("default")
   end
 
   def test_options_do_not_have_side_effects_on_conditions
