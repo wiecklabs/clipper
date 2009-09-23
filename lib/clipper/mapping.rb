@@ -16,7 +16,7 @@ module Clipper
       field
     end
 
-    attr_reader :signatures, :accessors, :types, :name, :fields, :target
+    attr_reader :signatures, :accessors, :types, :name, :fields, :target, :associations
 
     def initialize(repository, target, name)
       unless repository.is_a?(Clipper::Repository) && target.is_a?(Class) && name.is_a?(String)

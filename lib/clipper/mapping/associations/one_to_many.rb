@@ -97,7 +97,7 @@ module Clipper
 
           new_value.each do |item|
             association.set_key(self, item)
-            self.__session__.enlist(item) if self.__session__
+            __session__.enlist(item) if self.__session__
           end
 
           instance_variable_set(association.instance_variable_name, OneToManyCollection.new(association, self, new_value))

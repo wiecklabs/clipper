@@ -115,7 +115,6 @@ module Clipper
           serial_key = mapping.keys.detect { |field| field.type.is_a?(self.class::Types::Serial) }
 
           collection.each do |object|
-
             values = session.unit_of_work.proxy_for(object).dirty_values
 
             statement = "INSERT INTO #{quote_identifier(collection.mapping.name)} "
