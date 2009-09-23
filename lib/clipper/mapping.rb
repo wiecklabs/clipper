@@ -121,5 +121,8 @@ module Clipper
     class NoKeyError < StandardError
     end
 
+    class DuplicateAssociationError < StandardError
+    end
+
   end
 end

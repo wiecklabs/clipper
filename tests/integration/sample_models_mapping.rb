@@ -44,7 +44,7 @@ orm.map(Integration::SampleModels::Exhibit, "exhibits") do |exhibits, type|
 
   exhibits.key :id
 
-#  exhibits.many_to_one(:zoo, Integration::SampleModels::Zoo) do |exhibit, zoo|
-#    zoo.id.eq(exhibit.zoo_id)
-#  end
+  exhibits.many_to_one(:zoo, Integration::SampleModels::Zoo) do |exhibit, zoo|
+    zoo.id.eq(exhibit.zoo_id)
+  end
 end
