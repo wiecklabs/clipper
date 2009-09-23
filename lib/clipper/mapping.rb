@@ -44,6 +44,10 @@ module Clipper
       @repository.class.type_map
     end
 
+    def mappings
+      @repository.mappings
+    end
+
     def field(field_name, *repository_types)
       unless accessor = @target.accessors[field_name]
         raise ArgumentError.new("#{field_name.inspect} has not been delcared as an accessor on #{@target}")
