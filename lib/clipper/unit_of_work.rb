@@ -35,8 +35,11 @@ module Clipper
 
       @session.mappings[object.class].associations.each do |association|
         if association.is_a?(Clipper::Mapping::OneToMany)
-          association.get(object).each do |associated_object|
-            @session.enlist(associated_object)
+          collection = association.get(object)
+          if collection.loaded?
+            collection.each do |associated_object|
+              @session.enlist(associated_object)
+            end
           end
         end
       end
