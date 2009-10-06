@@ -130,14 +130,13 @@ module Clipper
             end
           end
 
-          if self.__session__
-            new_value.each do |item|
-              association.set_key(self, item)
-              __session__.enlist(item)
-            end
+          collection = OneToManyCollection.new(association, self)
+
+          new_value.each do |item|
+            collection << item
           end
 
-          instance_variable_set(association.instance_variable_name, OneToManyCollection.new(association, self, new_value))
+          instance_variable_set(association.instance_variable_name, collection)
         end
       end
     end
