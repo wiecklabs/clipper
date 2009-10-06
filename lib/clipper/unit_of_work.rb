@@ -35,11 +35,8 @@ module Clipper
 
       @session.mappings[object.class].associations.each do |association|
         if association.is_a?(Clipper::Mapping::OneToMany)
-          collection = association.get(object)
-          if collection.loaded?
-            collection.each do |associated_object|
-              @session.enlist(associated_object)
-            end
+          association.get(object).each_to_enlist do |associated_object|
+            @session.enlist(associated_object)
           end
         end
       end
@@ -109,9 +106,9 @@ module Clipper
             # Since we just created the instance, we need to ensure that all associated items know about
             # the new parent key
             collection.each do |instance|
-              association.get(instance).each do |associated_instance|
+              association.get(instance).each_to_enlist do |associated_instance|
                 association.set_key(instance, associated_instance)
-              end
+              end.finished_enlisting!
             end
           end
 

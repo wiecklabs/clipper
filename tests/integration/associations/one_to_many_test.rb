@@ -36,6 +36,92 @@ class Integration::OneToManyTest < Test::Unit::TestCase
 
   end
 
+  def test_each_to_enlist_yields_added_objects
+    zoo = Zoo.new('Dallas')
+    monkey = Exhibit.new('Zebra')
+    platypus = Exhibit.new('Platypus')
+    zoo.exhibits << monkey
+    zoo.exhibits << platypus
+
+    monkey_found = platypus_found = false
+    zoo.exhibits.each_to_enlist do |object|
+      if !monkey_found and object === monkey
+        monkey_found = true
+      end
+      if !platypus_found and object === platypus
+        platypus_found = true
+      end
+    end
+
+    assert(monkey_found)
+    assert(platypus_found)
+  end
+
+  def test_each_to_enlist_yields_setted_objects
+    zoo = Zoo.new('Dallas')
+    monkey = Exhibit.new('Zebra')
+    platypus = Exhibit.new('Platypus')
+    zoo.exhibits = [monkey, platypus]
+
+    monkey_found = platypus_found = false
+    zoo.exhibits.each_to_enlist do |object|
+      if !monkey_found and object === monkey
+        monkey_found = true
+      end
+      if !platypus_found and object === platypus
+        platypus_found = true
+      end
+    end
+
+    assert(monkey_found)
+    assert(platypus_found)
+  end
+
+  def test_each_to_enlist_does_not_yield_loaded_objects
+    zoo = Zoo.new('Dallas')
+    monkey = Exhibit.new('Zebra')
+    platypus = Exhibit.new('Platypus')
+    zoo.exhibits = [monkey, platypus]
+    orm.save(zoo)
+
+    zoo = orm.get(Zoo, 0)
+    monkey_found = platypus_found = false
+    zoo.exhibits.each_to_enlist do |object|
+      if !monkey_found and object === monkey
+        monkey_found = true
+      end
+      if !platypus_found and object === platypus
+        platypus_found = true
+      end
+    end
+
+    assert(!monkey_found)
+    assert(!platypus_found)
+  end
+
+  def test_each_to_enlist_works_with_loaded_and_new_objects
+    zoo = Zoo.new('Dallas')
+    monkey = Exhibit.new('Zebra')
+    platypus = Exhibit.new('Platypus')
+    zoo.exhibits = [monkey]
+    orm.save(zoo)
+
+    zoo = orm.get(Zoo, 0)
+    zoo.exhibits << platypus
+    monkey_found = platypus_found = false
+    zoo.exhibits.each_to_enlist do |object|
+      if !monkey_found and object === monkey
+        monkey_found = true
+      end
+      if !platypus_found and object === platypus
+        platypus_found = true
+      end
+    end
+
+    assert(!monkey_found)
+    assert(platypus_found)
+  end
+
   def test_saving_all_new_objects
     orm do |session|
       zoo = Zoo.new('Dallas')
@@ -132,5 +218,16 @@ class Integration::OneToManyTest < Test::Unit::TestCase
     zoo = orm.get(Zoo, 0)
     assert_equal(1, zoo.exhibits.size)
     assert_equal(4, orm.all(Exhibit).size)
+  end
+
+  def test_clears_to_enlist_after_saving
+    zoo = Zoo.new('Dallas')
+    zoo.exhibits << Exhibit.new('Sample')
+    orm.save(zoo)
+
+    zoo.exhibits.each_to_enlist do |object|
+      fail('collection not cleared')
+    end
+    assert(true)
   end
 end

@@ -9,7 +9,7 @@ module Clipper
         
         @association = association
         @parent = parent
-        @collection = children
+        @to_enlist = @collection = children
         @mapping = association.associated_mapping
       end
 
@@ -18,17 +18,27 @@ module Clipper
       end
 
       def add(item)
-        load! unless loaded?
         super
 
         if @parent.__session__
           @association.set_key(@parent, item)
           @parent.__session__.enlist(item)
+        else
+          @to_enlist << item
         end
 
         item
       end
       alias << add
+
+      def each_to_enlist
+        @to_enlist.each { |item| yield item }
+        self
+      end
+
+      def finished_enlisting!
+        @to_enlist = []
+      end
 
       def each
         load! unless loaded?
@@ -46,7 +56,7 @@ module Clipper
         if @parent.__session__
           criteria = @association.match_criteria.call(@parent, Clipper::Query::Criteria.new(@mapping))
 
-          @collection = @parent.__session__.find(@mapping, criteria.__options__, criteria.__conditions__)
+          @collection = @parent.__session__.find(@mapping, criteria.__options__, criteria.__conditions__) | @to_enlist
         end
 
         @loaded = true
@@ -113,7 +123,7 @@ module Clipper
         target.send(:define_method, association.setter) do |new_value|
           raise ArgumentError.new("#{self.class}.#{association.setter} only accepts enumerables") unless new_value.is_a?(Enumerable)
 
-          if (items = self.send(association.getter)) and __session__
+          if __session__ and (items = self.send(association.getter))
             items.each do |item|
               association.unlink(self, item)
               __session__.enlist(item)
