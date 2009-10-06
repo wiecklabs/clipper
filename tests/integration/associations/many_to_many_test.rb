@@ -86,8 +86,8 @@ class Integration::ManyToManyTest < Test::Unit::TestCase
   end
 
   def test_multiple_appends
-    flunk "Multiple appends is broken because of ManyToMany's #add implementation"
-
+    flunk "Multiple appends is broken because of ManyToMany's #load implementation"
+    
     exhibit1 = Exhibit.new('Human Baby')
     exhibit2 = Exhibit.new('Dog')
 

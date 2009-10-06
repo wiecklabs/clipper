@@ -44,10 +44,10 @@ module Clipper
       @session.mappings[object.class].associations.each do |association|
         if association.is_a?(Clipper::Mapping::ManyToMany)
 
-          association.get(object).each do |associated_object, link|
+          association.get(object).each_to_enlist do |associated_object, link|
             @session.enlist(associated_object)
             @session.enlist(link)
-          end
+          end.finished_enlisting!
         end
       end
 

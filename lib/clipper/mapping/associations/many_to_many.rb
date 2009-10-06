@@ -3,20 +3,33 @@ module Clipper
 
     class ManyToManyCollection < ::Clipper::Collection
 
-      def initialize(association, parent, children, links)
+      def initialize(association, parent, children = nil)
+        @loaded = !children.nil?
+        children = [] if children.nil?
+        
         @association = association
         @parent = parent
         @collection = children
-        @links = links
+        @links = []
+        @to_enlist = []
         @mapping = association.associated_mapping
       end
 
-      def add(item, link)
-        @collection << item
-        @links << link
+      def loaded?
+        @loaded
+      end
 
-        @parent.__session__.enlist(item) if @parent.__session__
-        @parent.__session__.enlist(link) if @parent.__session__
+      def add(item)
+        @collection << item
+        link = @association.target.new(@parent, item)
+
+        if @parent.__session__
+          @parent.__session__.enlist(item)
+          @parent.__session__.enlist(link)
+        else
+          @to_enlist << item
+          @links << link
+        end
 
         @association.set_key(@parent, item, link)
 
@@ -24,10 +37,36 @@ module Clipper
       end
       alias << add
 
-      def each
-        @collection.zip(@links).each do |item, link|
+      def each_to_enlist
+        @to_enlist.zip(@links).each do |item, link|
           yield item, link
         end
+        self
+      end
+
+      def finished_enlisting!
+        @to_enlist = []
+        @links = []
+      end
+
+      def size
+        load! unless loaded?
+        @collection.size
+      end
+
+      def each
+        load! unless loaded?
+        @collection.each { |item| yield item }
+      end
+
+      protected
+
+      def load!
+        if @parent.__session__
+          @collection = @association.load(@parent) | @to_enlist
+        end
+
+        @loaded = true
       end
 
     end
@@ -202,11 +241,7 @@ module Clipper
           if data = instance_variable_get(association.instance_variable_name)
             data
           else
-            if __session__
-              instance_variable_set(association.instance_variable_name, ManyToManyCollection.new(association, self, association.load(self), []))
-            else
-              instance_variable_set(association.instance_variable_name, ManyToManyCollection.new(association, self, [], [])) #Collection.new(association.associated_mapping, [])))
-            end
+            instance_variable_set(association.instance_variable_name, ManyToManyCollection.new(association, self))
           end
 
         end
@@ -220,14 +255,10 @@ module Clipper
             end
           end
 
-          collection = ManyToManyCollection.new(association, self, [], [])
+          collection = ManyToManyCollection.new(association, self)
 
           new_value.each do |item|
-            association_link = association.target.new(self, item)
-            # association.set_key(self, item, association_link)
-            # self.__session__.enlist(association_link) if self.__session__
-
-            collection.add(item, association_link)
+            collection << item
           end
 
           instance_variable_set(association.instance_variable_name, collection)
