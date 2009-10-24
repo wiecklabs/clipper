@@ -119,6 +119,7 @@ module Clipper
       results.each do |result|
         result.instance_variable_set("@__session__", self)
         self.identity_map.add(result)
+        self.unit_of_work.register_clean(result)
       end
 
       results

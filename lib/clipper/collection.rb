@@ -47,5 +47,10 @@ module Clipper
       entries[index]
     end
 
+    def |(items)
+      @collection | items
+      self
+    end
+
   end
 end

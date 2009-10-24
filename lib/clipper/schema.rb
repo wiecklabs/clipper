@@ -7,10 +7,10 @@ module Clipper
     def create(mapped_class)
       mapping = @repository.mappings[mapped_class]
       raise UnmappedClassError.new() if mapping.nil?
-#      mapping.associations.each do |association|
-#        next unless association.is_a?(Clipper::Mappings::ManyToMany)
-#        @repository.schema.create(association.target_mapping)
-#      end
+      mapping.associations.each do |association|
+        next unless association.is_a?(Clipper::Mapping::ManyToMany)
+        @repository.schema.create(association.target_mapping)
+      end
       @repository.schema.create(mapping)
     end
 
@@ -21,10 +21,10 @@ module Clipper
 
     def destroy(mapped_class)
       mapping = @repository.mappings[mapped_class]
-#      mapping.associations.each do |association|
-#        next unless association.is_a?(Clipper::Mappings::ManyToMany)
-#        @repository.schema.destroy(association.target_mapping)
-#      end
+      mapping.associations.each do |association|
+        next unless association.is_a?(Clipper::Mapping::ManyToMany)
+        @repository.schema.destroy(association.target_mapping)
+      end
       @repository.schema.destroy(mapping)
     end
 

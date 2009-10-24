@@ -16,7 +16,7 @@ module Clipper
       field
     end
 
-    attr_reader :signatures, :accessors, :types, :name, :fields, :target
+    attr_reader :signatures, :accessors, :types, :name, :fields, :target, :associations
 
     def initialize(repository, target, name)
       unless repository.is_a?(Clipper::Repository) && target.is_a?(Class) && name.is_a?(String)
@@ -36,11 +36,16 @@ module Clipper
 
       @signatures = java.util.LinkedHashSet.new
       @accessors = java.util.LinkedHashSet.new
+      @associations = java.util.LinkedHashSet.new
       @types = java.util.LinkedHashSet.new
     end
 
     def type_map
       @repository.class.type_map
+    end
+
+    def mappings
+      @repository.mappings
     end
 
     def field(field_name, *repository_types)
@@ -85,12 +90,45 @@ module Clipper
       keys.include?(field)
     end
 
+    def one_to_many(name, mapped_name, &match_criteria)
+      add_association OneToMany.new(self, name, mapped_name, &match_criteria)
+    end
+
+    def many_to_one(name, mapped_name, &match_criteria)
+      add_association ManyToOne.new(self, name, mapped_name, &match_criteria)
+    end
+
+    def many_to_many(name, mapped_name, join_mapping_name)
+      add_association ManyToMany.new(@repository, self, name, mapped_name, join_mapping_name)
+    end
+
+    def property(field_name, property_type, *repository_types)
+      @target.accessor field_name => property_type
+      field(field_name, *repository_types)
+    end
+
     private
+
+    def add_association(association)
+      if @associations.include?(association)
+        raise DuplicateAssociationError.new("Association #{association} is already a member of Mapping #{name.inspect}")
+      else
+        @associations << association
+        association.class.bind!(association, target)
+        association
+      end
+    end
+
+    class UnmappedClassError < StandardError
+    end
 
     class UnmappedFieldError < StandardError
     end
 
     class NoKeyError < StandardError
+    end
+
+    class DuplicateAssociationError < StandardError
     end
 
   end

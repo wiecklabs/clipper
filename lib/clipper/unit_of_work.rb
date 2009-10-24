@@ -22,34 +22,34 @@ module Clipper
         return
       end
 
-#      @session.mappings[object.class].associations.each do |association|
-#        if association.is_a?(Clipper::Mappings::ManyToOne)
-#          if (associated_object = association.get(object))
-#            @session.enlist(associated_object)
-#          end
-#        end
-#      end
+      @session.mappings[object.class].associations.each do |association|
+        if association.is_a?(Clipper::Mapping::ManyToOne)
+          if (associated_object = association.get(object))
+            @session.enlist(associated_object)
+          end
+        end
+      end
 
       # Add CREATE ZooKeeper
       @work_orders << new_work_order
 
-#      @session.mappings[object.class].associations.each do |association|
-#        if association.is_a?(Clipper::Mappings::OneToMany)
-#          association.get(object).each do |associated_object|
-#            @session.enlist(associated_object)
-#          end
-#        end
-#      end
-#
-#      @session.mappings[object.class].associations.each do |association|
-#        if association.is_a?(Clipper::Mappings::ManyToMany)
-#
-#          association.get(object).each do |associated_object, link|
-#            @session.enlist(associated_object)
-#            @session.enlist(link)
-#          end
-#        end
-#      end
+      @session.mappings[object.class].associations.each do |association|
+        if association.is_a?(Clipper::Mapping::OneToMany)
+          association.get(object).each_to_enlist do |associated_object|
+            @session.enlist(associated_object)
+          end
+        end
+      end
+
+      @session.mappings[object.class].associations.each do |association|
+        if association.is_a?(Clipper::Mapping::ManyToMany)
+
+          association.get(object).each_to_enlist do |associated_object, link|
+            @session.enlist(associated_object)
+            @session.enlist(link)
+          end.finished_enlisting!
+        end
+      end
 
       execute if @flush_immediately
     end
@@ -89,29 +89,28 @@ module Clipper
         when :create, :update then
           collection = work_order[1].is_a?(Collection) ? work_order[1] : Collection.new(@session.mappings[work_order[1].class], [work_order[1]].flatten)
 
-#          @session.mappings[work_order[1].class].associations.each do |association|
-#            next unless association.is_a?(Clipper::Mappings::ManyToOne)
-#
-#            collection.each do |instance|
-#              if (associated_object = association.get(instance))
-#                association.set_key(instance, associated_object)
-#              end
-#            end
-#          end
+          @session.mappings[work_order[1].class].associations.each do |association|
+            next unless association.is_a?(Clipper::Mapping::ManyToOne)
+
+            collection.each do |instance|
+              if (associated_object = association.get(instance))
+                association.set_key(instance, associated_object)
+              end
+            end
+          end
 
           @session.repository.send(work_order[0], collection, @session)
 
-#          @session.mappings[work_order[1].class].associations.each do |association|
-#            next unless association.is_a?(Clipper::Mappings::OneToMany)
-#
-#            # Since we just created the instance, we need to ensure that all associated items know about
-#            # the new parent key
-#            collection.each do |instance|
-#              association.get(instance).each do |associated_instance|
-#                association.set_key(instance, associated_instance)
-#              end
-#            end
-#          end
+          @session.mappings[work_order[1].class].associations.each do |association|
+            next unless association.is_a?(Clipper::Mapping::OneToMany)
+            # Since we just created the instance, we need to ensure that all associated items know about
+            # the new parent key
+            collection.each do |instance|
+              association.get(instance).each_to_enlist do |associated_instance|
+                association.set_key(instance, associated_instance)
+              end.finished_enlisting!
+            end
+          end
 
         when :delete then
           collection = work_order[1].is_a?(Collection) ? work_order[1] : Collection.new(@session.mappings[work_order[1].class], [work_order[1]].flatten)

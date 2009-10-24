@@ -1,9 +1,11 @@
 module Clipper
-  class Mappings
+  class Mapping
 
     class ManyToOne < Association
 
       def initialize(mapping, name, mapped_name, &match_criteria)
+        raise ArgumentError.new("You must pass a block containing a criteria expression for '#{mapping.name} has_many #{name}'") unless match_criteria
+
         @mapping = mapping
         @name = name
         @mapped_name = mapped_name
@@ -27,7 +29,7 @@ module Clipper
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
         conditions = criteria.__conditions__
-        conditions.value.field.set(parent, conditions.field.get(child))
+        conditions.value.field.accessor.set(parent, conditions.field.accessor.get(child))
       end
 
       def unlink(parent)
@@ -35,7 +37,7 @@ module Clipper
         criteria = self.match_criteria.call(mapping_criteria, Clipper::Query::Criteria.new(self.associated_mapping))
 
         c = criteria.__conditions__
-        c.value.field.set(parent, nil)
+        c.value.field.accessor.set(parent, nil)
       end
 
       def self.bind!(association, target)

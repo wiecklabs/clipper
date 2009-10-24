@@ -1,22 +1,35 @@
 module Clipper
-  class Mappings
+  class Mapping
 
     class ManyToManyCollection < ::Clipper::Collection
 
-      def initialize(association, parent, children, links)
+      def initialize(association, parent, children = nil)
+        @loaded = !children.nil?
+        children = [] if children.nil?
+        
         @association = association
         @parent = parent
         @collection = children
-        @links = links
+        @links = []
+        @to_enlist = []
         @mapping = association.associated_mapping
       end
 
-      def add(item, link)
-        @collection << item
-        @links << link
+      def loaded?
+        @loaded
+      end
 
-        @parent.__session__.enlist(item) if @parent.__session__
-        @parent.__session__.enlist(link) if @parent.__session__
+      def add(item)
+        @collection << item
+        link = @association.target.new(@parent, item)
+
+        if @parent.__session__
+          @parent.__session__.enlist(item)
+          @parent.__session__.enlist(link)
+        else
+          @to_enlist << item
+          @links << link
+        end
 
         @association.set_key(@parent, item, link)
 
@@ -24,17 +37,44 @@ module Clipper
       end
       alias << add
 
-      def each
-        @collection.zip(@links).each do |item, link|
+      def each_to_enlist
+        @to_enlist.zip(@links).each do |item, link|
           yield item, link
         end
+        self
+      end
+
+      def finished_enlisting!
+        @to_enlist = []
+        @links = []
+      end
+
+      def size
+        load! unless loaded?
+        @collection.size
+      end
+
+      def each
+        load! unless loaded?
+        @collection.each { |item| yield item }
+      end
+
+      protected
+
+      def load!
+        if @parent.__session__
+          @collection = @association.load(@parent) | @to_enlist
+        end
+
+        @loaded = true
       end
 
     end
 
     class ManyToMany < Association
 
-      def initialize(mapping, name, mapped_name, target_mapping_name)
+      def initialize(repository, mapping, name, mapped_name, target_mapping_name)
+        @repository = repository
         @mapping = mapping
         @name = name
         @mapped_name = mapped_name
@@ -52,7 +92,7 @@ module Clipper
 
         begin
           setup_join_map
-        rescue Clipper::Mappings::UnmappedClassError
+        rescue Clipper::Mapping::UnmappedClassError
           # setup_join_map failed because the mapping referenced by "mapped_name" doesn't exist yet
           # this callback registartion lets just recieve a notification when the map is added
           # so we can finish creating our join map
@@ -66,36 +106,39 @@ module Clipper
         "#{field.mapping.name}_#{field.name}"
       end
 
-      class ValueProxy < Clipper::Mappings::ValueProxy
-        def initialize(type, instance, join_field, key_field)
-          @type = type
-          @instance = instance
-          @join_field = join_field
-          @key_field = key_field
-          super(join_field)
-        end
-
-        def get
-          @instance.send(@type) ? set(@key_field.get(@instance.send(@type))) : @value
-        end
-
-      end
+#      class ValueProxy < Clipper::Mapping::ValueProxy
+#        def initialize(type, instance, join_field, key_field)
+#          @type = type
+#          @instance = instance
+#          @join_field = join_field
+#          @key_field = key_field
+#          super(join_field)
+#        end
+#
+#        def get
+#          @instance.send(@type) ? set(@key_field.get(@instance.send(@type))) : @value
+#        end
+#
+#      end
 
       def setup_join_map
-        @target_mapping = Mapping.new(@mapping.mappings, @target, @target_mapping_name)
+        @repository.mappings[@target] = @target_mapping = Clipper::Mapping.map(@repository, @target, @target_mapping_name)
+        keys = []
 
         # Builds a hash of Source Key Field -> Anonymous Key Field
         key_field_map = @key_field_map = (mapping.keys.entries + associated_mapping.keys.entries).inject({}) do |map, key_field|
-          type = case key_field.type
-            when Clipper::Types::Serial then
-              Clipper::Types::Integer
-            else
-              key_field.type
-            end
-
           join_key_field_name = key_field_name(key_field)
+          
+          type = if key_field.type.is_a?(@repository.class::Types::Serial)
+            @repository.class::Types::Integer.new
+          else
+            key_field.type
+          end
 
-          map[key_field] = target_mapping.field(join_key_field_name, type, key_field.default)
+          target_mapping.property(join_key_field_name.to_sym, key_field.accessor.type, type)#.default)
+
+          map[key_field] = target_mapping[join_key_field_name.to_sym]
+          keys << join_key_field_name.to_sym
           map
         end
 
@@ -110,7 +153,7 @@ module Clipper
           key_field, join_key_field = nil
 
           if !var && key_field_map.detect { |key_field, join_key_field| "@#{join_key_field.name}" == name }
-            var = ValueProxy.new((key_field.mapping == mapping ? :parent : :child), self, join_key_field, key_field)
+            var = key_field.accessor.get(self.send((key_field.mapping == mapping ? :parent : :child)))
             instance_variable_set("@#{join_key_field.name}", var)
           end
 
@@ -118,10 +161,7 @@ module Clipper
         end
 
         # Many-To-Many key spans each field in the table
-        @target_mapping.key(*@key_field_map.values)
-
-        # Register our "anonymous" mapping
-        mapping.mappings << @target_mapping
+        @target_mapping.key(*keys)
       end
 
       # The "parent" mapping
@@ -143,11 +183,11 @@ module Clipper
 
       def set_key(parent, child, link)
         mapping.keys.each do |key_field|
-          @key_field_map[key_field].set(link, key_field.get(parent))
+          @key_field_map[key_field].accessor.set(link, key_field.accessor.get(parent))
         end
 
         associated_mapping.keys.each do |key_field|
-          @key_field_map[key_field].set(link, key_field.get(child))
+          @key_field_map[key_field].accessor.set(link, key_field.accessor.get(child))
         end
       end
 
@@ -164,7 +204,7 @@ module Clipper
         self.mapping.keys.each do |key_field|
           join_key_field = @key_field_map[key_field]
 
-          criteria.send(join_key_field.name.to_sym).send(:eq, key_field.get(instance))
+          criteria.send(join_key_field.name.to_sym).send(:eq, key_field.accessor.get(instance))
         end
 
         instance.__session__.find(self.target, criteria.__options__, criteria.__conditions__)
@@ -198,15 +238,10 @@ module Clipper
 
       def self.bind!(association, target)
         target.send(:define_method, association.getter) do
-
           if data = instance_variable_get(association.instance_variable_name)
             data
           else
-            if __session__
-              instance_variable_set(association.instance_variable_name, ManyToManyCollection.new(association, self, association.load(self), []))
-            else
-              instance_variable_set(association.instance_variable_name, ManyToManyCollection.new(association, self, [], [])) #Collection.new(association.associated_mapping, [])))
-            end
+            instance_variable_set(association.instance_variable_name, ManyToManyCollection.new(association, self))
           end
 
         end
@@ -220,14 +255,10 @@ module Clipper
             end
           end
 
-          collection = ManyToManyCollection.new(association, self, [], [])
+          collection = ManyToManyCollection.new(association, self)
 
           new_value.each do |item|
-            association_link = association.target.new(self, item)
-            # association.set_key(self, item, association_link)
-            # self.__session__.enlist(association_link) if self.__session__
-
-            collection.add(item, association_link)
+            collection << item
           end
 
           instance_variable_set(association.instance_variable_name, collection)
